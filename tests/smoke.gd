@@ -34,6 +34,7 @@ func run_tests() -> void:
 	check(game.camera.current, "Camera is active")
 	check(game.targets.size() == 3, "Three test targets spawn")
 	check(game.ammo == 5, "Starting magazine has five rounds")
+	check(game.reserve_ammo == 20, "Starting reserve has twenty rounds")
 	check(not game.intel and not game.finished, "Mission starts incomplete")
 	for i in range(90):
 		await physics_frame
@@ -48,12 +49,46 @@ func run_tests() -> void:
 	press(game, KEY_E)
 	check(game.intel, "Nearby terminal grants intel")
 	check(not game.finished, "Intel collection does not immediately extract")
+	check(not game.begin_reload(), "Full magazine rejects reload")
 	game.ammo = 0
 	press(game, KEY_R)
-	check(game.ammo == 5, "Development refill restores magazine")
-	game.player.position = Vector3(0, 1, 3)
+	check(game.ammo == 0 and game.reload_remaining > 0.0, "Reload is not instantaneous")
+	check(not game.can_fire(), "Reload blocks firing")
+	check(not game.begin_reload(), "Duplicate reload is rejected")
+	game.advance_weapon(1.0)
+	check(game.ammo == 0, "Incomplete reload transfers no ammunition")
+	press(game, KEY_ESCAPE)
+	check(game.paused, "Escape pauses game")
+	var remaining: float = game.reload_remaining
+	var location: Vector3 = game.player.position
+	game.advance_weapon(10.0)
+	game._physics_process(1.0)
+	check(game.reload_remaining == remaining, "Pause freezes reload timer")
+	check(game.player.position == location, "Pause freezes player simulation")
+	check(game.hud.text.contains("PAUSED"), "Pause is displayed")
+	press(game, KEY_ESCAPE)
+	check(not game.paused, "Escape resumes game")
+	game.advance_weapon(3.0)
+	check(game.ammo == 5 and game.reserve_ammo == 15, "Reload consumes reserve ammunition")
+	check(game.can_fire(), "Loaded rifle can fire")
+	game.shot_remaining = 0.9
+	check(not game.can_fire(), "Bolt cycle blocks firing")
+	game.advance_weapon(1.0)
+	check(game.can_fire(), "Bolt cycle expires")
+	game.ammo = 4
+	game.reserve_ammo = 1
+	check(game.begin_reload(), "Partial reload starts")
+	game.advance_weapon(3.0)
+	check(game.ammo == 5 and game.reserve_ammo == 0, "Partial reload conserves ammunition")
+	game.ammo = 0
+	check(not game.begin_reload(), "Empty reserve prevents reload")
+	check(not game.can_fire(), "Empty magazine prevents firing")
+	game.player.position = Vector3(0, -20, 0)
+	game._physics_process(0.0)
+	check(game.player.position == Vector3(0, 1, 3), "Falling off map recovers player")
 	press(game, KEY_E)
 	check(game.finished, "Returning with intel completes mission")
+	check(not game.can_fire(), "Completed mission prevents firing")
 	await physics_frame
 	await process_frame
 	check(game.hud.text.contains("MISSION COMPLETE"), "HUD reports mission completion")
