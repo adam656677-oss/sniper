@@ -1,0 +1,48 @@
+name: Windows runtime smoke test
+on:
+  workflow_run:
+    workflows: [Validate and build]
+    types: [completed]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  startup:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download build from successful validation run
+        uses: actions/download-artifact@v4
+        with:
+          name: EchoRidge-Windows-development
+          path: game
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+      - name: Launch exported game for 120 headless frames
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force reports | Out-Null
+          $exe = Join-Path $PWD 'game/EchoRidge.exe'
+          $log = Join-Path $PWD 'reports/windows-runtime.log'
+          if (!(Test-Path $exe)) { throw 'Windows executable missing' }
+          $process = Start-Process -FilePath $exe -ArgumentList @('--headless', '--quit-after', '120', '--log-file', ('"' + $log + '"')) -PassThru
+          if (!$process.WaitForExit(90000)) {
+            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            throw 'Game did not exit within 90 seconds'
+          }
+          $process.Refresh()
+          if ($process.ExitCode -ne 0) { throw "Game exited with code $($process.ExitCode)" }
+          if (!(Test-Path $log)) { throw 'Runtime log was not created' }
+          Get-Content $log
+          if (Select-String -Path $log -Pattern 'SCRIPT ERROR:|ERROR:' -Quiet) { throw 'Runtime errors found' }
+          if (!(Select-String -Path $log -Pattern 'Godot Engine' -Quiet)) { throw 'Engine startup banner missing' }
+      - name: Upload Windows runtime log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-runtime-logs
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
