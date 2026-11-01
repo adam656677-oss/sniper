@@ -8,6 +8,14 @@ var reload_remaining := 0.0
 var shot_remaining := 0.0
 var paused := false
 
+func set_paused(value: bool) -> void:
+	paused = value
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused or finished else Input.MOUSE_MODE_CAPTURED
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(player):
+		set_paused(true)
+
 func begin_reload() -> bool:
 	if paused or finished or reload_remaining > 0.0 or ammo >= MAGAZINE_SIZE or reserve_ammo <= 0:
 		return false
@@ -30,14 +38,13 @@ func can_fire() -> bool:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_ESCAPE:
-			paused = not paused
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused else Input.MOUSE_MODE_CAPTURED
-			return
 		if event.keycode == KEY_N:
 			get_tree().reload_current_scene()
 			return
-	if paused:
+		if event.keycode == KEY_ESCAPE:
+			set_paused(not paused)
+			return
+	if paused or finished:
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_R:
 		begin_reload()
@@ -50,6 +57,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			shot_remaining = SHOT_INTERVAL
 			return
 	super._unhandled_input(event)
+	if finished:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _physics_process(delta: float) -> void:
 	if paused:
