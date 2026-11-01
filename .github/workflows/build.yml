@@ -31,6 +31,14 @@ jobs:
           timeout 90s godot --headless --path . --script res://tests/smoke.gd 2>&1 | tee reports/smoke.log
           if grep -E 'SCRIPT ERROR:|ERROR:|FAIL:' reports/smoke.log; then exit 1; fi
           grep -q 'SMOKE TESTS PASSED' reports/smoke.log
+      - name: Validate focus and mission-completion regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          timeout 90s godot --headless --path . --script res://tests/focus.gd 2>&1 | tee reports/focus.log
+          if grep -E 'SCRIPT ERROR:|ERROR:|FAIL:' reports/focus.log; then exit 1; fi
+          grep -q 'FOCUS TESTS PASSED' reports/focus.log
       - name: Export Windows development build
         shell: bash
         run: |
