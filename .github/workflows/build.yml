@@ -1,0 +1,57 @@
+name: Validate and build
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Godot and export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://github.com/godotengine/godot-builds/releases/download/4.3-stable
+          curl --fail --location --retry 3 "$base/Godot_v4.3-stable_linux.x86_64.zip" -o /tmp/godot.zip
+          curl --fail --location --retry 3 "$base/Godot_v4.3-stable_export_templates.tpz" -o /tmp/templates.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          sudo install /tmp/godot/Godot_v4.3-stable_linux.x86_64 /usr/local/bin/godot
+          unzip -q /tmp/templates.zip -d /tmp/godot-templates
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable"
+          cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.3.stable/"
+          godot --version
+      - name: Import and validate mission
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          timeout 90s godot --headless --path . --editor --quit 2>&1 | tee reports/import.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' reports/import.log; then exit 1; fi
+          timeout 90s godot --headless --path . --script res://tests/smoke.gd 2>&1 | tee reports/smoke.log
+          if grep -E 'SCRIPT ERROR:|ERROR:|FAIL:' reports/smoke.log; then exit 1; fi
+          grep -q 'SMOKE TESTS PASSED' reports/smoke.log
+      - name: Export Windows development build
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p builds/windows
+          timeout 180s godot --headless --path . --export-debug "Windows Desktop" builds/windows/EchoRidge.exe 2>&1 | tee reports/export.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' reports/export.log; then exit 1; fi
+          test -s builds/windows/EchoRidge.exe
+          test -s builds/windows/EchoRidge.pck
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: EchoRidge-Windows-development
+          path: builds/windows/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-logs
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
