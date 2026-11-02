@@ -5,7 +5,13 @@ var camera: Camera3D
 var hud: Label
 var intel := false
 var finished := false
+var paused := false
 var ammo := 5
+var reserve := 20
+var reload_remaining := 0.0
+var cooldown := 0.0
+var shot_requested := false
+var shots := 0
 var targets: Array[StaticBody3D] = []
 
 func box(pos: Vector3, size: Vector3, color: Color) -> StaticBody3D:
@@ -55,50 +61,116 @@ func _ready() -> void:
 	player.add_child(camera)
 	var layer := CanvasLayer.new()
 	add_child(layer)
+	var screen := Control.new()
+	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	screen.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(screen)
 	hud = Label.new()
 	hud.position = Vector2(20, 20)
-	layer.add_child(hud)
+	screen.add_child(hud)
 	var crosshair := Label.new()
 	crosshair.text = "+"
+	screen.add_child(crosshair)
 	crosshair.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	layer.add_child(crosshair)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	update_hud()
+
+func start_reload() -> void:
+	if paused or finished or reload_remaining > 0 or ammo >= 5 or reserve <= 0:
+		return
+	reload_remaining = 2.0
+	shot_requested = false
+
+func advance_weapon(delta: float) -> void:
+	if paused or finished:
+		return
+	cooldown = maxf(0.0, cooldown - maxf(0.0, delta))
+	if reload_remaining > 0:
+		reload_remaining = maxf(0.0, reload_remaining - maxf(0.0, delta))
+		if reload_remaining == 0:
+			var rounds := mini(5 - ammo, reserve)
+			ammo += rounds
+			reserve -= rounds
+
+func can_fire() -> bool:
+	return not paused and not finished and ammo > 0 and cooldown <= 0 and reload_remaining <= 0
+
+func perform_shot() -> void:
+	if not can_fire():
+		return
+	ammo -= 1
+	shots += 1
+	cooldown = 1.0
+	var start := camera.global_position
+	var query := PhysicsRayQueryParameters3D.create(start, start - camera.global_basis.z * 300)
+	query.exclude = [player.get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit and hit.collider in targets:
+		targets.erase(hit.collider)
+		hit.collider.queue_free()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ESCAPE:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		if event.keycode == KEY_R:
-			ammo = 5
+			paused = not paused
+			shot_requested = false
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused else Input.MOUSE_MODE_CAPTURED
+			update_hud()
+			return
 		if event.keycode == KEY_N:
 			get_tree().reload_current_scene()
-		if event.keycode == KEY_E and not finished:
+			return
+		if paused or finished:
+			return
+		if event.keycode == KEY_R:
+			start_reload()
+		if event.keycode == KEY_E:
 			if player.position.distance_to(Vector3(0, 1, -60)) < 3:
 				intel = true
 			if intel and player.position.distance_to(Vector3(0, 1, 3)) < 3:
 				finished = true
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not finished:
-		player.rotate_y(-event.relative.x * 0.002)
-		camera.rotation.x = clampf(camera.rotation.x - event.relative.y * 0.002, -1.4, 1.4)
+				shot_requested = false
+	if event is InputEventMouseMotion and not paused and not finished:
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			var sensitivity := 0.0007 if camera.fov < 30 else 0.002
+			player.rotate_y(-event.relative.x * sensitivity)
+			camera.rotation.x = clampf(camera.rotation.x - event.relative.y * sensitivity, -1.4, 1.4)
 	if event is InputEventMouseButton and event.pressed:
-		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		if paused or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+			if event.button_index == MOUSE_BUTTON_LEFT:
+				paused = false
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			return
+		if finished:
 			return
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			camera.fov = 25.0 if camera.fov > 30 else 75.0
-		if event.button_index == MOUSE_BUTTON_LEFT and ammo > 0 and not finished:
-			ammo -= 1
-			var start := camera.global_position
-			var query := PhysicsRayQueryParameters3D.create(start, start - camera.global_basis.z * 300)
-			query.exclude = [player.get_rid()]
-			var hit := get_world_3d().direct_space_state.intersect_ray(query)
-			if hit and hit.collider in targets:
-				targets.erase(hit.collider)
-				hit.collider.queue_free()
+		if event.button_index == MOUSE_BUTTON_LEFT and can_fire():
+			shot_requested = true
+
+func update_hud() -> void:
+	var objective := "Return to green extraction marker; press E" if intel else "Reach gold terminal ahead; press E"
+	if finished:
+		objective = "MISSION COMPLETE — N to restart"
+	elif paused:
+		objective = "PAUSED — Escape or left click to resume"
+	var weapon_status := "RELOADING %.1fs" % reload_remaining if reload_remaining > 0 else "READY"
+	if cooldown > 0 and reload_remaining <= 0:
+		weapon_status = "CYCLING BOLT"
+	if ammo == 0 and reload_remaining <= 0:
+		weapon_status = "EMPTY — R to reload"
+	hud.text = "ECHO RIDGE | Native 3D prototype\n%s\nAmmo: %d / %d | %s | Targets: %d | Shots: %d\nWASD move | Mouse aim | Left fire | Right zoom\nR reload | E interact | Escape pause | N restart" % [objective, ammo, reserve, weapon_status, targets.size(), shots]
 
 func _physics_process(delta: float) -> void:
+	update_hud()
+	if paused or finished:
+		return
+	advance_weapon(delta)
+	if shot_requested:
+		shot_requested = false
+		perform_shot()
 	var direction := Vector3.ZERO
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not finished:
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		direction = Vector3(float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A)), 0, float(Input.is_physical_key_pressed(KEY_S)) - float(Input.is_physical_key_pressed(KEY_W)))
 		direction = player.basis * direction.normalized()
 	player.velocity.x = direction.x * 5
@@ -108,7 +180,3 @@ func _physics_process(delta: float) -> void:
 	else:
 		player.velocity.y = 0
 	player.move_and_slide()
-	var objective := "Return to green extraction marker; press E" if intel else "Reach gold terminal ahead; press E"
-	if finished:
-		objective = "MISSION COMPLETE — N to restart"
-	hud.text = "ECHO RIDGE | Native 3D foundation\n%s\nAmmo: %d | Targets: %d\nWASD move | Mouse aim | Left click fire | Right click zoom\nR refill | E interact | Escape release mouse | N restart" % [objective, ammo, targets.size()]
