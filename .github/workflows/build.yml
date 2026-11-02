@@ -39,6 +39,16 @@ jobs:
           timeout 90s godot --headless --path . --script res://tests/focus.gd 2>&1 | tee reports/focus.log
           if grep -E 'SCRIPT ERROR:|ERROR:|FAIL:' reports/focus.log; then exit 1; fi
           grep -q 'FOCUS TESTS PASSED' reports/focus.log
+      - name: Require ballistic and projectile integration tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s godot --headless --path . --script res://tests/ballistics_test.gd 2>&1 | tee reports/ballistics.log
+          if grep -E 'SCRIPT ERROR:|ERROR:|FAIL:' reports/ballistics.log; then exit 1; fi
+          grep -q 'Ballistics: 8 checks, 0 failures' reports/ballistics.log
+          timeout 90s godot --headless --path . --script res://tests/projectiles.gd 2>&1 | tee reports/projectiles.log
+          if grep -E 'SCRIPT ERROR:|ERROR:|FAIL:' reports/projectiles.log; then exit 1; fi
+          grep -q 'PROJECTILE TESTS PASSED' reports/projectiles.log
       - name: Export Windows development build
         shell: bash
         run: |
