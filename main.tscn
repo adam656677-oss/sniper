@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://projectile_gameplay.gd" id="1"]
+[ext_resource type="Script" path="res://scope_overlay.gd" id="2"]
 
 [node name="EchoRidge" type="Node3D"]
 script = ExtResource("1")
+
+[node name="ScopeLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="ScopeOverlay" type="Control" parent="ScopeLayer"]
+visible = false
+mouse_filter = 2
+script = ExtResource("2")
