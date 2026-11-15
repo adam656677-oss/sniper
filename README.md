@@ -18,8 +18,10 @@ Planning and status live in `docs/`:
 | `autoload/game_state.gd` | `GameState` autoload: paused, finished, intel, mission signals |
 | `scenes/player/` | First-person body and camera |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
-| `scenes/levels/test_range.tscn` | The test range level; targets are children of `Targets` |
-| `scenes/targets/` | `TargetDummy` with hit zones |
+| `scenes/levels/level_base.gd` | Level contract: spawn, wind, targets, interact, objective, completion |
+| `scenes/levels/test_range.tscn` | The intel mission level; targets are children of `Targets` |
+| `scenes/levels/shooting_range.tscn` | The 1000 m plate range |
+| `scenes/targets/` | `TargetDummy` with hit zones, `SteelPlate` range target |
 | `scenes/weapons/aim_sway.gd` | Breath-hold and sway model |
 | `scenes/ui/hud.gd`, `scope_overlay.gd` | HUD label and scope reticle |
 | `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
@@ -28,6 +30,13 @@ Planning and status live in `docs/`:
 ## Implemented
 
 Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets with head, torso and limb hit zones. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+
+## Scenes
+
+| Scene | What it is |
+|---|---|
+| `main.tscn` | Test range mission: collect intel at the terminal, extract. The default scene (F5). |
+| `range_mission.tscn` | 1000 m shooting range with a steel plate every 100 m on its own bearing. Open it and press F6. Rings every plate to complete. |
 
 ## Controls
 

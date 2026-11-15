@@ -43,7 +43,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 1.10 Sidearm: suppressed pistol with hitscan, for close range. Shotguns removed or kept as a mission-specific pickup. Verify: weapons test updated.
 - [ ] 1.11 Weapon animation: idle, aim in/out, fire with bolt cycle, reload, sprint, from Mixamo or hand-made. Verify: playtest; test that `AnimationPlayer` has required clips.
 - [ ] 1.12 Camera: head bob, recoil kick and recovery, FOV change on sprint, landing dip. Verify: playtest.
-- [ ] 1.13 Target range level: a 1000 m shooting range with distance markers, steel plates that ring and fall, wind variation. This is the tuning playground. Verify: playtest.
+- [x] 1.13 Target range level: a 1000 m shooting range with distance markers, steel plates that ring and fall, wind variation. This is the tuning playground. Verify: playtest.
 
 **Exit gate:** A playtester can hit a plate at 600 m using the scope, wind and drop cues without being told the numbers, and says the shot feels good.
 

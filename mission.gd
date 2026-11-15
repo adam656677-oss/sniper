@@ -3,7 +3,7 @@ extends Node3D
 # Mission root: wires the level, player, weapon rig and HUD together and
 # routes input to the right system. Simulation state lives in GameState.
 
-@onready var level: Node3D = $Level
+@onready var level: LevelBase = $Level
 @onready var player: Player = $Player
 @onready var weapon: WeaponRig = $WeaponRig
 @onready var hud: Label = $HUDLayer/HUD
@@ -57,10 +57,7 @@ func _notification(what: int) -> void:
 		GameState.set_paused(true)
 
 func interact() -> void:
-	if level.near_terminal(player.position):
-		GameState.collect_intel()
-	if GameState.intel and level.near_extraction(player.position):
-		GameState.finish_mission()
+	level.interact(player.position)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
@@ -101,7 +98,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			weapon.toggle_aim()
 
 func update_hud() -> void:
-	var objective := "Return to the green extraction marker and press E" if GameState.intel else "Reach the gold terminal ahead and press E"
+	var objective: String = level.objective_text()
 	if GameState.finished:
 		objective = "MISSION COMPLETE - N to restart"
 	elif GameState.paused:
@@ -140,6 +137,8 @@ func _physics_process(delta: float) -> void:
 	advance_sway(delta)
 	killcam.advance(delta)
 	measured_range = measure_range() if is_aiming() else -1.0
+	if not GameState.finished and level.is_complete():
+		GameState.finish_mission()
 	if GameState.finished:
 		weapon.projectiles.clear()
 	update_hud()
