@@ -1,0 +1,141 @@
+# Echo Ridge master checklist
+
+The ordered production checklist for taking Echo Ridge from the current broken prototype to a shippable single-player sniper game. Phases are sequential gates: do not start a phase until the previous phase's **exit gate** is met. Within a phase, items are ordered by dependency.
+
+Each item has a **verify** note. `test` means a headless `SceneTree` script in `tests/` that CI runs. `playtest` means a human on Windows. `review` means a documentation or code review in the pull request.
+
+Legend: `[ ]` not started, `[~]` in progress, `[x]` done and verified. Update this file in the same pull request as the work.
+
+Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Current state: `docs/STATUS.md`. Tools and access: `docs/TOOLING.md`.
+
+---
+
+## Phase 0: Repair and stabilise (the build must be green before anything else)
+
+- [ ] 0.1 Fix `scope_overlay.gd` parse error: `var hit := ...` becomes `var hit: Dictionary = ...`. Verify: import log has no `SCRIPT ERROR`.
+- [ ] 0.2 Resolve the duplicate members. Remove `paused`, `reload_remaining`, `cooldown`, `reserve`, `start_reload`, `can_fire`, `perform_shot` and the pause/reload handling from `main.gd`, restoring it to the world-building base, **or** complete 0.5 directly. Verify: `scripts/validate.sh` import step passes.
+- [ ] 0.3 Fix CI false positive in all three workflows: fail only on `SCRIPT ERROR:` and `FAIL:`, not every `ERROR:` (the headless dummy renderer prints `Parameter "m" is null` for `BoxMesh`). Verify: a green "Validate and build" run on the pull request.
+- [ ] 0.4 Consolidate the two test APIs. Decide one set of names (`reserve_ammo`, `shot_remaining`, `begin_reload()`, `set_paused()`) and update `tests/smoke.gd` to match. Verify: smoke and focus suites both pass against one script.
+- [ ] 0.5 Flatten the inheritance chain. Replace `main.gd` > `gameplay.gd` > `weapons.gd` > `projectile_gameplay.gd` with: `Mission` root script, `Player` scene, `Weapon` scene, `WeaponProfile` resource, `Projectile` system, `GameState` autoload. HUD built from `Control` nodes, no string replacement. Verify: every existing test passes unchanged in intent; test files may be edited only for node paths.
+- [ ] 0.6 Convert the code-built world into `levels/test_range.tscn` (ground, cover, targets, terminal, extraction). Verify: smoke test "Three test targets spawn" passes from the scene.
+- [ ] 0.7 Replace raw keycodes with `InputMap` actions (`move_*`, `fire`, `aim`, `reload`, `interact`, `pause`, `restart`, `weapon_1..3`). Verify: tests use `Input.action_press` or synthesised action events.
+- [ ] 0.8 Rename real product names in `LOADOUT` to fictional ones. Verify: review.
+- [ ] 0.9 Evaluate upgrading to the current Godot 4.x stable. Run the full suite and a Windows export on the candidate version in a branch. Adopt only if green; update the CI pin. Verify: CI green on the new pin.
+- [ ] 0.10 Enable branch protection on `main` requiring "Validate and build" **(owner)**. Verify: a push to `main` without a pull request is rejected.
+- [ ] 0.11 Update `README.md` and `docs/VALIDATION.md` to describe the real suite and controls. Verify: review.
+- [ ] 0.12 Download the Windows build from CI and launch it on a Windows machine. Verify: playtest; record the result in `docs/VALIDATION.md`.
+
+**Exit gate:** CI green on `main`, a Windows build artefact exists, one human has launched it and played the test range.
+
+---
+
+## Phase 1: Core sniper feel (the shot)
+
+- [ ] 1.1 Rendered scope. A `SubViewport` rendering the scoped view through a scope mesh, with parallax, eye-box vignette, chromatic edge and reticle as a texture. Variable zoom (e.g. 4x to 12x). Verify: playtest; test asserts scope camera FOV range and that reticle scene instantiates.
+- [ ] 1.2 Ballistics v2 in `ballistics.gd`: drag (G1 or G7 coefficient), muzzle velocity per profile, wind as a velocity vector affecting relative airflow, zeroing distance. Verify: test with reference trajectories (drop at 300 m, 600 m, 1000 m within tolerance).
+- [ ] 1.3 Breath hold and sway: stamina-driven hold, sway amplitude based on stance and heart rate. Verify: test sway amplitude ranges by stance; playtest feel.
+- [ ] 1.4 Stances: stand, crouch, prone. Prone with bipod reduces sway further. Verify: test collider heights and sway multipliers.
+- [ ] 1.5 Range-finding and wind reading: laser range finder (or mil-dot estimation on realism setting), wind indicator on HUD and in scope, wind sock props in level. Verify: test range readout against known distance; playtest readability.
+- [ ] 1.6 Scope zero adjustment (elevation turret in 100 m steps) and holdover marks. Verify: test that zeroing to N metres gives zero drop at N.
+- [ ] 1.7 Hit model: hitboxes (head, torso, limbs) on a target scene with damage multipliers. Verify: test headshot kills, limb hit does not.
+- [ ] 1.8 Bullet time / kill cam for shots over a distance threshold, skippable, optional in settings. Verify: playtest; test that it triggers only above threshold.
+- [ ] 1.9 Impact feedback: tracer on long shots, dust and blood decals (toggle), ricochet sound, hit marker. Verify: playtest.
+- [ ] 1.10 Sidearm: suppressed pistol with hitscan, for close range. Shotguns removed or kept as a mission-specific pickup. Verify: weapons test updated.
+- [ ] 1.11 Weapon animation: idle, aim in/out, fire with bolt cycle, reload, sprint, from Mixamo or hand-made. Verify: playtest; test that `AnimationPlayer` has required clips.
+- [ ] 1.12 Camera: head bob, recoil kick and recovery, FOV change on sprint, landing dip. Verify: playtest.
+- [ ] 1.13 Target range level: a 1000 m shooting range with distance markers, steel plates that ring and fall, wind variation. This is the tuning playground. Verify: playtest.
+
+**Exit gate:** A playtester can hit a plate at 600 m using the scope, wind and drop cues without being told the numbers, and says the shot feels good.
+
+---
+
+## Phase 2: Enemies and stealth
+
+- [ ] 2.1 Enemy scene: humanoid model, skeleton, hitboxes from 1.7, ragdoll on death, `NavigationAgent3D`. Verify: test spawn, navigation to a point, death ragdoll activates.
+- [ ] 2.2 Perception component: vision cone with distance falloff, occlusion raycasts to multiple body points, light-level factor, hearing with sound events (gunshot radius by weapon and suppressor, footsteps by stance and surface). Verify: test detection times at distances, in cover, in shadow.
+- [ ] 2.3 Behaviour state machine: Patrol, Suspicious, Investigate, Alert, Search, Flee, Dead. Timeouts and de-escalation. Verify: test transitions for scripted stimuli.
+- [ ] 2.4 Squad coordination: `AlertCoordinator` shares last known position, escalates mission alert level (Calm, Suspicious, Alert, Lockdown), spawns reinforcement patrol on Lockdown. Verify: test escalation rules.
+- [ ] 2.5 Enemy combat: return fire with inaccuracy that improves while the player stays still; suppression of player (screen effect); flanking move toward last known position. Verify: test accuracy curve; playtest.
+- [ ] 2.6 Body awareness: enemies discover bodies and escalate; player can move bodies. Verify: test body discovery escalates.
+- [ ] 2.7 Enemy animations: idle, walk, run, aim, fire, hit reactions, death variants, alert gestures. Verify: playtest.
+- [ ] 2.8 Player stealth tools: binoculars with target tagging (persistent outline through walls, optional on realism), noise meter, distraction (throw rock or shoot a device). Verify: test tagging persists, noise meter responds.
+- [ ] 2.9 Player damage, health regeneration or medkits, death and checkpoint reload. Verify: test damage and respawn.
+- [ ] 2.10 Difficulty settings affecting perception rates, enemy accuracy, HUD assists. Verify: test that difficulty scales the numbers.
+
+**Exit gate:** In the test range with ten enemies, a playtester can complete a stealth clear and a loud clear, and enemies behave believably in both.
+
+---
+
+## Phase 3: World, art and audio (the AAA look)
+
+- [ ] 3.1 Asset licence ledger `assets/LICENSES.md` and Git LFS enabled **(owner)**. Verify: review; a model commits through LFS.
+- [ ] 3.2 Switch to the Forward+ renderer; configure SDFGI or VoxelGI, volumetric fog, SSAO, SSR, TAA, physical light units, ACES tonemap. Verify: playtest at target hardware for 60 fps at 1080p; test that project settings match.
+- [ ] 3.3 Terrain: Terrain3D add-on, 1 km² heightmap, four blended ground textures, grass and detail meshes with distance culling. Verify: playtest frame time budget.
+- [ ] 3.4 Environment kit: rocks, trees (with wind sway and LODs), buildings, walls, roads, props, vehicles. Source per `docs/TOOLING.md`. Verify: review of ledger; playtest.
+- [ ] 3.5 Lighting and atmosphere: sun angle and sky per mission, time of day presets (dawn, noon, dusk, night), fog layers, cloud shadows. Verify: playtest.
+- [ ] 3.6 Weather: wind strength and direction tied to ballistics, rain and dust storms as visibility modifiers. Verify: test weather affects wind vector; playtest.
+- [ ] 3.7 Player and weapon models: first-person arms, rifle with scope and bipod, pistol, binoculars. Verify: playtest.
+- [ ] 3.8 Characters: at least two enemy variants (patrol, officer) with material variation. Verify: playtest.
+- [ ] 3.9 VFX: muzzle flash, smoke, shell eject, impacts per surface, blood (toggle), dust from movement, distant explosions. Verify: playtest.
+- [ ] 3.10 Audio: weapon shots with distance layers and reflections, suppressed variants, bolt, reload, footsteps per surface, foley, ambience beds, enemy voice barks (alert, search, hit), dynamic music stems by alert level, mix bus with ducking. Verify: test bus layout; playtest.
+- [ ] 3.11 Performance pass: occlusion culling, LOD distances, texture streaming budgets, shadow cascade tuning, GPU profile under 16 ms. Verify: automated frame-time capture in a scripted fly-through.
+
+**Exit gate:** A 60-second capture of the mission looks like a current-generation game to someone who has not seen the project.
+
+---
+
+## Phase 4: Vertical slice mission and game shell
+
+- [ ] 4.1 Mission 1 design doc: objectives, map, enemy placement, routes, three approaches. Verify: review.
+- [ ] 4.2 Mission framework: objectives (primary, secondary, optional), mission phases, triggers, scripted events, failure conditions, extraction. Verify: test objective completion and failure.
+- [ ] 4.3 Build Mission 1 on the terrain from 3.3. Verify: playtest start to finish.
+- [ ] 4.4 Checkpoints and save/load: serialise mission state, player state, enemy states, with versioned save format. Verify: test save, restart, load round trip.
+- [ ] 4.5 Main menu, pause menu, mission select, results screen (score, accuracy, longest shot, stealth rating). Verify: test navigation; playtest.
+- [ ] 4.6 Settings: video (resolution, window mode, vsync, quality presets, FOV), audio (buses), controls (remap, sensitivity, invert), gameplay (realism toggles, kill cam, assists), accessibility (subtitles, colour-blind reticle, hold or toggle aim, reduced motion). Persist to user settings file. Verify: test persistence.
+- [ ] 4.7 Controller support with glyphs and aim assist option. Verify: playtest with a controller.
+- [ ] 4.8 Gunsmith workbench: wire `gunsmith.gd` to `WeaponProfile`, workbench UI between missions, per-weapon saved configuration. Verify: existing gunsmith tests plus save round trip.
+- [ ] 4.9 Tutorial: the target range from 1.13 as a guided first mission. Verify: playtest with someone new.
+- [ ] 4.10 Localisation hooks: all strings through `tr()`, CSV with English. Verify: test that no user-facing literal strings remain in scripts (lint script).
+- [ ] 4.11 Crash and error handling: unhandled error logging to user directory, safe fallback on corrupt save. Verify: test corrupt save fallback.
+
+**Exit gate:** A stranger can install the build, start a new game, play the tutorial and Mission 1 to the results screen, change settings, quit and resume from a checkpoint, with no instructions from the team.
+
+---
+
+## Phase 5: Content scale-up
+
+- [ ] 5.1 Campaign outline: six to eight missions, narrative through briefings and radio, fictional factions. Verify: review.
+- [ ] 5.2 Missions 2 through N, each with a distinct biome or time of day and one new mechanic (night with thermal scope, moving vehicle target, protect an ally, timed extraction, sandstorm). One pull request per mission, each with a playtest. Verify: playtest each.
+- [ ] 5.3 Additional rifles and scopes through the gunsmith (fictional names). Verify: gunsmith tests extended.
+- [ ] 5.4 Enemy variety: snipers that counter the player, dogs, vehicles, drones. Verify: tests for each perception type.
+- [ ] 5.5 Challenge modes: range leaderboard (local), long-shot challenges. Verify: test scoring.
+- [ ] 5.6 Achievements framework (platform-agnostic, local). Verify: test unlock rules.
+
+**Exit gate:** Full campaign playable start to finish by a playtester in one sitting without a blocking bug.
+
+---
+
+## Phase 6: Polish, QA and release
+
+- [ ] 6.1 Bug triage process: issue labels, severity, weekly pass. Verify: review.
+- [ ] 6.2 Full playtest rounds with at least five external testers, feedback captured and triaged. Verify: review.
+- [ ] 6.3 Performance validation on minimum and recommended specs; document them. Verify: captures.
+- [ ] 6.4 Accessibility review against the game accessibility guidelines basic tier. Verify: review.
+- [ ] 6.5 Release build: release export template, PCK encryption decision, version stamping, build number in main menu. Verify: CI produces a release artefact.
+- [ ] 6.6 Code signing certificate **(owner)** and signed installer. Verify: SmartScreen does not warn on a clean Windows install.
+- [ ] 6.7 Store presence **(owner decision)**: Steam partner account, store page, capsule art, trailer, achievements wiring if Steam. Verify: review.
+- [ ] 6.8 Legal: licence ledger complete, third-party notices screen, privacy statement if any telemetry, age rating self-assessment. Verify: review.
+- [ ] 6.9 Launch day checklist: tagged release, changelog, backup of build, known issues list. Verify: review.
+- [ ] 6.10 Post-launch: crash log collection channel, patch cadence. Verify: review.
+
+**Exit gate:** Signed release build on the store or download page, with documented specs and known issues.
+
+---
+
+## Working agreements that keep the checklist honest
+
+1. One pull request per checklist item or small group; the PR links the item and updates this file.
+2. CI green is mandatory. Never merge red. Never widen the grep to hide an error.
+3. Every system ships with a headless test. Visual items are marked `playtest` and the playtest result (date, machine, outcome) is recorded in `docs/VALIDATION.md`.
+4. Fictional names for weapons, factions and places.
+5. The design doc is updated when a decision changes, in the same PR.
