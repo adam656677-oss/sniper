@@ -22,7 +22,12 @@ func _ready() -> void:
 	weapon.excluded = [player.get_rid()]
 	weapon.body_hit.connect(level.on_body_hit)
 	weapon.wind = level.wind
+	level.player = player
 	level.target_killed.connect(on_target_killed)
+	weapon.fired.connect(on_weapon_fired)
+
+func on_weapon_fired(profile: WeaponProfile) -> void:
+	level.report_noise(camera.global_position, 25.0 if profile.suppressed else 400.0)
 	update_hud()
 
 func on_target_killed(_body: Node3D, distance: float) -> void:
@@ -99,7 +104,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func update_hud() -> void:
 	var objective: String = level.objective_text()
-	if GameState.finished:
+	if GameState.failed:
+		objective = "MISSION FAILED - N to restart"
+	elif GameState.finished:
 		objective = "MISSION COMPLETE - N to restart"
 	elif GameState.paused:
 		objective = "PAUSED - Escape to resume | N to restart"
@@ -117,8 +124,9 @@ func update_hud() -> void:
 	var shot_line := ""
 	if killcam.active():
 		shot_line = "\nLONG SHOT %.0f m (Space to skip)" % last_long_shot
-	hud.text = "ECHO RIDGE | prototype\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | Escape pause" % [
-		objective, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, range_line, wind_text(), shot_line]
+	var alert_line := "Health %d | Alert: %s | Hostiles: %d" % [int(round(player.health)), level.coordinator.level_name(), level.enemies.size()]
+	hud.text = "ECHO RIDGE | prototype\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | Escape pause" % [
+		objective, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, alert_line, range_line, wind_text(), shot_line]
 
 func is_aiming() -> bool:
 	return camera.fov < 70.0

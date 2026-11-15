@@ -21,7 +21,8 @@ Planning and status live in `docs/`:
 | `scenes/levels/level_base.gd` | Level contract: spawn, wind, targets, interact, objective, completion |
 | `scenes/levels/test_range.tscn` | The intel mission level; targets are children of `Targets` |
 | `scenes/levels/shooting_range.tscn` | The 1000 m plate range |
-| `scenes/targets/` | `TargetDummy` with hit zones, `SteelPlate` range target |
+| `scenes/targets/` | `TargetDummy` with hit zones, `SteelPlate` range target, shared hit-zone helpers |
+| `scenes/enemies/` | `Enemy` state machine, `Perception`, `AlertCoordinator` |
 | `scenes/weapons/aim_sway.gd` | Breath-hold and sway model |
 | `scenes/ui/hud.gd`, `scope_overlay.gd` | HUD label and scope reticle |
 | `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
@@ -29,13 +30,14 @@ Planning and status live in `docs/`:
 
 ## Implemented
 
-Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets with head, torso and limb hit zones. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Three difficulty levels. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Scenes
 
 | Scene | What it is |
 |---|---|
 | `main.tscn` | Test range mission: collect intel at the terminal, extract. The default scene (F5). |
+| `compound_mission.tscn` | Walled compound with four patrolling hostiles. Perception, alert states, squad coordination, return fire, lockdown reinforcements. Eliminate every hostile to complete. Open it and press F6. |
 | `range_mission.tscn` | 1000 m shooting range with a steel plate every 100 m on its own bearing. Open it and press F6. Rings every plate to complete. |
 
 ## Controls
@@ -67,4 +69,4 @@ Runs the editor import and every headless suite in `tests/`. Set `GODOT` to the 
 
 ## Limitations
 
-This is a prototype, not a finished game. Targets are stationary dummies with no AI. There are no models, animations, sounds, menus, settings or saves. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.
+This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations, sounds, menus, settings or saves. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.

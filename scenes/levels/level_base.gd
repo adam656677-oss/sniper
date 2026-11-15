@@ -13,13 +13,65 @@ signal target_killed(body: Node3D, distance: float)
 @export var wind := Vector3(2.0, 0.0, 0.0) # Air-mass velocity in m/s, world frame.
 
 var targets: Array[StaticBody3D] = []
+var enemies: Array = []
+var coordinator: AlertCoordinator
+var player: Node3D
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(clear_color)
+	coordinator = AlertCoordinator.new()
+	coordinator.name = "AlertCoordinator"
+	add_child(coordinator)
+	coordinator.reinforcements_requested.connect(spawn_reinforcements)
 	if has_node("Targets"):
 		for child in $Targets.get_children():
 			if child is StaticBody3D:
 				register_target(child)
+	if has_node("Enemies"):
+		for child in $Enemies.get_children():
+			if child is CharacterBody3D and child.has_method("tick"):
+				register_enemy(child)
+
+func register_enemy(enemy: Node) -> void:
+	if enemy in enemies:
+		return
+	enemies.append(enemy)
+	enemy.level = self
+	enemy.coordinator = coordinator
+	coordinator.register(enemy)
+	enemy.died.connect(on_enemy_died)
+
+func on_enemy_died(enemy: Node) -> void:
+	enemies.erase(enemy)
+	coordinator.unregister(enemy)
+	coordinator.report_death(enemy)
+
+# Override to add hostiles when the coordinator reaches lockdown.
+func spawn_reinforcements(_position: Vector3) -> void:
+	pass
+
+func report_noise(position: Vector3, radius: float) -> void:
+	coordinator.report_noise(position, radius, null)
+
+# One flat navigation polygon at ground level. Enough for the prototype arenas;
+# baked meshes replace this with the terrain work.
+func build_flat_navmesh(center: Vector3, size: Vector2) -> NavigationRegion3D:
+	var region := NavigationRegion3D.new()
+	region.name = "FlatNavigation"
+	var mesh := NavigationMesh.new()
+	var half := size * 0.5
+	mesh.vertices = PackedVector3Array([
+		center + Vector3(-half.x, 0, -half.y), center + Vector3(half.x, 0, -half.y),
+		center + Vector3(half.x, 0, half.y), center + Vector3(-half.x, 0, half.y)
+	])
+	mesh.add_polygon(PackedInt32Array([0, 1, 2, 3]))
+	region.navigation_mesh = mesh
+	add_child(region)
+	return region
+
+func _physics_process(delta: float) -> void:
+	if GameState.simulation_active():
+		coordinator.advance(delta)
 
 func register_target(body: StaticBody3D) -> void:
 	targets.append(body)
