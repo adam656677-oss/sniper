@@ -1,6 +1,6 @@
 # Echo Ridge
 
-Single-player first-person sniper game prototype built in Godot 4.3. Open `project.godot` in the editor and press F5.
+Single-player first-person sniper game prototype built in Godot 4.7. Open `project.godot` in the editor and press F5.
 
 Planning and status live in `docs/`:
 
@@ -47,7 +47,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 scripts/validate.sh
 ```
 
-Runs the editor import and all six headless test suites (smoke, focus, ballistics, projectiles, gunsmith, weapons). Set `GODOT` to the path of a Godot 4.3 binary if it is not on `PATH`. CI runs the same steps and exports a Windows development build. See `docs/VALIDATION.md`.
+Runs the editor import and all six headless test suites (smoke, focus, ballistics, projectiles, gunsmith, weapons). Set `GODOT` to the path of a Godot 4.7 binary if it is not on `PATH`. CI runs the same steps and exports a Windows development build. See `docs/VALIDATION.md`.
 
 ## Limitations
 

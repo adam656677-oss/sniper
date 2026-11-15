@@ -20,7 +20,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 0.6 Convert the code-built world into `levels/test_range.tscn` (ground, cover, targets, terminal, extraction). Verify: smoke test "Three test targets spawn" passes from the scene.
 - [x] 0.7 Replace raw keycodes with `InputMap` actions (`move_*`, `fire`, `aim`, `reload`, `interact`, `pause`, `restart`, `weapon_1..3`). Verify: tests use `Input.action_press` or synthesised action events.
 - [x] 0.8 Rename real product names in `LOADOUT` to fictional ones. Verify: review.
-- [ ] 0.9 Evaluate upgrading to the current Godot 4.x stable. Run the full suite and a Windows export on the candidate version in a branch. Adopt only if green; update the CI pin. Verify: CI green on the new pin.
+- [x] 0.9 Evaluate upgrading to the current Godot 4.x stable. (4.7 stable: all suites pass unchanged; CI repinned.) Run the full suite and a Windows export on the candidate version in a branch. Adopt only if green; update the CI pin. Verify: CI green on the new pin.
 - [ ] 0.10 Enable branch protection on `main` requiring "Validate and build" **(owner)**. Verify: a push to `main` without a pull request is rejected.
 - [x] 0.11 Update `README.md` and `docs/VALIDATION.md` to describe the real suite and controls. Verify: review.
 - [ ] 0.12 Download the Windows build from CI and launch it on a Windows machine. Verify: playtest; record the result in `docs/VALIDATION.md`.

@@ -6,7 +6,7 @@ Status: isolated calculation module, not yet connected to gameplay or CI. Tests 
 
 Prototype slots: optic, spring, stock. All values are fictional game balancing, not real modification specifications. Lightweight springs trade faster cycling for increased spread; stock choices trade reload timing against spread. Precision optics and reflex optics set different camera fields of view. Families are `recon`, `auto_shotgun`, `pump_shotgun`, `carbine` and `heavy_rifle`; the last two are placeholders with no playable weapon yet. `WeaponProfile.to_stats()` produces the base dictionary this module expects.
 
-Run from the project root with Godot 4.3:
+Run from the project root with Godot 4.7:
 
 ```sh
 godot --headless --path . --script res://tests/gunsmith.gd

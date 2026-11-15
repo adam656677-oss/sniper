@@ -1,6 +1,6 @@
 # Validation and development builds
 
-CI pins Godot 4.3 stable for repeatability. Three workflows exist:
+CI pins Godot 4.7 stable for repeatability. Three workflows exist:
 
 - **Validate and build** (`build.yml`): import, run every test suite, export a Windows x86-64 development build, upload it as `EchoRidge-Windows-development`.
 - **Projectile regression tests** (`projectiles.yml`): import plus the ballistics and projectile suites only.
@@ -11,10 +11,10 @@ Steps fail only on `SCRIPT ERROR:` or `FAIL:` lines. Plain `ERROR:` lines are no
 ## Local validation
 
 ```bash
-GODOT=/path/to/Godot_v4.3-stable_linux.x86_64 scripts/validate.sh
+GODOT=/path/to/Godot_v4.7-stable_linux.x86_64 scripts/validate.sh
 ```
 
-Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.3 export templates in the user data directory).
+Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 export templates in the user data directory).
 
 ## Test suites
 

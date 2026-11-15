@@ -48,7 +48,7 @@ A first-person, single-player, mission-based sniper game in the tradition of lon
 ## Constraints
 
 - **Team**: one owner plus AI coding sessions. "AAA" therefore means AAA *standards* applied to a small scope, not AAA head-count. The checklist scales content only after the vertical slice is polished.
-- **Engine**: Godot 4.3 stable is pinned by CI and all existing code. Staying on Godot 4 is the recommendation (below). Upgrading the minor version is a checklist item with its own test gate, not an assumption.
+- **Engine**: Godot 4.7 stable (upgraded from the 4.3 pin on 2026-11-15 after the full suite passed unchanged). Staying on Godot 4 is the recommendation (below).
 - **Assets**: no art team. Plan on CC0 and purchased asset packs (Poly Haven, Kenney, Quaternius, Sketchfab CC-BY, Synty style packs) plus Blender for kitbashing, with a documented licence ledger. Purchased packs need owner budget approval.
 - **Verification**: anything that cannot be checked by a headless test or a CI export must be checked by a human playtest on Windows. The repository has never had one. The owner is the playtester until that changes.
 - **Repository hygiene**: pull requests only, CI must be green to merge.

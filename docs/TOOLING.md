@@ -6,7 +6,7 @@ What is needed to complete Echo Ridge, grouped by who provides it. Items marked 
 
 | Tool | Purpose | Notes |
 |---|---|---|
-| Godot 4.3 stable + export templates | Engine, editor, headless tests, Windows export | Pinned by CI. Upgrade is checklist item 0.9 |
+| Godot 4.7 stable + export templates | Engine, editor, headless tests, Windows export | Pinned by CI; repinned from 4.3 after checklist item 0.9 |
 | Blender 4.x | Kitbashing models, rigging, animation retargeting, LOD generation | Export glTF 2.0 into `assets/models/` |
 | Terrain3D (Godot add-on, MIT) | Heightmap terrain, texture painting, LOD | Needed for the 1 km² mission |
 | Git LFS | Store binary assets (models, textures, audio) in the repository | **(owner)** enable LFS on the GitHub repository; default quota is 1 GB storage and 1 GB bandwidth per month, buy a data pack if exceeded |
@@ -42,9 +42,9 @@ Every asset that enters the repository gets a line in `assets/LICENSES.md` (path
 
 ```bash
 # Linux
-curl -L -o godot.zip https://github.com/godotengine/godot-builds/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
-unzip godot.zip && chmod +x Godot_v4.3-stable_linux.x86_64
-export GODOT=$PWD/Godot_v4.3-stable_linux.x86_64
+curl -L -o godot.zip https://github.com/godotengine/godot-builds/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
+unzip godot.zip && chmod +x Godot_v4.7-stable_linux.x86_64
+export GODOT=$PWD/Godot_v4.7-stable_linux.x86_64
 ```
 
 ```bash

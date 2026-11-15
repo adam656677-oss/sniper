@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Local mirror of the CI validation steps. Exit code 0 means every suite passed.
 #
-#   GODOT=/path/to/Godot_v4.3-stable_linux.x86_64 scripts/validate.sh
+#   GODOT=/path/to/Godot_v4.7-stable_linux.x86_64 scripts/validate.sh
 #   scripts/validate.sh --export     # also export the Windows debug build
 #
 # Only "SCRIPT ERROR:" and "FAIL:" lines fail a step. The headless dummy renderer

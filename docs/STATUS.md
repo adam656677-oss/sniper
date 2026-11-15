@@ -1,6 +1,6 @@
 # Echo Ridge: project status audit
 
-Audited 2026-11-15 against commit `71c37b9` (branch `main`). Every claim below was reproduced locally with Godot 4.3 stable headless unless marked otherwise.
+Audited 2026-11-15 against commit `71c37b9` (branch `main`). Every claim below was reproduced locally with Godot 4.7 stable headless unless marked otherwise.
 
 ## Update 2026-11-15 (branch `adam/eager-brown-kubebc`)
 
@@ -18,7 +18,7 @@ Items 0.1 through 0.8 and 0.11 of the checklist are done on this branch. The bui
 
 | Area | State |
 |---|---|
-| Engine | Godot 4.3 stable, GL Compatibility renderer, 1280x720 |
+| Engine | Godot 4.7 stable, GL Compatibility renderer, 1280x720 |
 | World | Procedurally spawned boxes: ground slab, three cover blocks, three red target blocks, gold intel terminal, green extraction pad |
 | Player | `CharacterBody3D` capsule, WASD at 5 m/s, mouse look, gravity, fall-reset below y = -15 |
 | Weapons | Three selectable profiles (recon rifle, Origin 12, KSG). Magazine, reserve, timed reload, shot interval, pellet spread, FOV zoom |
@@ -48,4 +48,4 @@ No enemy AI, no animation, no models or textures (all primitives), no audio, no 
 scripts/validate.sh
 ```
 
-Requires the Godot 4.3 Linux binary on `PATH` as `godot` (or set `GODOT=/path/to/binary`). The script mirrors the CI steps and uses the corrected error matching.
+Requires the Godot 4.7 Linux binary on `PATH` as `godot` (or set `GODOT=/path/to/binary`). The script mirrors the CI steps and uses the corrected error matching.
