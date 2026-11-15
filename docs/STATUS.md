@@ -2,6 +2,10 @@
 
 Audited 2026-11-15 against commit `71c37b9` (branch `main`). Every claim below was reproduced locally with Godot 4.3 stable headless unless marked otherwise.
 
+## Update 2026-11-15 (branch `adam/eager-brown-kubebc`)
+
+Items 0.1, 0.2, 0.3 and 0.11 of the checklist are done on this branch: `main.gd` and `tests/smoke.gd` restored to the `7388d30` versions, `scope_overlay.gd` typed, workflows match only `SCRIPT ERROR:` and `FAIL:`. All six suites pass locally on a fresh import. The audit below describes `main` as found.
+
 ## Headline
 
 - **The project does not currently load.** The last commit on `main` added `paused` and `reload_remaining` to `main.gd`, but `gameplay.gd` (which extends `main.gd`) already declares both. Godot 4 treats that as a parse error, so `gameplay.gd`, `weapons.gd` and `projectile_gameplay.gd` all fail to load and the main scene cannot run.

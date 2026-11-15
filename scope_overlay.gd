@@ -18,7 +18,7 @@ func _physics_process(_delta: float) -> void:
 	var finish: Vector3 = origin - game.camera.global_basis.z * 300.0
 	var query := PhysicsRayQueryParameters3D.create(origin, finish)
 	query.exclude = [game.player.get_rid()]
-	var hit := game.get_world_3d().direct_space_state.intersect_ray(query)
+	var hit: Dictionary = game.get_world_3d().direct_space_state.intersect_ray(query)
 	range_text = "RANGE --" if hit.is_empty() else "SURFACE %.0f m" % origin.distance_to(hit.position)
 	queue_redraw()
 

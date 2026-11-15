@@ -1,15 +1,41 @@
 # Echo Ridge
 
-Single-player computer sniper-game prototype for Godot 4.3. Import project.godot and press F5.
+Single-player first-person sniper game prototype built in Godot 4.3. Open `project.godot` in the editor and press F5.
 
-## Implemented in source
-Procedural 3D test environment, player collision and first-person movement, mouse aiming, reduced scoped sensitivity, zoom, hitscan target shooting, one-second shot cooldown, five-round magazine, 20 reserve rounds, two-second reload, intel collection, extraction, pause and restart. Shooting queries are processed in the physics update.
+Planning and status live in `docs/`:
+
+- `docs/CHECKLIST.md`: the phased production checklist and exit gates.
+- `docs/STATUS.md`: audit of what works, what is broken and why.
+- `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`: design document and open questions.
+- `docs/TOOLING.md`: tools, asset sources, licences and what the owner needs to provide.
+- `docs/VALIDATION.md`: how to run the tests and builds.
+
+## Implemented
+
+Procedurally spawned test range (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Controls
-WASD move; mouse aim; left click fire; right click toggle zoom; R reload; E collect/extract; Escape pause/resume; left click also resumes; N restart. Reload and movement freeze while paused. The first click that resumes does not fire.
+
+| Input | Action |
+|---|---|
+| W A S D | Move |
+| Mouse | Aim |
+| Left click | Fire (also resumes from pause) |
+| Right click | Toggle zoom |
+| 1, 2, 3 | Select weapon |
+| R | Reload |
+| E | Collect intel at the gold terminal, extract at the green pad |
+| Escape | Pause or resume |
+| N | Restart |
 
 ## Validation
-See docs/VALIDATION.md. The existing workflow imports the project, runs tests/smoke.gd, and attempts a Windows development export. The smoke suite now contains 28 checks including timed reload, finite reserve, pause, cooldown gating and completed-mission firing restrictions. No passing engine run or Windows launch is claimed here. A successful export is not a visual playtest.
+
+```bash
+scripts/validate.sh
+```
+
+Runs the editor import and all six headless test suites (smoke, focus, ballistics, projectiles, gunsmith, weapons). Set `GODOT` to the path of a Godot 4.3 binary if it is not on `PATH`. CI runs the same steps and exports a Windows development build. See `docs/VALIDATION.md`.
 
 ## Limitations
-Unfinished prototype, not a AAA release. Targets are stationary blocks without enemy AI. No projectile travel, bullet drop, wind, reload/bolt animation, sound, save/load, advanced navigation or production art. Scope is a field-of-view change, not a finished optic. Ammunition exhaustion does not end the intel mission; restart resets supplies. Validation documentation's older 16-check description refers to the initial suite; current checks are in tests/smoke.gd.
+
+This is a prototype, not a finished game. Targets are stationary blocks with no AI. There are no models, animations, sounds, menus, settings or saves. The scope is a field-of-view change with a drawn overlay, not a rendered optic. The weapon table uses placeholder names that must be replaced before any public build. See `docs/CHECKLIST.md` for the full plan.

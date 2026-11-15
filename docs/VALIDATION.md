@@ -1,23 +1,38 @@
 # Validation and development builds
 
-The workflow pins Godot 4.3 stable for repeatability, not as a claim that it is the latest engine. It downloads the editor and export templates from the official Godot release repository.
+CI pins Godot 4.3 stable for repeatability. Three workflows exist:
 
-On pushes, pull requests, or manual dispatch, it imports the project, checks logs for engine/script errors, runs 16 mission smoke checks, and exports a Windows x86-64 development build only after validation succeeds. Logs are retained for failed runs where available. Builds are unsigned and are not public releases.
+- **Validate and build** (`build.yml`): import, run every test suite, export a Windows x86-64 development build, upload it as `EchoRidge-Windows-development`.
+- **Projectile regression tests** (`projectiles.yml`): import plus the ballistics and projectile suites only.
+- **Windows runtime smoke test** (`windows-runtime.yml`): after a successful validate run, launches the exported executable headlessly on a Windows runner for 120 frames and checks the log.
+
+Steps fail only on `SCRIPT ERROR:` or `FAIL:` lines. Plain `ERROR:` lines are not treated as failures because the headless dummy renderer prints `ERROR: Parameter "m" is null` for every `BoxMesh` created without a display; that line is benign. Earlier versions of the workflows matched it and never went green.
 
 ## Local validation
-Install Godot 4.3 and its export templates, then run from the project directory:
 
-```sh
-godot --headless --path . --editor --quit
-godot --headless --path . --script res://tests/smoke.gd
-mkdir -p builds/windows
-godot --headless --path . --export-debug "Windows Desktop" builds/windows/EchoRidge.exe
+```bash
+GODOT=/path/to/Godot_v4.3-stable_linux.x86_64 scripts/validate.sh
 ```
 
-## Downloading a successful build
-In the repository's Actions tab, open a successful Validate and build run and download EchoRidge-Windows-development. Extract the complete archive and keep the EXE and PCK together. Do not infer success merely because these workflow files exist.
+Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.3 export templates in the user data directory).
 
-## Coverage and limits
-Tests cover scene creation, player/camera initialization, targets, starting ammunition, floor collision, intel proximity, extraction requirements, development refill, and completion HUD. They do not verify shooting, aim accuracy, graphical appearance, audio, Windows launch behavior, performance, or enemy AI. A Linux headless export is not a Windows playtest.
+## Test suites
 
-These files have not yet executed in Godot at authoring time. GitHub Actions must run before any engine-test or build success can be reported. Actions availability and repository workflow permissions may affect execution. No credentials or paid services are required by the workflow; GitHub runner usage remains subject to the account's quotas and billing settings.
+| Suite | File | Covers |
+|---|---|---|
+| Smoke (36 checks) | `tests/smoke.gd` | Scene load, player and camera, targets, floor collision, intel and extraction rules, timed reload, reserve transfer, pause freezing reload and physics, cooldown, completion HUD |
+| Focus | `tests/focus.gd` | Focus-loss pause, mouse release, reload freeze, explicit resume, completed-mission input blocking |
+| Ballistics (8 checks) | `tests/ballistics_test.gd` | Integration step with gravity and wind, segment tracing |
+| Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |
+| Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
+| Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, spread |
+
+Not covered: visual appearance, audio, aim feel, Windows launch beyond a headless 120-frame run, performance, enemy behaviour (none exists).
+
+## Playtest log
+
+Record every human playtest here: date, build (commit or run id), machine, outcome.
+
+| Date | Build | Machine | Outcome |
+|---|---|---|---|
+| none yet | | | |

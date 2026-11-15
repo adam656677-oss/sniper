@@ -12,17 +12,17 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 
 ## Phase 0: Repair and stabilise (the build must be green before anything else)
 
-- [ ] 0.1 Fix `scope_overlay.gd` parse error: `var hit := ...` becomes `var hit: Dictionary = ...`. Verify: import log has no `SCRIPT ERROR`.
-- [ ] 0.2 Resolve the duplicate members. Remove `paused`, `reload_remaining`, `cooldown`, `reserve`, `start_reload`, `can_fire`, `perform_shot` and the pause/reload handling from `main.gd`, restoring it to the world-building base, **or** complete 0.5 directly. Verify: `scripts/validate.sh` import step passes.
-- [ ] 0.3 Fix CI false positive in all three workflows: fail only on `SCRIPT ERROR:` and `FAIL:`, not every `ERROR:` (the headless dummy renderer prints `Parameter "m" is null` for `BoxMesh`). Verify: a green "Validate and build" run on the pull request.
-- [ ] 0.4 Consolidate the two test APIs. Decide one set of names (`reserve_ammo`, `shot_remaining`, `begin_reload()`, `set_paused()`) and update `tests/smoke.gd` to match. Verify: smoke and focus suites both pass against one script.
+- [x] 0.1 Fix `scope_overlay.gd` parse error: `var hit := ...` becomes `var hit: Dictionary = ...`. Verify: import log has no `SCRIPT ERROR`.
+- [x] 0.2 Resolve the duplicate members. Remove `paused`, `reload_remaining`, `cooldown`, `reserve`, `start_reload`, `can_fire`, `perform_shot` and the pause/reload handling from `main.gd`, restoring it to the world-building base, **or** complete 0.5 directly. Verify: `scripts/validate.sh` import step passes.
+- [x] 0.3 Fix CI false positive in all three workflows: fail only on `SCRIPT ERROR:` and `FAIL:`, not every `ERROR:` (the headless dummy renderer prints `Parameter "m" is null` for `BoxMesh`). Verify: a green "Validate and build" run on the pull request.
+- [~] 0.4 Consolidate the two test APIs. (Smoke test restored to the child-layer API; names are consistent again. Final naming decided in 0.5.) Decide one set of names (`reserve_ammo`, `shot_remaining`, `begin_reload()`, `set_paused()`) and update `tests/smoke.gd` to match. Verify: smoke and focus suites both pass against one script.
 - [ ] 0.5 Flatten the inheritance chain. Replace `main.gd` > `gameplay.gd` > `weapons.gd` > `projectile_gameplay.gd` with: `Mission` root script, `Player` scene, `Weapon` scene, `WeaponProfile` resource, `Projectile` system, `GameState` autoload. HUD built from `Control` nodes, no string replacement. Verify: every existing test passes unchanged in intent; test files may be edited only for node paths.
 - [ ] 0.6 Convert the code-built world into `levels/test_range.tscn` (ground, cover, targets, terminal, extraction). Verify: smoke test "Three test targets spawn" passes from the scene.
 - [ ] 0.7 Replace raw keycodes with `InputMap` actions (`move_*`, `fire`, `aim`, `reload`, `interact`, `pause`, `restart`, `weapon_1..3`). Verify: tests use `Input.action_press` or synthesised action events.
 - [ ] 0.8 Rename real product names in `LOADOUT` to fictional ones. Verify: review.
 - [ ] 0.9 Evaluate upgrading to the current Godot 4.x stable. Run the full suite and a Windows export on the candidate version in a branch. Adopt only if green; update the CI pin. Verify: CI green on the new pin.
 - [ ] 0.10 Enable branch protection on `main` requiring "Validate and build" **(owner)**. Verify: a push to `main` without a pull request is rejected.
-- [ ] 0.11 Update `README.md` and `docs/VALIDATION.md` to describe the real suite and controls. Verify: review.
+- [x] 0.11 Update `README.md` and `docs/VALIDATION.md` to describe the real suite and controls. Verify: review.
 - [ ] 0.12 Download the Windows build from CI and launch it on a Windows machine. Verify: playtest; record the result in `docs/VALIDATION.md`.
 
 **Exit gate:** CI green on `main`, a Windows build artefact exists, one human has launched it and played the test range.
