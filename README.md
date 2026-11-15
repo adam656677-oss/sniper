@@ -24,13 +24,14 @@ Planning and status live in `docs/`:
 | `scenes/targets/` | `TargetDummy` with hit zones, `SteelPlate` range target, shared hit-zone helpers |
 | `scenes/enemies/` | `Enemy` state machine, `Perception`, `AlertCoordinator` |
 | `scenes/weapons/aim_sway.gd` | Breath-hold and sway model |
+| `scenes/player/stealth_kit.gd` | Binoculars, tagging, footstep noise, stones |
 | `scenes/ui/hud.gd`, `scope_overlay.gd` | HUD label and scope reticle |
 | `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
 | `tests/` | Headless test suites run by `scripts/validate.sh` and CI |
 
 ## Implemented
 
-Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Three difficulty levels. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Binoculars with target tagging, a stance-based noise meter and throwable stones. Three difficulty levels. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Scenes
 
@@ -49,6 +50,8 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | Left click | Fire (also resumes from pause) |
 | Right click | Toggle zoom |
 | 1, 2 | Rifle, sidearm |
+| B | Toggle binoculars (left click or T tags the hostile under the crosshair) |
+| G | Throw a stone to draw a guard |
 | Shift (hold) | Hold breath while aiming |
 | [ and ] | Zero turret down and up (100 m steps) |
 | Space | Skip long-shot slow motion |

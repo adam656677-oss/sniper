@@ -58,7 +58,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [~] 2.5 (return fire with stillness and distance accuracy done; suppression effect and flanking pending) Enemy combat: return fire with inaccuracy that improves while the player stays still; suppression of player (screen effect); flanking move toward last known position. Verify: test accuracy curve; playtest.
 - [~] 2.6 (discovery and escalation done; carrying bodies pending) Body awareness: enemies discover bodies and escalate; player can move bodies. Verify: test body discovery escalates.
 - [ ] 2.7 Enemy animations: idle, walk, run, aim, fire, hit reactions, death variants, alert gestures. Verify: playtest.
-- [ ] 2.8 Player stealth tools: binoculars with target tagging (persistent outline through walls, optional on realism), noise meter, distraction (throw rock or shoot a device). Verify: test tagging persists, noise meter responds.
+- [x] 2.8 Player stealth tools: binoculars with target tagging, noise meter, stone distraction. (Outline-through-walls visual comes with Phase 3.) Verify: test tagging persists, noise meter responds.
 - [x] 2.9 Player damage, health regeneration or medkits, death and checkpoint reload. Verify: test damage and respawn.
 - [x] 2.10 Difficulty settings affecting perception rates, enemy accuracy, HUD assists. Verify: test that difficulty scales the numbers.
 

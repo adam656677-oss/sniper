@@ -50,8 +50,8 @@ func on_enemy_died(enemy: Node) -> void:
 func spawn_reinforcements(_position: Vector3) -> void:
 	pass
 
-func report_noise(position: Vector3, radius: float) -> void:
-	coordinator.report_noise(position, radius, null)
+func report_noise(position: Vector3, radius: float, loudness: float = 1.0) -> void:
+	coordinator.report_noise(position, radius, null, loudness)
 
 # One flat navigation polygon at ground level. Enough for the prototype arenas;
 # baked meshes replace this with the terrain work.

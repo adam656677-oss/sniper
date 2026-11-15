@@ -51,13 +51,16 @@ func report_contact(reporter: Node, position: Vector3) -> void:
 		if enemy.global_position.distance_to(reporter.global_position) <= SHARE_RADIUS:
 			enemy.receive_contact(position)
 
-func report_noise(position: Vector3, radius: float, source: Node = null) -> void:
+# loudness caps how alarming the sound is: 1.0 gunfire, 0.5 distant or thrown,
+# 0.3 footsteps. Within a quarter of the radius a loud sound is unmistakable.
+func report_noise(position: Vector3, radius: float, source: Node = null, loudness: float = 1.0) -> void:
 	for enemy in enemies:
 		if enemy == source or not enemy.is_alive():
 			continue
 		var distance: float = enemy.global_position.distance_to(position)
 		if distance <= radius:
-			enemy.on_noise(position, 1.0 if distance <= radius * 0.25 else 0.5)
+			var heard := 1.0 if distance <= radius * 0.25 else 0.5
+			enemy.on_noise(position, minf(heard, loudness))
 
 func report_body(position: Vector3) -> void:
 	bodies.append(position)

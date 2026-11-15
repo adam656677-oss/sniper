@@ -128,7 +128,8 @@ func receive_contact(position: Vector3) -> void:
 	if state == State.PATROL or state == State.SUSPICIOUS:
 		change_state(State.INVESTIGATE)
 
-# loudness 1.0 is close and unmistakable; 0.5 is distant.
+# loudness 1.0 is close and unmistakable; 0.5 is distant or thrown; below 0.5
+# is a faint sound such as footsteps that only makes a patrol suspicious.
 func on_noise(position: Vector3, loudness: float) -> void:
 	if not is_alive():
 		return
@@ -137,9 +138,13 @@ func on_noise(position: Vector3, loudness: float) -> void:
 	if loudness >= 1.0:
 		perception.awareness = 1.0
 		become_alert()
-	elif state == State.PATROL or state == State.SUSPICIOUS:
-		perception.awareness = maxf(perception.awareness, 0.5)
-		change_state(State.INVESTIGATE)
+	elif loudness >= 0.5:
+		if state == State.PATROL or state == State.SUSPICIOUS:
+			perception.awareness = maxf(perception.awareness, 0.5)
+			change_state(State.INVESTIGATE)
+	elif state == State.PATROL:
+		perception.awareness = maxf(perception.awareness, SUSPICIOUS_THRESHOLD)
+		change_state(State.SUSPICIOUS)
 
 func on_body_seen(position: Vector3) -> void:
 	last_known = position

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://mission.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/levels/shooting_range.tscn" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scope_overlay.gd" id="6"]
 [ext_resource type="Script" path="res://scenes/weapons/aim_sway.gd" id="7"]
 [ext_resource type="Script" path="res://scenes/killcam.gd" id="8"]
+[ext_resource type="Script" path="res://scenes/player/stealth_kit.gd" id="9"]
 
 [node name="RangeMission" type="Node3D"]
 script = ExtResource("1")
@@ -25,6 +26,9 @@ script = ExtResource("7")
 
 [node name="KillCam" type="Node" parent="."]
 script = ExtResource("8")
+
+[node name="StealthKit" type="Node" parent="."]
+script = ExtResource("9")
 
 [node name="HUDLayer" type="CanvasLayer" parent="."]
 
