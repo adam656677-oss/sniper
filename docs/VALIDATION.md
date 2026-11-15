@@ -20,7 +20,7 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.3 
 
 | Suite | File | Covers |
 |---|---|---|
-| Smoke (36 checks) | `tests/smoke.gd` | Scene load, player and camera, targets, floor collision, intel and extraction rules, timed reload, reserve transfer, pause freezing reload and physics, cooldown, completion HUD |
+| Smoke (34 checks) | `tests/smoke.gd` | Scene load, player and camera, targets, floor collision, intel and extraction rules, timed reload, reserve transfer, pause freezing reload and physics, cooldown, completion HUD |
 | Focus | `tests/focus.gd` | Focus-loss pause, mouse release, reload freeze, explicit resume, completed-mission input blocking |
 | Ballistics (8 checks) | `tests/ballistics_test.gd` | Integration step with gravity and wind, segment tracing |
 | Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |

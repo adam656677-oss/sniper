@@ -1,17 +1,22 @@
 extends Control
 
-var game: Node
+# Scope reticle drawn over the view while the projectile rifle is aimed.
+
 var range_text := "RANGE --"
 
 func _ready() -> void:
-	game = get_parent().get_parent()
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+func mission() -> Node:
+	return owner
+
 func _physics_process(_delta: float) -> void:
-	if not is_instance_valid(game) or not is_instance_valid(game.camera):
+	var game := mission()
+	if game == null or not is_instance_valid(game.camera):
 		visible = false
 		return
-	visible = game.active_weapon == 0 and game.camera.fov < 70.0 and not game.paused and not game.finished
+	var scoped: bool = game.weapon.profile().simulated_projectile and game.camera.fov < 70.0
+	visible = scoped and GameState.simulation_active()
 	if not visible:
 		return
 	var origin: Vector3 = game.camera.global_position
@@ -46,6 +51,6 @@ func _draw() -> void:
 		draw_line(center + Vector2(-4, offset), center + Vector2(4, offset), ink, 1.0)
 	var font := ThemeDB.fallback_font
 	draw_string(font, center + Vector2(-90, radius * 0.65), range_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
-	var wind: Vector3 = game.wind_acceleration
+	var wind: Vector3 = mission().weapon.wind_acceleration
 	draw_string(font, center + Vector2(-150, radius * 0.78), "Wind acceleration X/Z: %.1f / %.1f m/s^2" % [wind.x, wind.z], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
 	draw_string(font, center + Vector2(-120, -radius * 0.75), "PROTOTYPE - UNCALIBRATED", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)

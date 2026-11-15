@@ -1,11 +1,11 @@
 extends RefCounted
 
 # Fictional balancing only. No real firearm modification specifications.
-const FAMILIES := ["recon", "origin12", "ksg", "ar_style", "l115_style"]
+const FAMILIES := ["recon", "auto_shotgun", "pump_shotgun", "carbine", "heavy_rifle"]
 const PARTS := {
-	"precision_scope": {"slot": "optic", "families": ["recon", "ar_style", "l115_style"], "multiply": {}, "set": {"fov": 18.0}},
+	"precision_scope": {"slot": "optic", "families": ["recon", "carbine", "heavy_rifle"], "multiply": {}, "set": {"fov": 18.0}},
 	"reflex": {"slot": "optic", "families": FAMILIES, "multiply": {}, "set": {"fov": 60.0}},
-	"light_spring": {"slot": "spring", "families": ["origin12", "ar_style"], "multiply": {"interval": 0.9, "spread": 1.1}, "set": {}},
+	"light_spring": {"slot": "spring", "families": ["auto_shotgun", "carbine"], "multiply": {"interval": 0.9, "spread": 1.1}, "set": {}},
 	"light_stock": {"slot": "stock", "families": FAMILIES, "multiply": {"reload": 0.95, "spread": 1.1}, "set": {}},
 	"stable_stock": {"slot": "stock", "families": FAMILIES, "multiply": {"reload": 1.05, "spread": 0.9}, "set": {}}
 }
@@ -43,5 +43,5 @@ static func upgraded_preset(family: String) -> Dictionary:
 	if family not in FAMILIES:
 		return {}
 	var result := {"stock": "stable_stock"}
-	result["optic"] = "precision_scope" if family in ["recon", "l115_style"] else "reflex"
+	result["optic"] = "precision_scope" if family in ["recon", "heavy_rifle"] else "reflex"
 	return result

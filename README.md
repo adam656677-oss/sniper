@@ -10,9 +10,22 @@ Planning and status live in `docs/`:
 - `docs/TOOLING.md`: tools, asset sources, licences and what the owner needs to provide.
 - `docs/VALIDATION.md`: how to run the tests and builds.
 
+## Layout
+
+| Path | Role |
+|---|---|
+| `main.tscn`, `mission.gd` | Mission root: wires level, player, weapon rig and HUD; routes input actions |
+| `autoload/game_state.gd` | `GameState` autoload: paused, finished, intel, mission signals |
+| `scenes/player/` | First-person body and camera |
+| `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
+| `scenes/levels/test_range.tscn` | The test range level; targets are children of `Targets` |
+| `scenes/ui/hud.gd`, `scope_overlay.gd` | HUD label and scope reticle |
+| `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
+| `tests/` | Headless test suites run by `scripts/validate.sh` and CI |
+
 ## Implemented
 
-Procedurally spawned test range (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Controls
 
@@ -38,4 +51,4 @@ Runs the editor import and all six headless test suites (smoke, focus, ballistic
 
 ## Limitations
 
-This is a prototype, not a finished game. Targets are stationary blocks with no AI. There are no models, animations, sounds, menus, settings or saves. The scope is a field-of-view change with a drawn overlay, not a rendered optic. The weapon table uses placeholder names that must be replaced before any public build. See `docs/CHECKLIST.md` for the full plan.
+This is a prototype, not a finished game. Targets are stationary blocks with no AI. There are no models, animations, sounds, menus, settings or saves. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.

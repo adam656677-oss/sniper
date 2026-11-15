@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/weapon_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Bulwark pump shotgun"
+family = "pump_shotgun"
+capacity = 14
+reserve = 28
+reload_seconds = 5.0
+shot_interval = 0.95
+pellets = 8
+spread = 0.045
+max_range = 50.0
+aim_fov = 60.0
+simulated_projectile = false
+muzzle_velocity = 0.0

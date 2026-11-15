@@ -1,6 +1,7 @@
 extends SceneTree
 
 var failures := 0
+var state: Node
 var checks := 0
 
 func check(condition: bool, description: String) -> void:
@@ -21,6 +22,7 @@ func _initialize() -> void:
 	call_deferred("run_tests")
 
 func run_tests() -> void:
+	state = root.get_node("GameState")
 	var packed = load("res://main.tscn")
 	check(packed is PackedScene, "Main scene loads")
 	if not packed is PackedScene:
@@ -29,69 +31,74 @@ func run_tests() -> void:
 	var game = packed.instantiate()
 	root.add_child(game)
 	await process_frame
+	var weapon = game.weapon
 	check(is_instance_valid(game.player), "Player exists")
 	check(is_instance_valid(game.camera), "Camera exists")
 	check(game.camera.current, "Camera is active")
-	check(game.targets.size() == 3, "Three test targets spawn")
-	check(game.ammo == 5, "Starting magazine has five rounds")
-	check(game.reserve_ammo == 20, "Starting reserve has twenty rounds")
-	check(not game.intel and not game.finished, "Mission starts incomplete")
+	check(game.level.targets.size() == 3, "Three test targets spawn")
+	check(weapon.ammo == 5 and weapon.reserve_ammo == 20, "Starting ammunition is finite")
+	check(not state.intel and not state.finished, "Mission starts incomplete")
 	for i in range(90):
 		await physics_frame
 	check(game.player.is_on_floor(), "Player settles on floor")
 	check(game.player.position.y > 0.5, "Player does not fall through floor")
 	press(game, KEY_E)
-	check(not game.finished, "Extraction without intel is rejected")
+	check(not state.finished, "Extraction without intel is rejected")
 	game.player.position = Vector3(0, 1, -50)
 	press(game, KEY_E)
-	check(not game.intel, "Intel cannot be collected from a distance")
+	check(not state.intel, "Intel cannot be collected from a distance")
 	game.player.position = Vector3(0, 1, -58)
 	press(game, KEY_E)
-	check(game.intel, "Nearby terminal grants intel")
-	check(not game.finished, "Intel collection does not immediately extract")
-	check(not game.begin_reload(), "Full magazine rejects reload")
-	game.ammo = 0
+	check(state.intel, "Nearby terminal grants intel")
+	check(not state.finished, "Intel collection does not immediately extract")
+	check(not weapon.begin_reload(), "Full magazine rejects reload")
+	weapon.ammo = 0
 	press(game, KEY_R)
-	check(game.ammo == 0 and game.reload_remaining > 0.0, "Reload is not instantaneous")
-	check(not game.can_fire(), "Reload blocks firing")
-	check(not game.begin_reload(), "Duplicate reload is rejected")
-	game.advance_weapon(1.0)
-	check(game.ammo == 0, "Incomplete reload transfers no ammunition")
+	check(weapon.reload_remaining > 0 and weapon.ammo == 0, "Reload is timed, not instant")
+	check(not weapon.can_fire(), "Cannot fire during reload")
+	check(not weapon.begin_reload(), "Duplicate reload is rejected")
+	weapon.advance_weapon(1.0)
+	check(weapon.ammo == 0, "Partial reload does not grant ammunition")
 	press(game, KEY_ESCAPE)
-	check(game.paused, "Escape pauses game")
-	var remaining: float = game.reload_remaining
-	var location: Vector3 = game.player.position
-	game.advance_weapon(10.0)
-	game._physics_process(1.0)
-	check(game.reload_remaining == remaining, "Pause freezes reload timer")
-	check(game.player.position == location, "Pause freezes player simulation")
+	check(state.paused, "Escape pauses simulation")
+	var remaining: float = weapon.reload_remaining
+	weapon.advance_weapon(5.0)
+	check(weapon.reload_remaining == remaining, "Reload freezes while paused")
+	var before: Vector3 = game.player.position
+	game.player.velocity = Vector3(5, 0, 0)
+	game.player._physics_process(1.0)
+	check(game.player.position == before, "Player physics freezes while paused")
+	game.player.velocity = Vector3.ZERO
+	game._physics_process(0.0)
 	check(game.hud.text.contains("PAUSED"), "Pause is displayed")
 	press(game, KEY_ESCAPE)
-	check(not game.paused, "Escape resumes game")
-	game.advance_weapon(3.0)
-	check(game.ammo == 5 and game.reserve_ammo == 15, "Reload consumes reserve ammunition")
-	check(game.can_fire(), "Loaded rifle can fire")
-	game.shot_remaining = 0.9
-	check(not game.can_fire(), "Bolt cycle blocks firing")
-	game.advance_weapon(1.0)
-	check(game.can_fire(), "Bolt cycle expires")
-	game.ammo = 4
-	game.reserve_ammo = 1
-	check(game.begin_reload(), "Partial reload starts")
-	game.advance_weapon(3.0)
-	check(game.ammo == 5 and game.reserve_ammo == 0, "Partial reload conserves ammunition")
-	game.ammo = 0
-	check(not game.begin_reload(), "Empty reserve prevents reload")
-	check(not game.can_fire(), "Empty magazine prevents firing")
+	check(not state.paused, "Escape resumes simulation")
+	weapon.advance_weapon(2.1)
+	check(weapon.ammo == 5 and weapon.reserve_ammo == 15, "Completed reload consumes reserve")
+	check(weapon.can_fire(), "Loaded rifle can fire")
+	weapon.shot_remaining = 1.0
+	check(not weapon.can_fire(), "Cooldown blocks firing")
+	weapon.advance_weapon(1.1)
+	check(weapon.can_fire(), "Weapon becomes ready after cooldown")
+	weapon.ammo = 4
+	weapon.reserve_ammo = 1
+	weapon.begin_reload()
+	weapon.advance_weapon(2.3)
+	check(weapon.ammo == 5 and weapon.reserve_ammo == 0, "Partial magazine uses exact reserve")
+	weapon.ammo = 0
+	weapon.begin_reload()
+	check(weapon.reload_remaining == 0 and not weapon.can_fire(), "Empty reserve cannot reload or fire")
 	game.player.position = Vector3(0, -20, 0)
-	game._physics_process(0.0)
+	game.player._physics_process(0.0)
 	check(game.player.position == Vector3(0, 1, 3), "Falling off map recovers player")
 	press(game, KEY_E)
-	check(game.finished, "Returning with intel completes mission")
-	check(not game.can_fire(), "Completed mission prevents firing")
+	check(state.finished, "Returning with intel completes mission")
+	check(not weapon.can_fire(), "Completed mission blocks firing")
 	await physics_frame
 	await process_frame
 	check(game.hud.text.contains("MISSION COMPLETE"), "HUD reports mission completion")
+	press(game, KEY_ESCAPE)
+	check(not state.paused, "Pause is ignored after completion")
 	game.queue_free()
 	await process_frame
 	print("Checks: %d; failures: %d" % [checks, failures])

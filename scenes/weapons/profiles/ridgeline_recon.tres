@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/weapon_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Ridgeline recon rifle"
+family = "recon"
+capacity = 5
+reserve = 20
+reload_seconds = 2.2
+shot_interval = 0.9
+pellets = 1
+spread = 0.0
+max_range = 300.0
+aim_fov = 25.0
+simulated_projectile = true
+muzzle_velocity = 180.0

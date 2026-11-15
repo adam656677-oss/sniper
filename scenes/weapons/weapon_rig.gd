@@ -1,0 +1,154 @@
+class_name WeaponRig
+extends Node
+
+# Owns the loadout, per-weapon ammunition, reload and cycling timers, and
+# fires either hitscan pellets or a simulated projectile (see ballistics.gd).
+# Needs `camera` and `excluded` set by the mission before firing.
+
+const Ballistics = preload("res://ballistics.gd")
+const DEFAULT_PROFILES := [
+	"res://scenes/weapons/profiles/ridgeline_recon.tres",
+	"res://scenes/weapons/profiles/vanguard_auto.tres",
+	"res://scenes/weapons/profiles/bulwark_pump.tres"
+]
+const HIP_FOV := 75.0
+const PROJECTILE_LIFETIME := 3.0
+const SUBSTEP := 1.0 / 120.0
+
+signal body_hit(body: Node3D)
+
+var profiles: Array[WeaponProfile] = []
+var active := 0
+var ammo := 0
+var reserve_ammo := 0
+var reload_remaining := 0.0
+var shot_remaining := 0.0
+var stored: Array[Dictionary] = []
+var projectiles: Array[Dictionary] = []
+var wind_acceleration := Vector3.ZERO
+var spread_rng := RandomNumberGenerator.new()
+var camera: Camera3D
+var excluded: Array[RID] = []
+
+func _ready() -> void:
+	spread_rng.randomize()
+	if profiles.is_empty():
+		for path in DEFAULT_PROFILES:
+			profiles.append(load(path) as WeaponProfile)
+	for profile in profiles:
+		stored.append({"ammo": profile.capacity, "reserve": profile.reserve, "cooldown": 0.0})
+	ammo = profiles[active].capacity
+	reserve_ammo = profiles[active].reserve
+
+func profile() -> WeaponProfile:
+	return profiles[active]
+
+func select_weapon(index: int) -> bool:
+	if not GameState.simulation_active() or reload_remaining > 0.0 or index < 0 or index >= profiles.size():
+		return false
+	stored[active] = {"ammo": ammo, "reserve": reserve_ammo, "cooldown": shot_remaining}
+	active = index
+	ammo = int(stored[index].ammo)
+	reserve_ammo = int(stored[index].reserve)
+	shot_remaining = float(stored[index].cooldown)
+	if camera:
+		camera.fov = HIP_FOV
+	return true
+
+func toggle_aim() -> void:
+	if camera and GameState.simulation_active():
+		camera.fov = profile().aim_fov if camera.fov > 70.0 else HIP_FOV
+
+func begin_reload() -> bool:
+	if not GameState.simulation_active() or reload_remaining > 0.0 or ammo >= profile().capacity or reserve_ammo <= 0:
+		return false
+	reload_remaining = profile().reload_seconds
+	return true
+
+func advance_weapon(delta: float) -> void:
+	if not GameState.simulation_active():
+		return
+	var elapsed := maxf(delta, 0.0)
+	shot_remaining = maxf(0.0, shot_remaining - elapsed)
+	if reload_remaining > 0.0:
+		reload_remaining = maxf(0.0, reload_remaining - elapsed)
+		if reload_remaining == 0.0:
+			var transfer := mini(profile().capacity - ammo, reserve_ammo)
+			ammo += transfer
+			reserve_ammo -= transfer
+
+func can_fire() -> bool:
+	return GameState.simulation_active() and ammo > 0 and reload_remaining == 0.0 and shot_remaining == 0.0
+
+func fire_weapon() -> bool:
+	if not can_fire() or camera == null:
+		return false
+	ammo -= 1
+	var current := profile()
+	shot_remaining = current.shot_interval
+	if current.simulated_projectile:
+		projectiles.append({
+			"position": camera.global_position,
+			"velocity": -camera.global_basis.z * current.muzzle_velocity,
+			"age": 0.0,
+			"distance": 0.0
+		})
+		return true
+	var space := camera.get_world_3d().direct_space_state
+	for pellet in range(current.pellets):
+		var angle := spread_rng.randf_range(0.0, TAU)
+		var radius := sqrt(spread_rng.randf()) * current.spread
+		var local_direction := Vector3(cos(angle) * radius, sin(angle) * radius, -1.0).normalized()
+		var origin := camera.global_position
+		var finish := origin + camera.global_basis * local_direction * current.max_range
+		var hit := Ballistics.trace_segment(space, origin, finish, excluded)
+		if not hit.is_empty():
+			body_hit.emit(hit.collider)
+	return true
+
+func advance_projectiles(delta: float) -> void:
+	if not GameState.simulation_active() or camera == null:
+		return
+	var elapsed := maxf(delta, 0.0)
+	var space := camera.get_world_3d().direct_space_state
+	var max_range := profiles[0].max_range
+	for profile_entry in profiles:
+		if profile_entry.simulated_projectile:
+			max_range = profile_entry.max_range
+	for index in range(projectiles.size() - 1, -1, -1):
+		var projectile: Dictionary = projectiles[index]
+		var remaining := minf(elapsed, PROJECTILE_LIFETIME - float(projectile.age))
+		var removed := false
+		while remaining > 0.0:
+			var dt := minf(remaining, SUBSTEP)
+			var start: Vector3 = projectile.position
+			var state := Ballistics.step(start, projectile.velocity, dt, 9.81, wind_acceleration)
+			var finish: Vector3 = state.position
+			var segment_length := start.distance_to(finish)
+			var range_left := maxf(0.0, max_range - float(projectile.distance))
+			if segment_length > range_left:
+				finish = start.move_toward(finish, range_left)
+			var hit := Ballistics.trace_segment(space, start, finish, excluded)
+			if not hit.is_empty():
+				body_hit.emit(hit.collider)
+				removed = true
+				break
+			projectile.position = finish
+			projectile.velocity = state.velocity
+			projectile.age = float(projectile.age) + dt
+			projectile.distance = float(projectile.distance) + start.distance_to(finish)
+			remaining = maxf(0.0, remaining - dt)
+			if segment_length >= range_left:
+				removed = true
+				break
+		if removed or float(projectile.age) >= PROJECTILE_LIFETIME:
+			projectiles.remove_at(index)
+
+func status_text() -> String:
+	if reload_remaining > 0.0:
+		return "RELOADING %.1fs" % reload_remaining
+	if ammo == 0:
+		return "EMPTY - R to reload"
+	if shot_remaining > 0.0:
+		return "CYCLING"
+	return "READY"

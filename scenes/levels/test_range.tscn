@@ -1,0 +1,147 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/test_range.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="ground_mesh"]
+size = Vector3(80, 1, 100)
+
+[sub_resource type="BoxShape3D" id="ground_shape"]
+size = Vector3(80, 1, 100)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.24, 0.32, 0.23, 1)
+
+[sub_resource type="BoxMesh" id="cover_mesh"]
+size = Vector3(6, 4, 5)
+
+[sub_resource type="BoxShape3D" id="cover_shape"]
+size = Vector3(6, 4, 5)
+
+[sub_resource type="StandardMaterial3D" id="cover_mat"]
+albedo_color = Color(0.4, 0.43, 0.4, 1)
+
+[sub_resource type="BoxMesh" id="target_mesh"]
+size = Vector3(0.8, 2, 0.6)
+
+[sub_resource type="BoxShape3D" id="target_shape"]
+size = Vector3(0.8, 2, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="target_mat"]
+albedo_color = Color(0.7, 0.25, 0.18, 1)
+
+[sub_resource type="BoxMesh" id="terminal_mesh"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="terminal_shape"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="terminal_mat"]
+albedo_color = Color(0.95, 0.75, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="extraction_mesh"]
+size = Vector3(3, 0.1, 3)
+
+[sub_resource type="BoxShape3D" id="extraction_shape"]
+size = Vector3(3, 0.1, 3)
+
+[sub_resource type="StandardMaterial3D" id="extraction_mat"]
+albedo_color = Color(0.1, 0.8, 0.4, 1)
+
+[node name="TestRange" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.409576, -0.286788, 0, 0.573576, 0.819152, 0.5, -0.709406, 0.496732, 0, 10, 0)
+light_energy = 1.4
+
+[node name="Targets" type="Node3D" parent="."]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -25)
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("ground_mesh")
+material_override = SubResource("ground_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("ground_shape")
+
+[node name="Cover1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2, -18)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover1"]
+mesh = SubResource("cover_mesh")
+material_override = SubResource("cover_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover1"]
+shape = SubResource("cover_shape")
+
+[node name="Cover2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2, -35)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover2"]
+mesh = SubResource("cover_mesh")
+material_override = SubResource("cover_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover2"]
+shape = SubResource("cover_shape")
+
+[node name="Cover3" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, -48)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover3"]
+mesh = SubResource("cover_mesh")
+material_override = SubResource("cover_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover3"]
+shape = SubResource("cover_shape")
+
+[node name="Target1" type="StaticBody3D" parent="Targets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
+
+[node name="Mesh" type="MeshInstance3D" parent="Targets/Target1"]
+mesh = SubResource("target_mesh")
+material_override = SubResource("target_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Targets/Target1"]
+shape = SubResource("target_shape")
+
+[node name="Target2" type="StaticBody3D" parent="Targets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1, -42)
+
+[node name="Mesh" type="MeshInstance3D" parent="Targets/Target2"]
+mesh = SubResource("target_mesh")
+material_override = SubResource("target_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Targets/Target2"]
+shape = SubResource("target_shape")
+
+[node name="Target3" type="StaticBody3D" parent="Targets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -55)
+
+[node name="Mesh" type="MeshInstance3D" parent="Targets/Target3"]
+mesh = SubResource("target_mesh")
+material_override = SubResource("target_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Targets/Target3"]
+shape = SubResource("target_shape")
+
+[node name="Terminal" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -60)
+
+[node name="Mesh" type="MeshInstance3D" parent="Terminal"]
+mesh = SubResource("terminal_mesh")
+material_override = SubResource("terminal_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Terminal"]
+shape = SubResource("terminal_shape")
+
+[node name="Extraction" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 3)
+
+[node name="Mesh" type="MeshInstance3D" parent="Extraction"]
+mesh = SubResource("extraction_mesh")
+material_override = SubResource("extraction_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Extraction"]
+shape = SubResource("extraction_shape")

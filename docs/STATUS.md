@@ -4,7 +4,7 @@ Audited 2026-11-15 against commit `71c37b9` (branch `main`). Every claim below w
 
 ## Update 2026-11-15 (branch `adam/eager-brown-kubebc`)
 
-Items 0.1, 0.2, 0.3 and 0.11 of the checklist are done on this branch: `main.gd` and `tests/smoke.gd` restored to the `7388d30` versions, `scope_overlay.gd` typed, workflows match only `SCRIPT ERROR:` and `FAIL:`. All six suites pass locally on a fresh import. The audit below describes `main` as found.
+Items 0.1 through 0.8 and 0.11 of the checklist are done on this branch. The build is repaired and CI is green (first Windows build artefact produced). The four-layer inheritance chain is gone: the project is now `mission.gd` (root) + `GameState` autoload + `Player` scene + `WeaponRig` node with `WeaponProfile` resources + `TestRange` level scene + HUD and scope overlay. Input goes through `InputMap` actions. Weapon names are fictional. All six suites pass locally on a fresh import. The audit below describes `main` as found.
 
 ## Headline
 
