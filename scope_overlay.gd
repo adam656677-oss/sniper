@@ -51,6 +51,6 @@ func _draw() -> void:
 		draw_line(center + Vector2(-4, offset), center + Vector2(4, offset), ink, 1.0)
 	var font := ThemeDB.fallback_font
 	draw_string(font, center + Vector2(-90, radius * 0.65), range_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
-	var wind: Vector3 = mission().weapon.wind_acceleration
-	draw_string(font, center + Vector2(-150, radius * 0.78), "Wind acceleration X/Z: %.1f / %.1f m/s^2" % [wind.x, wind.z], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
+	var wind: Vector3 = mission().weapon.wind
+	draw_string(font, center + Vector2(-150, radius * 0.78), "Wind X/Z: %.1f / %.1f m/s" % [wind.x, wind.z], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
 	draw_string(font, center + Vector2(-120, -radius * 0.75), "PROTOTYPE - UNCALIBRATED", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)

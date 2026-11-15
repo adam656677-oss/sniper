@@ -25,7 +25,7 @@ var reload_remaining := 0.0
 var shot_remaining := 0.0
 var stored: Array[Dictionary] = []
 var projectiles: Array[Dictionary] = []
-var wind_acceleration := Vector3.ZERO
+var wind := Vector3.ZERO # Air-mass velocity in m/s.
 var spread_rng := RandomNumberGenerator.new()
 var camera: Camera3D
 var excluded: Array[RID] = []
@@ -87,11 +87,15 @@ func fire_weapon() -> bool:
 	var current := profile()
 	shot_remaining = current.shot_interval
 	if current.simulated_projectile:
+		var params := Ballistics.make_params(Ballistics.DEFAULT_GRAVITY, current.drag_coefficient, wind)
+		var elevation := Ballistics.zero_angle(current.muzzle_velocity, current.zero_range, params)
+		var direction := (-camera.global_basis.z).rotated(camera.global_basis.x, elevation)
 		projectiles.append({
 			"position": camera.global_position,
-			"velocity": -camera.global_basis.z * current.muzzle_velocity,
+			"velocity": direction * current.muzzle_velocity,
 			"age": 0.0,
-			"distance": 0.0
+			"distance": 0.0,
+			"profile": current
 		})
 		return true
 	var space := camera.get_world_3d().direct_space_state
@@ -111,18 +115,17 @@ func advance_projectiles(delta: float) -> void:
 		return
 	var elapsed := maxf(delta, 0.0)
 	var space := camera.get_world_3d().direct_space_state
-	var max_range := profiles[0].max_range
-	for profile_entry in profiles:
-		if profile_entry.simulated_projectile:
-			max_range = profile_entry.max_range
 	for index in range(projectiles.size() - 1, -1, -1):
 		var projectile: Dictionary = projectiles[index]
+		var shot_profile: WeaponProfile = projectile.profile
+		var max_range: float = shot_profile.max_range
+		var params := Ballistics.make_params(Ballistics.DEFAULT_GRAVITY, shot_profile.drag_coefficient, wind)
 		var remaining := minf(elapsed, PROJECTILE_LIFETIME - float(projectile.age))
 		var removed := false
 		while remaining > 0.0:
 			var dt := minf(remaining, SUBSTEP)
 			var start: Vector3 = projectile.position
-			var state := Ballistics.step(start, projectile.velocity, dt, 9.81, wind_acceleration)
+			var state := Ballistics.step_drag(start, projectile.velocity, dt, params)
 			var finish: Vector3 = state.position
 			var segment_length := start.distance_to(finish)
 			var range_left := maxf(0.0, max_range - float(projectile.distance))

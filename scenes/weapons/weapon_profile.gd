@@ -16,6 +16,9 @@ extends Resource
 @export var aim_fov := 25.0
 @export var simulated_projectile := false
 @export var muzzle_velocity := 180.0
+@export var drag_coefficient := 0.0
+@export var zero_range := 0.0
+@export var damage := 50.0
 
 func to_stats() -> Dictionary:
 	return {

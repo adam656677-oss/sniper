@@ -32,7 +32,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 ## Phase 1: Core sniper feel (the shot)
 
 - [ ] 1.1 Rendered scope. A `SubViewport` rendering the scoped view through a scope mesh, with parallax, eye-box vignette, chromatic edge and reticle as a texture. Variable zoom (e.g. 4x to 12x). Verify: playtest; test asserts scope camera FOV range and that reticle scene instantiates.
-- [ ] 1.2 Ballistics v2 in `ballistics.gd`: drag (G1 or G7 coefficient), muzzle velocity per profile, wind as a velocity vector affecting relative airflow, zeroing distance. Verify: test with reference trajectories (drop at 300 m, 600 m, 1000 m within tolerance).
+- [x] 1.2 Ballistics v2 in `ballistics.gd`: drag (G1 or G7 coefficient), muzzle velocity per profile, wind as a velocity vector affecting relative airflow, zeroing distance. Verify: test with reference trajectories (drop at 300 m, 600 m, 1000 m within tolerance).
 - [ ] 1.3 Breath hold and sway: stamina-driven hold, sway amplitude based on stance and heart rate. Verify: test sway amplitude ranges by stance; playtest feel.
 - [ ] 1.4 Stances: stand, crouch, prone. Prone with bipod reduces sway further. Verify: test collider heights and sway multipliers.
 - [ ] 1.5 Range-finding and wind reading: laser range finder (or mil-dot estimation on realism setting), wind indicator on HUD and in scope, wind sock props in level. Verify: test range readout against known distance; playtest readability.
