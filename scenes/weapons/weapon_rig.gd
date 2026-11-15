@@ -15,7 +15,7 @@ const HIP_FOV := 75.0
 const PROJECTILE_LIFETIME := 3.0
 const SUBSTEP := 1.0 / 120.0
 
-signal body_hit(body: Node3D)
+signal body_hit(body: Node3D, shape_index: int, damage: float)
 
 var profiles: Array[WeaponProfile] = []
 var active := 0
@@ -107,7 +107,7 @@ func fire_weapon() -> bool:
 		var finish := origin + camera.global_basis * local_direction * current.max_range
 		var hit := Ballistics.trace_segment(space, origin, finish, excluded)
 		if not hit.is_empty():
-			body_hit.emit(hit.collider)
+			body_hit.emit(hit.collider, int(hit.get("shape", -1)), current.damage)
 	return true
 
 func advance_projectiles(delta: float) -> void:
@@ -133,7 +133,7 @@ func advance_projectiles(delta: float) -> void:
 				finish = start.move_toward(finish, range_left)
 			var hit := Ballistics.trace_segment(space, start, finish, excluded)
 			if not hit.is_empty():
-				body_hit.emit(hit.collider)
+				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage)
 				removed = true
 				break
 			projectile.position = finish

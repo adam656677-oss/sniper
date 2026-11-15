@@ -7,6 +7,7 @@ extends Node3D
 @onready var player: Player = $Player
 @onready var weapon: WeaponRig = $WeaponRig
 @onready var hud: Label = $HUDLayer/HUD
+@onready var sway: AimSway = $AimSway
 var camera: Camera3D
 
 func _ready() -> void:
@@ -51,6 +52,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		weapon.select_weapon(1)
 	elif event.is_action_pressed("weapon_3"):
 		weapon.select_weapon(2)
+	elif event.is_action_pressed("crouch"):
+		player.toggle_stance(Player.Stance.CROUCH)
+	elif event.is_action_pressed("prone"):
+		player.toggle_stance(Player.Stance.PRONE)
 	elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		if event.is_action_pressed("fire"):
 			weapon.fire_weapon()
@@ -63,12 +68,30 @@ func update_hud() -> void:
 		objective = "MISSION COMPLETE - N to restart"
 	elif GameState.paused:
 		objective = "PAUSED - Escape to resume | N to restart"
-	hud.text = "ECHO RIDGE | prototype\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n1-3 weapon | Left fire | Right aim | R reload | E interact | Escape pause" % [
-		objective, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size()]
+	var stance_name: String = Player.Stance.keys()[player.stance].capitalize()
+	var breath := "Breath %d%%" % int(round(sway.breath_fraction() * 100.0))
+	if sway.exhausted:
+		breath = "WINDED"
+	elif sway.holding:
+		breath = "HOLDING %d%%" % int(round(sway.breath_fraction() * 100.0))
+	hud.text = "ECHO RIDGE | prototype\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s\n1-3 weapon | Left fire | Right aim | Shift hold breath | C crouch | Z prone | R reload | E interact | Escape pause" % [
+		objective, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath]
+
+func is_aiming() -> bool:
+	return camera.fov < 70.0
+
+func advance_sway(delta: float) -> void:
+	sway.stance_multiplier = player.sway_multiplier()
+	if GameState.simulation_active():
+		sway.set_holding(is_aiming() and Input.is_action_pressed("hold_breath"))
+		sway.advance(delta)
+	var offset := sway.offset_degrees() if is_aiming() and GameState.simulation_active() else Vector2.ZERO
+	camera.rotation_degrees = Vector3(offset.y, offset.x, 0.0)
 
 func _physics_process(delta: float) -> void:
 	weapon.advance_weapon(delta)
 	weapon.advance_projectiles(delta)
+	advance_sway(delta)
 	if GameState.finished:
 		weapon.projectiles.clear()
 	update_hud()

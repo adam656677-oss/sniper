@@ -16,12 +16,25 @@ func _ready() -> void:
 	RenderingServer.set_default_clear_color(clear_color)
 	for child in $Targets.get_children():
 		if child is StaticBody3D:
-			targets.append(child)
+			register_target(child)
 
-func on_body_hit(body: Node3D) -> void:
+func register_target(body: StaticBody3D) -> void:
+	targets.append(body)
+	if body.has_signal("died") and not body.died.is_connected(on_target_died):
+		body.died.connect(on_target_died)
+
+func on_target_died(body: Node3D) -> void:
 	if body in targets:
 		targets.erase(body)
 		body.queue_free()
+
+func on_body_hit(body: Node3D, shape_index: int = -1, damage: float = 0.0) -> void:
+	if body == null:
+		return
+	if body.has_method("take_hit"):
+		body.take_hit(shape_index, damage)
+	elif body in targets:
+		on_target_died(body)
 
 func near_terminal(point: Vector3) -> bool:
 	return point.distance_to(terminal_point) < INTERACT_DISTANCE

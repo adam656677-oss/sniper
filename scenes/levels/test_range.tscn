@@ -1,6 +1,7 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scenes/levels/test_range.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/targets/target_dummy.tscn" id="2"]
 
 [sub_resource type="BoxMesh" id="ground_mesh"]
 size = Vector3(80, 1, 100)
@@ -19,15 +20,6 @@ size = Vector3(6, 4, 5)
 
 [sub_resource type="StandardMaterial3D" id="cover_mat"]
 albedo_color = Color(0.4, 0.43, 0.4, 1)
-
-[sub_resource type="BoxMesh" id="target_mesh"]
-size = Vector3(0.8, 2, 0.6)
-
-[sub_resource type="BoxShape3D" id="target_shape"]
-size = Vector3(0.8, 2, 0.6)
-
-[sub_resource type="StandardMaterial3D" id="target_mat"]
-albedo_color = Color(0.7, 0.25, 0.18, 1)
 
 [sub_resource type="BoxMesh" id="terminal_mesh"]
 size = Vector3(1, 1, 1)
@@ -96,35 +88,14 @@ material_override = SubResource("cover_mat")
 [node name="Collision" type="CollisionShape3D" parent="Cover3"]
 shape = SubResource("cover_shape")
 
-[node name="Target1" type="StaticBody3D" parent="Targets"]
+[node name="Target1" parent="Targets" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
 
-[node name="Mesh" type="MeshInstance3D" parent="Targets/Target1"]
-mesh = SubResource("target_mesh")
-material_override = SubResource("target_mat")
-
-[node name="Collision" type="CollisionShape3D" parent="Targets/Target1"]
-shape = SubResource("target_shape")
-
-[node name="Target2" type="StaticBody3D" parent="Targets"]
+[node name="Target2" parent="Targets" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1, -42)
 
-[node name="Mesh" type="MeshInstance3D" parent="Targets/Target2"]
-mesh = SubResource("target_mesh")
-material_override = SubResource("target_mat")
-
-[node name="Collision" type="CollisionShape3D" parent="Targets/Target2"]
-shape = SubResource("target_shape")
-
-[node name="Target3" type="StaticBody3D" parent="Targets"]
+[node name="Target3" parent="Targets" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -55)
-
-[node name="Mesh" type="MeshInstance3D" parent="Targets/Target3"]
-mesh = SubResource("target_mesh")
-material_override = SubResource("target_mat")
-
-[node name="Collision" type="CollisionShape3D" parent="Targets/Target3"]
-shape = SubResource("target_shape")
 
 [node name="Terminal" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -60)

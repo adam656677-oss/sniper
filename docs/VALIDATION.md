@@ -2,7 +2,7 @@
 
 CI pins Godot 4.7 stable for repeatability. Three workflows exist:
 
-- **Validate and build** (`build.yml`): import, run every test suite, export a Windows x86-64 development build, upload it as `EchoRidge-Windows-development`.
+- **Validate and build** (`build.yml`): runs `scripts/validate.sh --export`, which imports the project, runs every suite in `tests/`, exports a Windows x86-64 development build, and uploads it as `EchoRidge-Windows-development`. CI and local validation are the same script.
 - **Projectile regression tests** (`projectiles.yml`): import plus the ballistics and projectile suites only.
 - **Windows runtime smoke test** (`windows-runtime.yml`): after a successful validate run, launches the exported executable headlessly on a Windows runner for 120 frames and checks the log.
 
@@ -25,7 +25,9 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 
 | Ballistics (8 checks) | `tests/ballistics_test.gd` | Integration step with gravity and wind, segment tracing |
 | Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |
 | Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
-| Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, spread |
+| Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, fictional names |
+| Aim | `tests/aim.gd` | Stances (collider, eye height, speed), sway amplitude by stance, breath hold, exhaustion and recovery, camera sway application |
+| Targets | `tests/targets.gd` | Hit zones (head, torso, limb), damage multipliers, death removal, live projectile headshot |
 
 Not covered: visual appearance, audio, aim feel, Windows launch beyond a headless 120-frame run, performance, enemy behaviour (none exists).
 

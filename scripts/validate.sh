@@ -33,10 +33,9 @@ run_step() {
 }
 
 run_step import --editor --quit
-for suite in smoke focus ballistics_test projectiles gunsmith weapons; do
-  if [ -f "tests/$suite.gd" ]; then
-    run_step "$suite" --script "res://tests/$suite.gd"
-  fi
+for path in tests/*.gd; do
+  suite="$(basename "$path" .gd)"
+  run_step "$suite" --script "res://tests/$suite.gd"
 done
 
 if [ "${1:-}" = "--export" ]; then
