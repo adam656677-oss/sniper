@@ -9,6 +9,9 @@ const INTERACT_DISTANCE := 3.0
 @export var terminal_point := Vector3(0, 1, -60)
 @export var extraction_point := Vector3(0, 1, 3)
 @export var clear_color := Color(0.45, 0.62, 0.74)
+@export var wind := Vector3(2.0, 0.0, 0.0) # Air-mass velocity in m/s, world frame.
+
+signal target_killed(body: Node3D, distance: float)
 
 var targets: Array[StaticBody3D] = []
 
@@ -28,13 +31,17 @@ func on_target_died(body: Node3D) -> void:
 		targets.erase(body)
 		body.queue_free()
 
-func on_body_hit(body: Node3D, shape_index: int = -1, damage: float = 0.0) -> void:
+func on_body_hit(body: Node3D, shape_index: int = -1, damage: float = 0.0, distance: float = 0.0) -> void:
 	if body == null:
 		return
 	if body.has_method("take_hit"):
+		var was_alive: bool = body.is_alive()
 		body.take_hit(shape_index, damage)
+		if was_alive and not body.is_alive():
+			target_killed.emit(body, distance)
 	elif body in targets:
 		on_target_died(body)
+		target_killed.emit(body, distance)
 
 func near_terminal(point: Vector3) -> bool:
 	return point.distance_to(terminal_point) < INTERACT_DISTANCE

@@ -8,14 +8,17 @@ extends Node
 const Ballistics = preload("res://ballistics.gd")
 const DEFAULT_PROFILES := [
 	"res://scenes/weapons/profiles/ridgeline_recon.tres",
-	"res://scenes/weapons/profiles/vanguard_auto.tres",
-	"res://scenes/weapons/profiles/bulwark_pump.tres"
+	"res://scenes/weapons/profiles/whisper_sidearm.tres"
 ]
+const ZERO_STEP := 100.0
+const ZERO_MIN := 100.0
+const ZERO_MAX := 1000.0
 const HIP_FOV := 75.0
 const PROJECTILE_LIFETIME := 3.0
 const SUBSTEP := 1.0 / 120.0
 
-signal body_hit(body: Node3D, shape_index: int, damage: float)
+signal body_hit(body: Node3D, shape_index: int, damage: float, distance: float)
+signal fired(profile: WeaponProfile)
 
 var profiles: Array[WeaponProfile] = []
 var active := 0
@@ -24,6 +27,7 @@ var reserve_ammo := 0
 var reload_remaining := 0.0
 var shot_remaining := 0.0
 var stored: Array[Dictionary] = []
+var zero_ranges: Array[float] = []
 var projectiles: Array[Dictionary] = []
 var wind := Vector3.ZERO # Air-mass velocity in m/s.
 var spread_rng := RandomNumberGenerator.new()
@@ -37,6 +41,7 @@ func _ready() -> void:
 			profiles.append(load(path) as WeaponProfile)
 	for profile in profiles:
 		stored.append({"ammo": profile.capacity, "reserve": profile.reserve, "cooldown": 0.0})
+		zero_ranges.append(profile.zero_range)
 	ammo = profiles[active].capacity
 	reserve_ammo = profiles[active].reserve
 
@@ -54,6 +59,29 @@ func select_weapon(index: int) -> bool:
 	if camera:
 		camera.fov = HIP_FOV
 	return true
+
+func zero_range() -> float:
+	return zero_ranges[active]
+
+# Move the elevation turret by whole steps. Only meaningful for projectile weapons.
+func adjust_zero(steps: int) -> bool:
+	if not GameState.simulation_active() or not profile().simulated_projectile or steps == 0:
+		return false
+	var target := clampf(zero_ranges[active] + ZERO_STEP * steps, ZERO_MIN, ZERO_MAX)
+	if target == zero_ranges[active]:
+		return false
+	zero_ranges[active] = target
+	return true
+
+func ballistic_params() -> Dictionary:
+	return Ballistics.make_params(Ballistics.DEFAULT_GRAVITY, profile().drag_coefficient, wind)
+
+# Metres of holdover at a range for the active weapon and its current zero.
+func holdover_at(distance: float) -> float:
+	var current := profile()
+	if not current.simulated_projectile or distance <= 0.0:
+		return 0.0
+	return Ballistics.holdover(current.muzzle_velocity, distance, zero_range(), ballistic_params())
 
 func toggle_aim() -> void:
 	if camera and GameState.simulation_active():
@@ -87,8 +115,8 @@ func fire_weapon() -> bool:
 	var current := profile()
 	shot_remaining = current.shot_interval
 	if current.simulated_projectile:
-		var params := Ballistics.make_params(Ballistics.DEFAULT_GRAVITY, current.drag_coefficient, wind)
-		var elevation := Ballistics.zero_angle(current.muzzle_velocity, current.zero_range, params)
+		var params := ballistic_params()
+		var elevation := Ballistics.zero_angle(current.muzzle_velocity, zero_range(), params)
 		var direction := (-camera.global_basis.z).rotated(camera.global_basis.x, elevation)
 		projectiles.append({
 			"position": camera.global_position,
@@ -97,6 +125,7 @@ func fire_weapon() -> bool:
 			"distance": 0.0,
 			"profile": current
 		})
+		fired.emit(current)
 		return true
 	var space := camera.get_world_3d().direct_space_state
 	for pellet in range(current.pellets):
@@ -107,7 +136,8 @@ func fire_weapon() -> bool:
 		var finish := origin + camera.global_basis * local_direction * current.max_range
 		var hit := Ballistics.trace_segment(space, origin, finish, excluded)
 		if not hit.is_empty():
-			body_hit.emit(hit.collider, int(hit.get("shape", -1)), current.damage)
+			body_hit.emit(hit.collider, int(hit.get("shape", -1)), current.damage, origin.distance_to(hit.position))
+	fired.emit(current)
 	return true
 
 func advance_projectiles(delta: float) -> void:
@@ -133,7 +163,8 @@ func advance_projectiles(delta: float) -> void:
 				finish = start.move_toward(finish, range_left)
 			var hit := Ballistics.trace_segment(space, start, finish, excluded)
 			if not hit.is_empty():
-				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage)
+				var travelled: float = float(projectile.distance) + start.distance_to(hit.position)
+				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage, travelled)
 				removed = true
 				break
 			projectile.position = finish

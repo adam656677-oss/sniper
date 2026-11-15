@@ -27,6 +27,7 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 
 | Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
 | Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, fictional names |
 | Aim | `tests/aim.gd` | Stances (collider, eye height, speed), sway amplitude by stance, breath hold, exhaustion and recovery, camera sway application |
+| Scope | `tests/scope.gd` | Zero turret steps and clamps, holdover, launch elevation, reticle marks, rangefinder, wind readout, kill-cam trigger and time scale |
 | Targets | `tests/targets.gd` | Hit zones (head, torso, limb), damage multipliers, death removal, live projectile headshot |
 
 Not covered: visual appearance, audio, aim feel, Windows launch beyond a headless 120-frame run, performance, enemy behaviour (none exists).

@@ -19,6 +19,7 @@ extends Resource
 @export var drag_coefficient := 0.0
 @export var zero_range := 0.0
 @export var damage := 50.0
+@export var suppressed := false
 
 func to_stats() -> Dictionary:
 	return {

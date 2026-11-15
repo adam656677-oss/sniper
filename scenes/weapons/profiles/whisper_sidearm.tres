@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/weapon_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Whisper sidearm"
+family = "sidearm"
+capacity = 15
+reserve = 45
+reload_seconds = 1.6
+shot_interval = 0.18
+pellets = 1
+spread = 0.012
+max_range = 60.0
+aim_fov = 55.0
+simulated_projectile = false
+muzzle_velocity = 0.0
+drag_coefficient = 0.0
+zero_range = 0.0
+damage = 30.0
+suppressed = true

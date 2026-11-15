@@ -27,7 +27,7 @@ Planning and status live in `docs/`:
 
 ## Implemented
 
-Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, 100 m zero, holdover maths. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets with head, torso and limb hit zones. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets with head, torso and limb hit zones. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Controls
 
@@ -37,8 +37,10 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | Mouse | Aim |
 | Left click | Fire (also resumes from pause) |
 | Right click | Toggle zoom |
-| 1, 2, 3 | Select weapon |
+| 1, 2 | Rifle, sidearm |
 | Shift (hold) | Hold breath while aiming |
+| [ and ] | Zero turret down and up (100 m steps) |
+| Space | Skip long-shot slow motion |
 | C | Toggle crouch |
 | Z | Toggle prone |
 | R | Reload |
