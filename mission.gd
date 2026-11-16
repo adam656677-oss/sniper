@@ -37,6 +37,8 @@ func _ready() -> void:
 	stealth.player = player
 	stealth.level = level
 	level.target_killed.connect(on_target_killed)
+	killcam.camera = $KillCamCamera
+	killcam.return_camera = camera
 	weapon.fired.connect(on_weapon_fired)
 	weapon.impact.connect(on_impact)
 	weapon.body_hit.connect(on_body_hit)
@@ -80,6 +82,12 @@ func on_impact(position: Vector3, normal: Vector3, body: Node3D) -> void:
 	feedback.impact(position, normal, not living)
 
 func on_weapon_fired(profile: WeaponProfile) -> void:
+	if profile.simulated_projectile and not weapon.projectiles.is_empty():
+		var round: Dictionary = weapon.projectiles[-1]
+		var predicted := weapon.predict_hit(round)
+		if not predicted.is_empty() and WeaponRig.would_kill(predicted.collider, predicted.shape, profile.damage):
+			if killcam.follow(round, predicted.distance, predicted.position):
+				last_long_shot = predicted.distance
 	feedback.kick(profile)
 	stats.shots += 1
 	level.report_noise(camera.global_position, 25.0 if profile.suppressed else 400.0)
@@ -256,7 +264,7 @@ func update_hud() -> void:
 	if player.suppression > 0.3:
 		extras += "  |  " + tr("SUPPRESSED")
 	lines.append(tr("Stones %d%s") % [stealth.stones, extras])
-	if killcam.active():
+	if killcam.active() or killcam.following:
 		lines.append(tr("LONG SHOT %.0f m  (Space to skip)") % last_long_shot)
 	hud.text = "\n".join(lines)
 
@@ -291,11 +299,13 @@ func _physics_process(delta: float) -> void:
 		feedback.advance(delta, Vector2(player.velocity.x, player.velocity.z).length(), is_aiming(), Settings.reduced_motion())
 	feedback.draw_tracers(weapon.projectiles)
 	update_crosshair()
+	$HUDLayer.visible = not killcam.following
 	weapon.wind = level.current_wind()
 	weapon.advance_weapon(delta)
 	weapon.advance_projectiles(delta)
 	advance_sway(delta)
 	killcam.advance(delta)
+	killcam.advance_follow(delta, killcam.following and weapon.projectiles.has(killcam.followed))
 	stealth.advance(delta)
 	var can_range := stealth.binoculars or (is_aiming() and not Settings.realism_ranging())
 	measured_range = measure_range() if can_range else -1.0

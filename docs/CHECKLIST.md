@@ -38,7 +38,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 1.5 Range-finding and wind reading: laser range finder (or mil-dot estimation on realism setting), wind indicator on HUD and in scope. (Wind sock props deferred to Phase 3 environment kit.) Verify: test range readout against known distance; playtest readability.
 - [x] 1.6 Scope zero adjustment (elevation turret in 100 m steps) and holdover marks. Verify: test that zeroing to N metres gives zero drop at N.
 - [x] 1.7 Hit model: hitboxes (head, torso, limbs) on a target scene with damage multipliers. Verify: test headshot kills, limb hit does not.
-- [~] 1.8 (trigger rule, time-scale envelope and skip done; camera follow pending) Bullet time / kill cam for shots over a distance threshold, skippable, optional in settings. Verify: playtest; test that it triggers only above threshold.
+- [x] 1.8 Bullet time / kill cam for shots over a distance threshold, skippable, optional in settings. Verify: playtest; test that it triggers only above threshold.
 - [~] 1.9 (tracers, dust puffs, capped bullet holes and a hit marker done; ricochet sound and blood toggle need audio and art) Impact feedback: tracer on long shots, dust and blood decals (toggle), ricochet sound, hit marker. Verify: playtest.
 - [x] 1.10 Sidearm: suppressed pistol with hitscan, for close range. Shotguns removed or kept as a mission-specific pickup. Verify: weapons test updated.
 - [ ] 1.11 Weapon animation: idle, aim in/out, fire with bolt cycle, reload, sprint, from Mixamo or hand-made. Verify: playtest; test that `AnimationPlayer` has required clips.

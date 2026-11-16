@@ -187,6 +187,42 @@ func advance_projectiles(delta: float) -> void:
 		if removed or float(projectile.age) >= PROJECTILE_LIFETIME:
 			projectiles.remove_at(index)
 
+# Dry run of a projectile with the same integration as advance_projectiles,
+# without moving it or emitting anything. Returns {} for a miss, otherwise
+# {"collider", "shape", "position", "distance", "time"}.
+func predict_hit(projectile: Dictionary) -> Dictionary:
+	if camera == null:
+		return {}
+	var space := camera.get_world_3d().direct_space_state
+	var shot_profile: WeaponProfile = projectile.profile
+	var params := Ballistics.make_params(Ballistics.DEFAULT_GRAVITY, shot_profile.drag_coefficient, wind)
+	var position: Vector3 = projectile.position
+	var velocity: Vector3 = projectile.velocity
+	var travelled := float(projectile.distance)
+	var age := float(projectile.age)
+	while age < PROJECTILE_LIFETIME and travelled < shot_profile.max_range:
+		var state := Ballistics.step_drag(position, velocity, SUBSTEP, params)
+		var finish: Vector3 = state.position
+		var hit := Ballistics.trace_segment(space, position, finish, excluded)
+		if not hit.is_empty():
+			return {"collider": hit.collider, "shape": int(hit.get("shape", -1)), "position": hit.position,
+				"distance": travelled + position.distance_to(hit.position), "time": age + SUBSTEP * position.distance_to(hit.position) / maxf(position.distance_to(finish), 0.001)}
+		travelled += position.distance_to(finish)
+		position = finish
+		velocity = state.velocity
+		age += SUBSTEP
+	return {}
+
+# True when a body would die from this weapon's damage in that hit zone.
+static func would_kill(body: Object, shape_index: int, damage: float) -> bool:
+	if body == null or not body.has_method("take_hit") or not body.has_method("is_alive") or not body.is_alive():
+		return false
+	var health = body.get("health")
+	if health == null:
+		return false
+	const HitZones = preload("res://scenes/targets/hit_zones.gd")
+	return float(health) <= damage * HitZones.multiplier(HitZones.zone_for_shape(body, shape_index))
+
 func status_text() -> String:
 	if reload_remaining > 0.0:
 		return "RELOADING %.1fs" % reload_remaining

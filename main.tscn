@@ -34,6 +34,9 @@ script = ExtResource("8")
 [node name="StealthKit" type="Node" parent="."]
 script = ExtResource("9")
 
+[node name="KillCamCamera" type="Camera3D" parent="."]
+fov = 60.0
+
 [node name="ShotFeedback" type="Node3D" parent="."]
 script = ExtResource("13")
 

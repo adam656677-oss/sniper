@@ -69,6 +69,28 @@ func run() -> void:
 	game.scope_view.set_zoom(12.0)
 	game.player.head.rotation.x = 0.0
 	await shot("07_range_scope_12x")
+	game.scope_view.set_zoom(4.0)
+	game.weapon.toggle_aim()
+	var dummy = load("res://scenes/targets/target_dummy.tscn").instantiate()
+	game.level.add_child(dummy)
+	dummy.global_position = Vector3(-30, 1, -300)
+	game.level.register_target(dummy)
+	game.level.wind = Vector3.ZERO
+	await physics_frame
+	await physics_frame
+	game.set_physics_process(false)
+	game.weapon.wind = Vector3.ZERO
+	var head: Vector3 = dummy.global_position + Vector3(0, 0.85, 0)
+	game.camera.global_position = Vector3(head.x, 1.6, head.z + 300.0)
+	game.camera.look_at(head + Vector3(0, game.weapon.holdover_at(300.0), 0), Vector3.UP)
+	game.weapon.shot_remaining = 0.0
+	game.weapon.fire_weapon()
+	game.weapon.advance_projectiles(0.3)
+	game.killcam.advance_follow(0.0, true)
+	game.feedback.draw_tracers(game.weapon.projectiles)
+	game.get_node("HUDLayer").visible = false
+	await shot("11_bullet_cam")
+	game.killcam.skip()
 	game.queue_free()
 	await process_frame
 	quit()
