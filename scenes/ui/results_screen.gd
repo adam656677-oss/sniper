@@ -43,21 +43,21 @@ static func score_for(stats: Dictionary, objectives: Node, failed: bool) -> int:
 
 func stealth_rating(stats: Dictionary, objectives: Node) -> String:
 	if objectives.status("undetected") == objectives.Status.COMPLETE:
-		return "Ghost"
+		return tr("Ghost")
 	if int(stats.detections) == 0:
-		return "Unseen"
-	return "Compromised" if int(stats.detections) < 3 else "Loud"
+		return tr("Unseen")
+	return tr("Compromised") if int(stats.detections) < 3 else tr("Loud")
 
 func show_results() -> void:
 	var stats: Dictionary = mission.stats
 	var objectives = mission.level.mission_log
 	var lines: Array[String] = []
-	lines.append("MISSION FAILED" if GameState.failed else "MISSION COMPLETE")
-	lines.append("Score: %d" % score_for(stats, objectives, GameState.failed))
-	lines.append("Time: %d:%02d" % [int(stats.elapsed) / 60, int(stats.elapsed) % 60])
-	lines.append("Shots: %d | Hits: %d | Accuracy: %d%%" % [stats.shots, stats.hits, int(round(mission.accuracy() * 100.0))])
-	lines.append("Kills: %d | Longest shot: %.0f m" % [stats.kills, stats.longest_kill])
-	lines.append("Stealth: %s (%d detections)" % [stealth_rating(stats, objectives), stats.detections])
+	lines.append(tr("MISSION FAILED") if GameState.failed else tr("MISSION COMPLETE"))
+	lines.append(tr("Score: %d") % score_for(stats, objectives, GameState.failed))
+	lines.append(tr("Time: %d:%02d") % [int(stats.elapsed) / 60, int(stats.elapsed) % 60])
+	lines.append(tr("Shots: %d | Hits: %d | Accuracy: %d%%") % [stats.shots, stats.hits, int(round(mission.accuracy() * 100.0))])
+	lines.append(tr("Kills: %d | Longest shot: %.0f m") % [stats.kills, stats.longest_kill])
+	lines.append(tr("Stealth: %s (%d detections)") % [stealth_rating(stats, objectives), stats.detections])
 	for line in objectives.lines():
 		lines.append(line)
 	text.text = "\n".join(lines)

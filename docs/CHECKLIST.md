@@ -95,7 +95,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [~] 4.7 (bindings for every action, right-stick look, trigger hold-to-aim, bumper weapon cycle; on-screen glyphs, aim assist and a real controller playtest pending) Controller support with glyphs and aim assist option. Verify: playtest with a controller.
 - [x] 4.8 Gunsmith workbench: wire `gunsmith.gd` to `WeaponProfile`, workbench UI between missions, per-weapon saved configuration. Verify: existing gunsmith tests plus save round trip.
 - [~] 4.9 (seven guided steps on the 1000 m range: aim, ring 100 m, range, zero, ring 300 m, breath, holdover; needs a playtest with someone new) Tutorial: the target range from 1.13 as a guided first mission. Verify: playtest with someone new.
-- [ ] 4.10 Localisation hooks: all strings through `tr()`, CSV with English. Verify: test that no user-facing literal strings remain in scripts (lint script).
+- [x] 4.10 Localisation hooks: all strings through `tr()`, CSV with English. Verify: test that no user-facing literal strings remain in scripts (lint script).
 - [x] 4.11 Crash and error handling: engine log written to user://logs (five rotating files), corrupt, incomplete and wrong-version saves rejected with a reason. Verify: test corrupt save fallback.
 
 **Exit gate:** A stranger can install the build, start a new game, play the tutorial and Mission 1 to the results screen, change settings, quit and resume from a checkpoint, with no instructions from the team.

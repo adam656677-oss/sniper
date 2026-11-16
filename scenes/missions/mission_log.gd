@@ -89,15 +89,15 @@ func line(objective: Dictionary) -> String:
 			mark = "[x]"
 		Status.FAILED:
 			mark = "[!]"
-	var text := "%s %s" % [mark, objective.title]
+	var text := "%s %s" % [mark, tr(String(objective.title))]
 	if objective.goal > 1 and objective.status == Status.ACTIVE:
 		text += " (%d/%d)" % [objective.progress, objective.goal]
 	if objective.kind == Kind.SECONDARY:
-		text += " (secondary)"
+		text += " " + tr("(secondary)")
 	elif objective.kind == Kind.OPTIONAL:
-		text += " (optional)"
+		text += " " + tr("(optional)")
 	if objective.status == Status.FAILED:
-		text += " FAILED"
+		text += " " + tr("FAILED")
 	return text
 
 # Completed optional objectives are dropped from the HUD list to keep it short.

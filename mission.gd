@@ -209,11 +209,11 @@ static func signed_text(value: float) -> String:
 func update_hud() -> void:
 	var lines: Array[String] = []
 	if GameState.failed:
-		lines.append("MISSION FAILED - N to restart")
+		lines.append(tr("MISSION FAILED - N to restart"))
 	elif GameState.finished:
-		lines.append("MISSION COMPLETE - N to restart")
+		lines.append(tr("MISSION COMPLETE - N to restart"))
 	elif GameState.paused:
-		lines.append("PAUSED")
+		lines.append(tr("PAUSED"))
 	lines.append_array(level.mission_log.lines())
 	lines.append(level.conditions_text())
 	var weapon_line := "%s  %d / %d  %s" % [weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
@@ -221,18 +221,18 @@ func update_hud() -> void:
 		weapon_line += "  (%d in flight)" % weapon.projectiles.size()
 	lines.append(weapon_line)
 	var stance_name: String = Player.Stance.keys()[player.stance].capitalize()
-	var breath := "Breath %d%%" % int(round(sway.breath_fraction() * 100.0))
+	var breath := tr("Breath %d%%") % int(round(sway.breath_fraction() * 100.0))
 	if sway.exhausted:
-		breath = "WINDED"
+		breath = tr("WINDED")
 	elif sway.holding:
-		breath = "HOLDING %d%%" % int(round(sway.breath_fraction() * 100.0))
-	lines.append("Health %d  |  %s  |  %s  |  Noise %d%%" % [int(round(player.health)), stance_name, breath, int(round(stealth.noise_level() * 100.0))])
+		breath = tr("HOLDING %d%%") % int(round(sway.breath_fraction() * 100.0))
+	lines.append(tr("Health %d  |  %s  |  %s  |  Noise %d%%") % [int(round(player.health)), stance_name, breath, int(round(stealth.noise_level() * 100.0))])
 	if not level.enemies.is_empty() or level.coordinator.level != AlertCoordinator.Level.CALM:
 		var tags := stealth.live_tags()
 		var tag_text := "" if tags.is_empty() else "  |  Tagged: " + ", ".join(tags.map(func(e): return "%.0f m" % player.global_position.distance_to(e.global_position)))
-		lines.append("Alert: %s  |  Hostiles %d%s" % [level.coordinator.level_name(), level.enemies.size(), tag_text])
+		lines.append(tr("Alert: %s  |  Hostiles %d%s") % [level.coordinator.level_name(), level.enemies.size(), tag_text])
 	if bool(Settings.get_value("gameplay", "hud_assists")):
-		var range_line := "Range --" if measured_range < 0.0 else "Range %.0f m" % measured_range
+		var range_line := tr("Range --") if measured_range < 0.0 else tr("Range %.0f m") % measured_range
 		if weapon.profile().simulated_projectile:
 			range_line += "  |  Zero %.0f m" % weapon.zero_range()
 			if measured_range > 0.0:
@@ -240,14 +240,14 @@ func update_hud() -> void:
 		lines.append(range_line + "  |  " + wind_text())
 	var extras := ""
 	if stealth.binoculars:
-		extras += "  |  BINOCULARS"
+		extras += "  |  " + tr("BINOCULARS")
 	if stealth.is_carrying():
-		extras += "  |  CARRYING BODY (E to drop)"
+		extras += "  |  " + tr("CARRYING BODY (E to drop)")
 	if player.suppression > 0.3:
-		extras += "  |  SUPPRESSED"
-	lines.append("Stones %d%s" % [stealth.stones, extras])
+		extras += "  |  " + tr("SUPPRESSED")
+	lines.append(tr("Stones %d%s") % [stealth.stones, extras])
 	if killcam.active():
-		lines.append("LONG SHOT %.0f m  (Space to skip)" % last_long_shot)
+		lines.append(tr("LONG SHOT %.0f m  (Space to skip)") % last_long_shot)
 	hud.text = "\n".join(lines)
 
 func hip_fov() -> float:

@@ -41,9 +41,9 @@ func _ready() -> void:
 	column.add_child(missions)
 	for i in range(MissionCatalog.count()):
 		var mission: Dictionary = MissionCatalog.get_mission(i)
-		button(missions, mission.title, func(): start_mission(i))
+		button(missions, tr(String(mission.title)), func(): start_mission(i))
 		var brief := Label.new()
-		brief.text = mission.brief
+		brief.text = tr(String(mission.brief))
 		missions.add_child(brief)
 	button(missions, "Back", func(): show_screen(Screen.HOME))
 	settings_screen = SettingsScreen.new()
@@ -70,7 +70,7 @@ func show_screen(value: int) -> void:
 	if screen == Screen.WORKBENCH:
 		workbench.load_into_controls()
 	continue_button.disabled = not SaveSystem.has_save(SaveSystem.CHECKPOINT_SLOT)
-	status.text = "Checkpoint available" if not continue_button.disabled else "No checkpoint yet"
+	status.text = tr("Checkpoint available") if not continue_button.disabled else tr("No checkpoint yet")
 	if screen == Screen.SETTINGS:
 		settings_screen.load_into_controls()
 
@@ -84,7 +84,7 @@ func start_mission(index: int) -> String:
 
 func continue_checkpoint() -> String:
 	if not SaveSystem.request_load(SaveSystem.CHECKPOINT_SLOT):
-		status.text = "Checkpoint could not be loaded: " + SaveSystem.last_error
+		status.text = tr("Checkpoint could not be loaded:") + " " + SaveSystem.last_error
 		return ""
 	var scene: String = String(SaveSystem.pending.scene)
 	scene_changer.call(scene)

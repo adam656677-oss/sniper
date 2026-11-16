@@ -32,6 +32,8 @@ Planning and status live in `docs/`:
 | `scenes/ui/` | HUD, main menu, mission catalog, settings screen, workbench, pause menu, results screen |
 | `scope_overlay.gd` | Scope reticle |
 | `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
+| `translations/strings.csv` | Translation table; keys are the English text. Run `python3 tools/extract_strings.py` after adding UI text, then add a column per language |
+| `tools/` | Screenshot capture and string extraction |
 | `tests/` | Headless test suites run by `scripts/validate.sh` and CI |
 
 ## Implemented

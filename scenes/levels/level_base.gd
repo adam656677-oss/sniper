@@ -168,7 +168,7 @@ func current_wind() -> Vector3:
 	return Atmosphere.wind_at(wind, weather, clock)
 
 func conditions_text() -> String:
-	return "%s, %s" % [["Dawn", "Noon", "Dusk", "Night"][time_of_day], ["clear", "windy", "rain", "dust"][weather]]
+	return "%s, %s" % [tr(["Dawn", "Noon", "Dusk", "Night"][time_of_day]), tr(["clear", "windy", "rain", "dust"][weather])]
 
 func _physics_process(delta: float) -> void:
 	if GameState.simulation_active():
@@ -207,7 +207,7 @@ func interact(_point: Vector3) -> void:
 func objective_text() -> String:
 	var active := mission_log.first_active_primary()
 	if active.is_empty():
-		return "All objectives complete" if mission_log.all_primary_complete() else "Stand by"
+		return tr("All objectives complete") if mission_log.all_primary_complete() else tr("Stand by")
 	return mission_log.line(active)
 
 func is_complete() -> bool:
