@@ -31,6 +31,7 @@ func run_tests() -> void:
 	menu.scene_changer = func(path): requested.append(path)
 	check(menu.screen == menu.Screen.HOME and menu.home.visible and not menu.missions.visible, "Menu opens on the home screen")
 	check(menu.continue_button.disabled, "Continue is disabled without a checkpoint")
+	check(menu.build_label().begins_with("v0.4.0 ("), "The menu shows the version and build")
 	check(menu.continue_checkpoint() == "" and requested.is_empty(), "Continue without a checkpoint changes nothing")
 	menu.show_screen(menu.Screen.MISSIONS)
 	var buttons: Array = []

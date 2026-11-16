@@ -1,0 +1,25 @@
+name: Playtest feedback
+description: How a session felt, what was confusing, what was fun
+labels: ["playtest", "triage"]
+body:
+  - type: input
+    id: build
+    attributes:
+      label: Build
+    validations:
+      required: true
+  - type: input
+    id: machine
+    attributes:
+      label: Machine
+      description: CPU, GPU, resolution, mouse or controller
+  - type: textarea
+    id: notes
+    attributes:
+      label: What happened in the session
+    validations:
+      required: true
+  - type: textarea
+    id: feel
+    attributes:
+      label: Shooting feel, enemy behaviour, readability

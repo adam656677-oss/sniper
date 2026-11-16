@@ -40,6 +40,13 @@ func _ready() -> void:
 	button(home, "Quit", func(): get_tree().quit())
 	status = Label.new()
 	home.add_child(status)
+	var version := Label.new()
+	version.text = build_label()
+	version.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	version.position = Vector2(-220, -32)
+	version.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	version.size = Vector2(210, 24)
+	add_child(version)
 	missions = VBoxContainer.new()
 	column.add_child(missions)
 	for i in range(MissionCatalog.count()):
@@ -61,6 +68,14 @@ func _ready() -> void:
 	records.add_child(records_text)
 	button(records, "Back", func(): show_screen(Screen.HOME))
 	show_screen(Screen.HOME)
+
+# "v0.4.0 (abc1234)" when CI stamped a build, "v0.4.0 (dev)" otherwise.
+static func build_label() -> String:
+	var version := String(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+	var build := "dev"
+	if FileAccess.file_exists("res://build_info.txt"):
+		build = FileAccess.get_file_as_string("res://build_info.txt").strip_edges()
+	return "v%s (%s)" % [version, build]
 
 func button(parent: Node, text: String, callback: Callable) -> Button:
 	var b := Button.new()

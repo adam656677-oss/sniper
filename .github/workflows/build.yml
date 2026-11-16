@@ -21,6 +21,9 @@ jobs:
           mkdir -p "$HOME/.local/share/godot/export_templates/4.7.stable"
           cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.7.stable/"
           godot --version
+      - name: Stamp the build
+        shell: bash
+        run: echo "${GITHUB_SHA::7}" > build_info.txt
       - name: Validate every test suite and export the Windows development build
         shell: bash
         run: |

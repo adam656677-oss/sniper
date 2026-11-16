@@ -3,3 +3,4 @@ builds/
 *.tmp
 reports/
 *.translation
+build_info.txt

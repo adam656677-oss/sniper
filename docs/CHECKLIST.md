@@ -86,7 +86,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 
 ## Phase 4: Vertical slice mission and game shell
 
-- [ ] 4.1 Mission 1 design doc: objectives, map, enemy placement, routes, three approaches. Verify: review.
+- [x] 4.1 Mission 1 design doc (docs/design/mission-01-kestrel-pass.md): objectives, map, enemy placement, routes, three approaches. Verify: review.
 - [x] 4.2 Mission framework: objectives (primary, secondary, optional), mission phases, triggers, scripted events, failure conditions, extraction. Verify: test objective completion and failure.
 - [ ] 4.3 Build Mission 1 on the terrain from 3.3. Verify: playtest start to finish.
 - [x] 4.4 Checkpoints and save/load: serialise mission state, player state, enemy states, with versioned save format. Verify: test save, restart, load round trip.
@@ -104,7 +104,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 
 ## Phase 5: Content scale-up
 
-- [ ] 5.1 Campaign outline: six to eight missions, narrative through briefings and radio, fictional factions. Verify: review.
+- [x] 5.1 Campaign outline (docs/design/campaign-outline.md; owner questions at the end): six to eight missions, narrative through briefings and radio, fictional factions. Verify: review.
 - [ ] 5.2 Missions 2 through N, each with a distinct biome or time of day and one new mechanic (night with thermal scope, moving vehicle target, protect an ally, timed extraction, sandstorm). One pull request per mission, each with a playtest. Verify: playtest each.
 - [ ] 5.3 Additional rifles and scopes through the gunsmith (fictional names). Verify: gunsmith tests extended.
 - [ ] 5.4 Enemy variety: snipers that counter the player, dogs, vehicles, drones. Verify: tests for each perception type.
@@ -117,11 +117,11 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 
 ## Phase 6: Polish, QA and release
 
-- [ ] 6.1 Bug triage process: issue labels, severity, weekly pass. Verify: review.
+- [x] 6.1 Bug triage process (docs/TRIAGE.md, issue and pull request templates): issue labels, severity, weekly pass. Verify: review.
 - [ ] 6.2 Full playtest rounds with at least five external testers, feedback captured and triaged. Verify: review.
 - [ ] 6.3 Performance validation on minimum and recommended specs; document them. Verify: captures.
 - [ ] 6.4 Accessibility review against the game accessibility guidelines basic tier. Verify: review.
-- [ ] 6.5 Release build: release export template, PCK encryption decision, version stamping, build number in main menu. Verify: CI produces a release artefact.
+- [~] 6.5 (release workflow on version tags, version and build stamp in the menu; PCK encryption decision pending owner) Release build: release export template, PCK encryption decision, version stamping, build number in main menu. Verify: CI produces a release artefact.
 - [ ] 6.6 Code signing certificate **(owner)** and signed installer. Verify: SmartScreen does not warn on a clean Windows install.
 - [ ] 6.7 Store presence **(owner decision)**: Steam partner account, store page, capsule art, trailer, achievements wiring if Steam. Verify: review.
 - [ ] 6.8 Legal: licence ledger complete, third-party notices screen, privacy statement if any telemetry, age rating self-assessment. Verify: review.

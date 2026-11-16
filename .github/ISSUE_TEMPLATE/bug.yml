@@ -1,0 +1,39 @@
+name: Bug report
+description: Something in the game behaves wrongly
+labels: ["bug", "triage"]
+body:
+  - type: input
+    id: build
+    attributes:
+      label: Build
+      description: Version shown in the main menu corner, or the Actions run number.
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - S1 crash, data loss or cannot progress
+        - S2 major feature broken, workaround exists
+        - S3 minor or cosmetic
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open the compound\n2. Go prone behind the north hut\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected and what happened
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Attach echo_ridge.log from the game's user folder (on Windows, %APPDATA%\Godot\app_userdata\Echo Ridge\logs).

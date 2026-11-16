@@ -8,6 +8,10 @@ CI pins Godot 4.7 stable for repeatability. Three workflows exist:
 
 Steps fail only on `SCRIPT ERROR:` or `FAIL:` lines. Plain `ERROR:` lines are not treated as failures because the headless dummy renderer prints `ERROR: Parameter "m" is null` for every `BoxMesh` created without a display; that line is benign. Earlier versions of the workflows matched it and never went green.
 
+## Release builds
+
+Pushing a tag such as `v0.4.0` runs `release.yml`: it validates, stamps the tag into the build, exports a Windows release build and uploads `EchoRidge-Windows-release-<tag>`. The version itself lives in `application/config/version` in project.godot. Development builds are stamped with the commit hash.
+
 ## Screenshots
 
 `tools/capture.gd` renders the main menu, mission select, the compound at the hip, through the scope and through binoculars, and the range at the hip and at 12x. CI runs it under a virtual display after validation and uploads `EchoRidge-screenshots`. Locally:
