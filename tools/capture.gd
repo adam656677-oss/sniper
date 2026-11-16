@@ -25,6 +25,9 @@ func run() -> void:
 	await shot("01_main_menu")
 	menu.show_screen(menu.Screen.MISSIONS)
 	await shot("02_mission_select")
+	menu.show_screen(menu.Screen.SETTINGS)
+	menu.settings_screen.tabs.current_tab = 5
+	await shot("09_settings_keys")
 	menu.queue_free()
 	await process_frame
 	var game = load("res://compound_mission.tscn").instantiate()

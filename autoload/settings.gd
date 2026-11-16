@@ -126,6 +126,15 @@ func clear_bindings() -> void:
 func sensitivity() -> float:
 	return clampf(float(get_value("controls", "sensitivity")), 0.1, 5.0)
 
+func reduced_motion() -> bool:
+	return bool(get_value("accessibility", "reduced_motion"))
+
+func high_contrast_reticle() -> bool:
+	return bool(get_value("accessibility", "colorblind_reticle"))
+
+func realism_ranging() -> bool:
+	return bool(get_value("gameplay", "realism_ranging"))
+
 func invert_y() -> bool:
 	return bool(get_value("controls", "invert_y"))
 
@@ -138,6 +147,9 @@ func apply() -> void:
 		if bus >= 0:
 			var key: String = String(bus_name).to_lower()
 			AudioServer.set_bus_volume_db(bus, linear_to_db(clampf(float(get_value("audio", key)), 0.0, 1.0)))
+	var tree := get_tree()
+	if tree and tree.root:
+		tree.root.scaling_3d_scale = clampf(float(get_value("video", "resolution_scale")), 0.5, 1.0)
 	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if get_value("video", "fullscreen") else DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if get_value("video", "vsync") else DisplayServer.VSYNC_DISABLED)

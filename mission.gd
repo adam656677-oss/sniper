@@ -20,7 +20,7 @@ var camera: Camera3D
 func _ready() -> void:
 	GameState.reset()
 	Settings.apply()
-	killcam.enabled = bool(Settings.get_value("gameplay", "killcam"))
+	killcam.enabled = bool(Settings.get_value("gameplay", "killcam")) and not Settings.reduced_motion()
 	camera = player.camera
 	player.spawn_point = level.spawn_point
 	player.position = level.spawn_point
@@ -271,7 +271,8 @@ func _physics_process(delta: float) -> void:
 	advance_sway(delta)
 	killcam.advance(delta)
 	stealth.advance(delta)
-	measured_range = measure_range() if is_aiming() or stealth.binoculars else -1.0
+	var can_range := stealth.binoculars or (is_aiming() and not Settings.realism_ranging())
+	measured_range = measure_range() if can_range else -1.0
 	if GameState.simulation_active():
 		stats.elapsed += delta
 	check_outcome()

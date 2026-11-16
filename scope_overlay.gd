@@ -63,11 +63,14 @@ func draw_scope_picture(center: Vector2, radius: float) -> void:
 		colors.append(Color.WHITE)
 	draw_polygon(points, colors, uvs, texture)
 
+func reticle_ink() -> Color:
+	return Color(1.0, 0.85, 0.0, 1.0) if Settings.high_contrast_reticle() else Color(0.04, 0.06, 0.04, 0.9)
+
 func _draw() -> void:
 	var viewport_size := get_viewport_rect().size
 	var center := viewport_size * 0.5
 	var radius := minf(viewport_size.x, viewport_size.y) * 0.38
-	var ink := Color(0.04, 0.06, 0.04, 0.9)
+	var ink := reticle_ink()
 	var tint := Color(0.0, 0.0, 0.0, 0.88)
 	draw_scope_picture(center, radius)
 	for i in range(96):

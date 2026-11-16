@@ -1,10 +1,12 @@
 keys,en
 (optional),(optional)
 (secondary),(secondary)
+Accessibility,Accessibility
 Aim down the scope (right click or left trigger),Aim down the scope (right click or left trigger)
 Alert: %s  |  Hostiles %d%s,Alert: %s  |  Hostiles %d%s
 All objectives complete,All objectives complete
 Apply,Apply
+Audio,Audio
 BINOCULARS,BINOCULARS
 Back,Back
 Breath %d%%,Breath %d%%
@@ -13,6 +15,7 @@ Checkpoint available,Checkpoint available
 Checkpoint could not be loaded:,Checkpoint could not be loaded:
 Compromised,Compromised
 Continue,Continue
+Controls,Controls
 Dawn,Dawn
 Defaults,Defaults
 Difficulty,Difficulty
@@ -26,12 +29,14 @@ Field of view,Field of view
 Fire only suppressed weapons,Fire only suppressed weapons
 Four hostiles patrol a walled compound. Clear it quietly and leave by the north gate.,Four hostiles patrol a walled compound. Clear it quietly and leave by the north gate.
 Fullscreen,Fullscreen
+Gameplay,Gameplay
 Ghost,Ghost
 HOLDING %d%%,HOLDING %d%%
 HUD assists,HUD assists
 Health %d  |  %s  |  %s  |  Noise %d%%,Health %d  |  %s  |  %s  |  Noise %d%%
 Hold your breath (Shift or left stick) while scoped,Hold your breath (Shift or left stick) while scoped
 Invert vertical look,Invert vertical look
+Keys,Keys
 Kills: %d | Longest shot: %.0f m,Kills: %d | Longest shot: %.0f m
 LONG SHOT %.0f m  (Space to skip),LONG SHOT %.0f m  (Space to skip)
 Load checkpoint,Load checkpoint
@@ -48,6 +53,7 @@ Night,Night
 No checkpoint yet,No checkpoint yet
 Noon,Noon
 PAUSED,PAUSED
+Press a key...,Press a key...
 Quit,Quit
 Quit to menu,Quit to menu
 Raise your zero to 300 m with ] (d-pad up),Raise your zero to 300 m with ] (d-pad up)
@@ -80,7 +86,9 @@ Stones %d%s,Stones %d%s
 The compound,The compound
 Time: %d:%02d,Time: %d:%02d
 "Tutorial. Learn the scope, rangefinder, zeroing, breath and holdover on a 1000 m range.","Tutorial. Learn the scope, rangefinder, zeroing, breath and holdover on a 1000 m range."
+Unbound,Unbound
 Unseen,Unseen
+Video,Video
 WINDED,WINDED
 WORKBENCH,WORKBENCH
 Workbench,Workbench
@@ -88,3 +96,21 @@ clear,clear
 dust,dust
 rain,rain
 windy,windy
+Move forward,Move forward
+Move back,Move back
+Move left,Move left
+Move right,Move right
+Fire,Fire
+Aim,Aim
+Reload,Reload
+Interact,Interact
+Crouch,Crouch
+Prone,Prone
+Hold breath,Hold breath
+Binoculars,Binoculars
+Tag target,Tag target
+Throw stone,Throw stone
+Zero up,Zero up
+Zero down,Zero down
+Quick save,Quick save
+Quick load,Quick load

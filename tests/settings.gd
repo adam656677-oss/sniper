@@ -20,6 +20,12 @@ func key_event(code: Key) -> InputEventKey:
 	event.pressed = true
 	return event
 
+func make_click() -> InputEventMouseButton:
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	return click
+
 func run_tests() -> void:
 	settings = root.get_node("Settings")
 	state = root.get_node("GameState")
@@ -60,6 +66,59 @@ func run_tests() -> void:
 	check(serialized == "key:%d" % KEY_K and settings.serialize_event(mouse) == "mouse:3", "Events serialize to text")
 	var back = settings.deserialize_event("mouse:3")
 	check(back is InputEventMouseButton and back.button_index == MOUSE_BUTTON_MIDDLE and settings.deserialize_event("garbage") == null, "Events deserialize and reject garbage")
+	# Settings screen: tabs, every option bound, remapping by listening.
+	settings.reset()
+	settings.clear_bindings()
+	var screen = load("res://scenes/ui/settings_screen.gd").new()
+	root.add_child(screen)
+	await process_frame
+	check(screen.tabs.get_tab_count() == 6, "Settings has video, audio, controls, gameplay, accessibility and key tabs")
+	var bound := 0
+	for section in settings.DEFAULTS:
+		for key in settings.DEFAULTS[section]:
+			if screen.sliders.has(section + "/" + key) or screen.checks.has(section + "/" + key) or key == "difficulty":
+				bound += 1
+	var total := 0
+	for section in settings.DEFAULTS:
+		total += settings.DEFAULTS[section].size()
+	check(bound == total, "Every setting has a control (%d of %d)" % [bound, total])
+	check(screen.remap_buttons.size() == settings.REMAPPABLE.size() and screen.remap_buttons["reload"].text == "R", "Every remappable action shows its key")
+	screen.start_listening("reload")
+	check(screen.remap_buttons["reload"].text == "Press a key...", "Choosing an action waits for a key")
+	check(screen.capture_binding(key_event(KEY_J)) and screen.remap_buttons["reload"].text == "J", "The next key becomes the binding")
+	check(InputMap.event_is_action(key_event(KEY_J), "reload"), "The captured key works in play")
+	screen.start_listening("fire")
+	check(screen.capture_binding(key_event(KEY_ESCAPE)) and screen.listening_action == "" and InputMap.event_is_action(make_click(), "fire"), "Escape cancels without changing the binding")
+	screen.sliders["audio/music"].value = 0.25
+	screen.checks["accessibility/reduced_motion"].button_pressed = true
+	screen.checks["accessibility/colorblind_reticle"].button_pressed = true
+	screen.checks["gameplay/realism_ranging"].button_pressed = true
+	screen.sliders["video/resolution_scale"].value = 0.75
+	screen.apply_from_controls()
+	var music := AudioServer.get_bus_index("Music")
+	check(AudioServer.bus_count == 3 and music > 0 and absf(AudioServer.get_bus_volume_db(music) - linear_to_db(0.25)) < 0.01, "Music volume reaches its audio bus")
+	check(is_equal_approx(root.scaling_3d_scale, 0.75), "Render scale reaches the viewport")
+	screen.queue_free()
+	await process_frame
+	var mission = load("res://range_mission.tscn").instantiate()
+	root.add_child(mission)
+	mission.set_physics_process(false)
+	await process_frame
+	check(not mission.killcam.enabled, "Reduced motion disables slow motion")
+	var overlay = mission.get_node("ScopeLayer/ScopeOverlay")
+	check(overlay.reticle_ink().r > 0.9, "High-contrast reticle is bright")
+	mission.weapon.toggle_aim()
+	mission._physics_process(0.016)
+	check(mission.measured_range < 0.0, "Realistic ranging hides range in the scope")
+	mission.weapon.toggle_aim()
+	mission.stealth.toggle_binoculars()
+	mission._physics_process(0.016)
+	check(mission.measured_range > 0.0, "Binoculars still range with realistic ranging")
+	mission.queue_free()
+	await process_frame
+	settings.reset()
+	settings.clear_bindings()
+	settings.apply()
 	var file := FileAccess.open(settings.PATH, FileAccess.WRITE)
 	file.store_string("[controls]\nsensitivity = \"not a number\"\n[gameplay\n")
 	file.close()

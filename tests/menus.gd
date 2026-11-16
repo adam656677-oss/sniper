@@ -44,13 +44,13 @@ func run_tests() -> void:
 	menu.show_screen(menu.Screen.SETTINGS)
 	check(menu.settings_screen.visible and not menu.home.visible, "Settings screen replaces the home screen")
 	var panel = menu.settings_screen
-	panel.sensitivity.value = 3.0
+	panel.sliders["controls/sensitivity"].value = 3.0
 	panel.difficulty.selected = 0
-	panel.killcam.button_pressed = false
+	panel.checks["gameplay/killcam"].button_pressed = false
 	panel.apply_from_controls()
 	check(settings.get_value("controls", "sensitivity") == 3.0 and state.difficulty == state.Difficulty.EASY and not settings.get_value("gameplay", "killcam"), "Applying the settings screen writes and applies values")
 	panel.reset_to_defaults()
-	check(panel.sensitivity.value == 1.0 and state.difficulty == state.Difficulty.NORMAL, "Defaults button restores the controls")
+	check(panel.sliders["controls/sensitivity"].value == 1.0 and state.difficulty == state.Difficulty.NORMAL, "Defaults button restores the controls")
 	panel.closed.emit()
 	check(menu.screen == menu.Screen.HOME, "Closing settings returns home")
 	menu.queue_free()
