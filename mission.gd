@@ -10,6 +10,7 @@ extends Node3D
 @onready var sway: AimSway = $AimSway
 @onready var killcam: KillCam = $KillCam
 @onready var stealth: StealthKit = $StealthKit
+@onready var results: ResultsScreen = $HUDLayer/Results
 var measured_range := -1.0
 var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
@@ -35,7 +36,21 @@ func _ready() -> void:
 	weapon.body_hit.connect(on_body_hit)
 	level.coordinator.level_changed.connect(on_alert_changed)
 	level.mission_log.objective_changed.connect(on_objective_changed)
+	GameState.mission_finished.connect(on_mission_over)
+	GameState.mission_failed.connect(on_mission_over)
 	SaveSystem.apply_pending(self)
+
+func on_mission_over() -> void:
+	if not GameState.failed:
+		for objective in level.mission_log.objectives:
+			if objective.status == MissionLog.Status.ACTIVE and objective.kind != MissionLog.Kind.PRIMARY:
+				level.mission_log.complete(objective.id)
+	SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
+	results.show_results()
+
+func quit_to_menu() -> void:
+	Engine.time_scale = 1.0
+	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
 
 func on_objective_changed(_id: String, status: int) -> void:
 	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete():

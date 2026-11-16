@@ -1,6 +1,6 @@
 # Echo Ridge
 
-Single-player first-person sniper game prototype built in Godot 4.7. Open `project.godot` in the editor and press F5.
+Single-player first-person sniper game prototype built in Godot 4.7. Open `project.godot` in the editor and press F5 for the main menu.
 
 Planning and status live in `docs/`:
 
@@ -28,7 +28,8 @@ Planning and status live in `docs/`:
 | `scenes/missions/` | `MissionLog` objectives and `TriggerZone` |
 | `scenes/weapons/aim_sway.gd` | Breath-hold and sway model |
 | `scenes/player/stealth_kit.gd` | Binoculars, tagging, footstep noise, stones |
-| `scenes/ui/hud.gd`, `scope_overlay.gd` | HUD label and scope reticle |
+| `scenes/ui/` | HUD, main menu, mission catalog, settings screen, pause menu, results screen |
+| `scope_overlay.gd` | Scope reticle |
 | `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
 | `tests/` | Headless test suites run by `scripts/validate.sh` and CI |
 
@@ -40,7 +41,8 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 
 | Scene | What it is |
 |---|---|
-| `main.tscn` | Test range mission: collect intel at the terminal, extract. The default scene (F5). |
+| `scenes/ui/main_menu.tscn` | Main menu: continue, missions, settings. The default scene (F5). |
+| `main.tscn` | Echo Ridge recon mission: collect intel at the terminal, extract. |
 | `compound_mission.tscn` | Walled compound with four patrolling hostiles. Perception, alert states, squad coordination, return fire, lockdown reinforcements. Eliminate every hostile to complete. Open it and press F6. |
 | `range_mission.tscn` | 1000 m shooting range with a steel plate every 100 m on its own bearing. Open it and press F6. Rings every plate to complete. |
 
@@ -76,4 +78,4 @@ Runs the editor import and every headless suite in `tests/`. Set `GODOT` to the 
 
 ## Limitations
 
-This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations, sounds, menus or settings. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.
+This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations or sounds, and the menus are unstyled. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.

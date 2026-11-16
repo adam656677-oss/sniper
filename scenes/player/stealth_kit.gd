@@ -37,7 +37,7 @@ func set_binoculars(value: bool) -> bool:
 	if not GameState.simulation_active() or camera == null:
 		return false
 	binoculars = value
-	camera.fov = BINOCULAR_FOV if binoculars else 75.0
+	camera.fov = BINOCULAR_FOV if binoculars else clampf(float(Settings.get_value("video", "fov")), 60.0, 110.0)
 	return binoculars
 
 func toggle_binoculars() -> bool:

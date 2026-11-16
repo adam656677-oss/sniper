@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://mission.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/levels/test_range.tscn" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Script" path="res://scenes/weapons/aim_sway.gd" id="7"]
 [ext_resource type="Script" path="res://scenes/killcam.gd" id="8"]
 [ext_resource type="Script" path="res://scenes/player/stealth_kit.gd" id="9"]
+[ext_resource type="Script" path="res://scenes/ui/pause_menu.gd" id="10"]
+[ext_resource type="Script" path="res://scenes/ui/results_screen.gd" id="11"]
 
 [node name="Mission" type="Node3D"]
 script = ExtResource("1")
@@ -52,6 +54,12 @@ offset_bottom = 12.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "+"
+
+[node name="PauseMenu" type="Control" parent="HUDLayer"]
+script = ExtResource("10")
+
+[node name="Results" type="Control" parent="HUDLayer"]
+script = ExtResource("11")
 
 [node name="ScopeLayer" type="CanvasLayer" parent="."]
 layer = 2

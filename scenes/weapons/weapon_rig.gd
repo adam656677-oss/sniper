@@ -13,7 +13,6 @@ const DEFAULT_PROFILES := [
 const ZERO_STEP := 100.0
 const ZERO_MIN := 100.0
 const ZERO_MAX := 1000.0
-const HIP_FOV := 75.0
 const PROJECTILE_LIFETIME := 3.0
 const SUBSTEP := 1.0 / 120.0
 
@@ -32,6 +31,7 @@ var projectiles: Array[Dictionary] = []
 var wind := Vector3.ZERO # Air-mass velocity in m/s.
 var spread_rng := RandomNumberGenerator.new()
 var camera: Camera3D
+var aiming := false
 var excluded: Array[RID] = []
 
 func _ready() -> void:
@@ -45,6 +45,9 @@ func _ready() -> void:
 	ammo = profiles[active].capacity
 	reserve_ammo = profiles[active].reserve
 
+func hip_fov() -> float:
+	return clampf(float(Settings.get_value("video", "fov")), 60.0, 110.0)
+
 func profile() -> WeaponProfile:
 	return profiles[active]
 
@@ -56,8 +59,9 @@ func select_weapon(index: int) -> bool:
 	ammo = int(stored[index].ammo)
 	reserve_ammo = int(stored[index].reserve)
 	shot_remaining = float(stored[index].cooldown)
+	aiming = false
 	if camera:
-		camera.fov = HIP_FOV
+		camera.fov = hip_fov()
 	return true
 
 func zero_range() -> float:
@@ -85,7 +89,8 @@ func holdover_at(distance: float) -> float:
 
 func toggle_aim() -> void:
 	if camera and GameState.simulation_active():
-		camera.fov = profile().aim_fov if camera.fov > 70.0 else HIP_FOV
+		aiming = not aiming
+		camera.fov = profile().aim_fov if aiming else hip_fov()
 
 func begin_reload() -> bool:
 	if not GameState.simulation_active() or reload_remaining > 0.0 or ammo >= profile().capacity or reserve_ammo <= 0:
