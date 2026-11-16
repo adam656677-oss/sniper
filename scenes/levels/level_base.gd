@@ -65,6 +65,28 @@ func on_enemy_died(enemy: Node) -> void:
 	coordinator.unregister(enemy)
 	coordinator.report_death(enemy)
 
+func find_enemy(enemy_name: String) -> Node:
+	for enemy in enemies:
+		if enemy.name == enemy_name:
+			return enemy
+	if has_node("Enemies/" + enemy_name):
+		return get_node("Enemies/" + enemy_name)
+	return null
+
+# Remove without objective progress or alert escalation; used when restoring a save.
+func remove_enemy_silently(enemy: Node) -> void:
+	enemies.erase(enemy)
+	coordinator.unregister(enemy)
+	enemy.queue_free()
+
+func remove_target_silently(body: Node) -> void:
+	targets.erase(body)
+	body.queue_free()
+
+# Re-evaluate trigger enablement after a restore. Levels override when they gate zones.
+func restore_triggers() -> void:
+	pass
+
 # Override to add hostiles when the coordinator reaches lockdown.
 func spawn_reinforcements(_position: Vector3) -> void:
 	pass

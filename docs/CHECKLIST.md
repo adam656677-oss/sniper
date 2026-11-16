@@ -89,14 +89,14 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [ ] 4.1 Mission 1 design doc: objectives, map, enemy placement, routes, three approaches. Verify: review.
 - [x] 4.2 Mission framework: objectives (primary, secondary, optional), mission phases, triggers, scripted events, failure conditions, extraction. Verify: test objective completion and failure.
 - [ ] 4.3 Build Mission 1 on the terrain from 3.3. Verify: playtest start to finish.
-- [ ] 4.4 Checkpoints and save/load: serialise mission state, player state, enemy states, with versioned save format. Verify: test save, restart, load round trip.
+- [x] 4.4 Checkpoints and save/load: serialise mission state, player state, enemy states, with versioned save format. Verify: test save, restart, load round trip.
 - [ ] 4.5 Main menu, pause menu, mission select, results screen (score, accuracy, longest shot, stealth rating). Verify: test navigation; playtest.
 - [ ] 4.6 Settings: video (resolution, window mode, vsync, quality presets, FOV), audio (buses), controls (remap, sensitivity, invert), gameplay (realism toggles, kill cam, assists), accessibility (subtitles, colour-blind reticle, hold or toggle aim, reduced motion). Persist to user settings file. Verify: test persistence.
 - [ ] 4.7 Controller support with glyphs and aim assist option. Verify: playtest with a controller.
 - [ ] 4.8 Gunsmith workbench: wire `gunsmith.gd` to `WeaponProfile`, workbench UI between missions, per-weapon saved configuration. Verify: existing gunsmith tests plus save round trip.
 - [ ] 4.9 Tutorial: the target range from 1.13 as a guided first mission. Verify: playtest with someone new.
 - [ ] 4.10 Localisation hooks: all strings through `tr()`, CSV with English. Verify: test that no user-facing literal strings remain in scripts (lint script).
-- [ ] 4.11 Crash and error handling: unhandled error logging to user directory, safe fallback on corrupt save. Verify: test corrupt save fallback.
+- [~] 4.11 (corrupt, incomplete and wrong-version saves are rejected with a reason; error log file pending) Crash and error handling: unhandled error logging to user directory, safe fallback on corrupt save. Verify: test corrupt save fallback.
 
 **Exit gate:** A stranger can install the build, start a new game, play the tutorial and Mission 1 to the results screen, change settings, quit and resume from a checkpoint, with no instructions from the team.
 

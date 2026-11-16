@@ -15,7 +15,8 @@ Planning and status live in `docs/`:
 | Path | Role |
 |---|---|
 | `main.tscn`, `mission.gd` | Mission root: wires level, player, weapon rig and HUD; routes input actions |
-| `autoload/game_state.gd` | `GameState` autoload: paused, finished, intel, mission signals |
+| `autoload/game_state.gd` | `GameState` autoload: paused, finished, failed, intel, difficulty |
+| `autoload/save_system.gd` | `SaveSystem` autoload: versioned JSON saves, checkpoints, quick save and load |
 | `scenes/player/` | First-person body and camera |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
 | `scenes/levels/level_base.gd` | Level contract: spawn, wind, targets, interact, objective, completion |
@@ -61,6 +62,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | R | Reload |
 | E | Collect intel at the gold terminal, extract at the green pad |
 | Escape | Pause or resume |
+| F5 / F9 | Quick save / quick load (falls back to the last checkpoint) |
 | N | Restart |
 
 ## Validation
@@ -73,4 +75,4 @@ Runs the editor import and every headless suite in `tests/`. Set `GODOT` to the 
 
 ## Limitations
 
-This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations, sounds, menus, settings or saves. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.
+This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations, sounds, menus or settings. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.

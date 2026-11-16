@@ -321,5 +321,30 @@ func tick(delta: float) -> void:
 			if state_time >= FLEE_SECONDS:
 				change_state(State.SEARCH)
 
+func capture() -> Dictionary:
+	return {
+		"name": name, "position": [global_position.x, global_position.y, global_position.z], "yaw": rotation.y,
+		"state": state, "health": health, "awareness": perception.awareness, "patrol_index": patrol_index,
+		"last_known": [last_known.x, last_known.y, last_known.z], "has_last_known": has_last_known
+	}
+
+func restore(data: Dictionary) -> void:
+	var p = data.get("position", [0, 0, 0])
+	global_position = Vector3(float(p[0]), float(p[1]), float(p[2]))
+	rotation.y = float(data.get("yaw", 0.0))
+	velocity = Vector3.ZERO
+	health = float(data.get("health", MAX_HEALTH))
+	perception.awareness = float(data.get("awareness", 0.0))
+	patrol_index = int(data.get("patrol_index", 0)) % maxi(patrol_points.size(), 1)
+	var lk = data.get("last_known", [0, 0, 0])
+	last_known = Vector3(float(lk[0]), float(lk[1]), float(lk[2]))
+	has_last_known = bool(data.get("has_last_known", false))
+	var saved_state := int(data.get("state", State.PATROL))
+	if saved_state == State.DEAD:
+		die()
+	else:
+		state = saved_state
+		state_time = 0.0
+
 func _physics_process(delta: float) -> void:
 	tick(delta)

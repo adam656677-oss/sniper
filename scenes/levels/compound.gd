@@ -24,6 +24,9 @@ func setup_objectives() -> void:
 	exfil_zone.enabled = false
 	exfil_zone.entered.connect(func(_zone): mission_log.complete("exfil"))
 
+func restore_triggers() -> void:
+	exfil_zone.enabled = mission_log.status("exfil") == MissionLog.Status.ACTIVE
+
 func on_alert_changed(level: int) -> void:
 	if level >= AlertCoordinator.Level.ALERT:
 		mission_log.fail("undetected")

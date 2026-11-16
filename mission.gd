@@ -32,6 +32,23 @@ func _ready() -> void:
 	weapon.fired.connect(on_weapon_fired)
 	weapon.body_hit.connect(on_body_hit)
 	level.coordinator.level_changed.connect(on_alert_changed)
+	level.mission_log.objective_changed.connect(on_objective_changed)
+	SaveSystem.apply_pending(self)
+
+func on_objective_changed(_id: String, status: int) -> void:
+	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete():
+		SaveSystem.save_game(SaveSystem.CHECKPOINT_SLOT, self)
+
+func quick_save() -> bool:
+	if not GameState.simulation_active():
+		return false
+	return SaveSystem.save_game(SaveSystem.QUICK_SLOT, self)
+
+func load_slot(slot: String) -> bool:
+	if not SaveSystem.request_load(slot):
+		return false
+	get_tree().reload_current_scene()
+	return true
 
 func on_weapon_fired(profile: WeaponProfile) -> void:
 	stats.shots += 1
@@ -99,6 +116,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("restart"):
 		get_tree().reload_current_scene()
+		return
+	if event.is_action_pressed("quick_save"):
+		quick_save()
+		return
+	if event.is_action_pressed("quick_load"):
+		if not load_slot(SaveSystem.QUICK_SLOT):
+			load_slot(SaveSystem.CHECKPOINT_SLOT)
 		return
 	if event.is_action_pressed("pause"):
 		if not GameState.finished:
@@ -171,7 +195,7 @@ func update_hud() -> void:
 	var tag_line := "Tagged: none" if tags.is_empty() else "Tagged: " + ", ".join(tags.map(func(e): return "%s %.0f m" % [e.name, player.global_position.distance_to(e.global_position)]))
 	var alert_line := "Health %d | Alert: %s | Hostiles: %d | %s | Stones %d | %s%s" % [int(round(player.health)), level.coordinator.level_name(), level.enemies.size(), noise_bar, stealth.stones, tag_line, " | BINOCULARS" if stealth.binoculars else ""]
 	var objective_lines: String = "\n".join(level.mission_log.lines())
-	hud.text = "ECHO RIDGE | prototype\n%s\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | B binoculars (fire tags) | G throw stone | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | Escape pause" % [
+	hud.text = "ECHO RIDGE | prototype\n%s\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | B binoculars (fire tags) | G throw stone | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | F5 save | F9 load | Escape pause" % [
 		objective, objective_lines, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, alert_line, range_line, wind_text(), shot_line]
 
 func is_aiming() -> bool:

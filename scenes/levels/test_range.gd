@@ -23,7 +23,7 @@ func on_target_died(body: Node3D) -> void:
 func interact(point: Vector3) -> void:
 	if near_terminal(point) and not GameState.intel:
 		GameState.collect_intel()
-		mission_log.complete("intel")
 		mission_log.activate("extract")
+		mission_log.complete("intel")
 	if GameState.intel and near_extraction(point):
 		mission_log.complete("extract")
