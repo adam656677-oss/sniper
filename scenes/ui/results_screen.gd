@@ -48,7 +48,7 @@ func stealth_rating(stats: Dictionary, objectives: Node) -> String:
 		return tr("Unseen")
 	return tr("Compromised") if int(stats.detections) < 3 else tr("Loud")
 
-func show_results() -> void:
+func show_results(progress: Dictionary = {}) -> void:
 	var stats: Dictionary = mission.stats
 	var objectives = mission.level.mission_log
 	var lines: Array[String] = []
@@ -58,6 +58,10 @@ func show_results() -> void:
 	lines.append(tr("Shots: %d | Hits: %d | Accuracy: %d%%") % [stats.shots, stats.hits, int(round(mission.accuracy() * 100.0))])
 	lines.append(tr("Kills: %d | Longest shot: %.0f m") % [stats.kills, stats.longest_kill])
 	lines.append(tr("Stealth: %s (%d detections)") % [stealth_rating(stats, objectives), stats.detections])
+	if progress.get("new_best", false):
+		lines.append(tr("New best score"))
+	for id in progress.get("unlocked", []):
+		lines.append(tr("Achievement unlocked:") + " " + tr(String(Progression.ACHIEVEMENTS[id].title)))
 	for line in objectives.lines():
 		lines.append(line)
 	text.text = "\n".join(lines)

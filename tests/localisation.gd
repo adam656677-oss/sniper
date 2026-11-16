@@ -51,6 +51,7 @@ func _initialize() -> void:
 	check(keys.size() > 50, "Translation table loads with %d strings" % keys.size())
 	var files: Array[String] = ["res://mission.gd", "res://scope_overlay.gd"]
 	gd_files("res://scenes", files)
+	gd_files("res://autoload", files)
 	var missing: Array[String] = []
 	var scanned := 0
 	for path in files:

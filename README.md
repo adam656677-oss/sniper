@@ -18,6 +18,7 @@ Planning and status live in `docs/`:
 | `autoload/game_state.gd` | `GameState` autoload: paused, finished, failed, intel, difficulty |
 | `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, difficulty, kill cam |
 | `autoload/loadout.gd` | `Loadout` autoload: installed gunsmith parts per weapon family |
+| `autoload/progression.gd` | `Progression` autoload: per-mission records and eight achievements |
 | `autoload/save_system.gd` | `SaveSystem` autoload: versioned JSON saves, checkpoints, quick save and load |
 | `scenes/player/` | First-person body and camera |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |

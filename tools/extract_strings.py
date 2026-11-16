@@ -19,7 +19,7 @@ PATTERNS = [
     r'"(?:title|brief)": "([^"]+)"',
     r'tr\("([^"]+)"\)',
 ]
-SOURCES = ["mission.gd", "scope_overlay.gd", "scenes"]
+SOURCES = ["mission.gd", "scope_overlay.gd", "scenes", "autoload"]
 
 def collect(root: pathlib.Path) -> list[str]:
     found = []

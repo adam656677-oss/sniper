@@ -108,8 +108,8 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [ ] 5.2 Missions 2 through N, each with a distinct biome or time of day and one new mechanic (night with thermal scope, moving vehicle target, protect an ally, timed extraction, sandstorm). One pull request per mission, each with a playtest. Verify: playtest each.
 - [ ] 5.3 Additional rifles and scopes through the gunsmith (fictional names). Verify: gunsmith tests extended.
 - [ ] 5.4 Enemy variety: snipers that counter the player, dogs, vehicles, drones. Verify: tests for each perception type.
-- [ ] 5.5 Challenge modes: range leaderboard (local), long-shot challenges. Verify: test scoring.
-- [ ] 5.6 Achievements framework (platform-agnostic, local). Verify: test unlock rules.
+- [~] 5.5 (local per-mission best score, fastest time and longest shot with a Records screen; dedicated long-shot challenges pending content) Challenge modes: range leaderboard (local), long-shot challenges. Verify: test scoring.
+- [x] 5.6 Achievements framework (platform-agnostic, local). Verify: test unlock rules.
 
 **Exit gate:** Full campaign playable start to finish by a playtester in one sitting without a blocking bug.
 

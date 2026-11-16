@@ -42,6 +42,7 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 
 | Loadout | `tests/loadout.gd` | Stock copies, compatible and incompatible installs, clearing, persistence and invalid entries dropped, mission rig carrying parts, aiming through the installed optic, workbench apply and presets |
 | Menus | `tests/menus.gd` | Home, mission list and scene requests, settings screen apply and defaults, pause menu visibility and resume, results on completion, secondary objectives completing, score formula, checkpoint cleared on finish, continue from checkpoint |
 | Missions | `tests/missions.gd` | Objective log (hidden, progress, completion, failure, round trip), test range intel and extraction, range plate progress and long-shot secondary, compound eliminate, exfil trigger, undetected and silent objectives, kill statistics, primary failure |
+| Progression | `tests/progression.gd` | Mission ids, unlock rules for all eight achievements, no repeats, best score, fastest time and longest shot, failures storing no record, persistence, results and Records screens |
 | Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |
 | Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
 | Tutorial | `tests/tutorial.gd` | Controller bindings on every core action, stick look, bumper weapon cycle, trigger hold-to-aim, tutorial steps revealed in order, waiting for conditions, finished steps leaving the HUD, several steps completing at once |

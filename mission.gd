@@ -53,7 +53,8 @@ func on_mission_over() -> void:
 			if objective.status == MissionLog.Status.ACTIVE and objective.kind != MissionLog.Kind.PRIMARY:
 				level.mission_log.complete(objective.id)
 	SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
-	results.show_results()
+	var progress := Progression.record(Progression.mission_id_for(scene_file_path), stats, level.mission_log, GameState.failed)
+	results.show_results(progress)
 
 func quit_to_menu() -> void:
 	Engine.time_scale = 1.0
