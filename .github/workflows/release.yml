@@ -1,0 +1,44 @@
+name: Release build
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.7 and export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://github.com/godotengine/godot-builds/releases/download/4.7-stable
+          curl --fail --location --retry 3 "$base/Godot_v4.7-stable_linux.x86_64.zip" -o /tmp/godot.zip
+          curl --fail --location --retry 3 "$base/Godot_v4.7-stable_export_templates.tpz" -o /tmp/templates.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          sudo install /tmp/godot/Godot_v4.7-stable_linux.x86_64 /usr/local/bin/godot
+          unzip -q /tmp/templates.zip -d /tmp/godot-templates
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.stable"
+          cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.7.stable/"
+      - name: Validate before releasing
+        shell: bash
+        run: GODOT=godot scripts/validate.sh
+      - name: Export the Windows release build
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${GITHUB_REF_NAME}" > build_info.txt
+          mkdir -p builds/release
+          timeout 240s godot --headless --path . --export-release "Windows Desktop" builds/release/EchoRidge.exe 2>&1 | tee export.log
+          if grep -E 'SCRIPT ERROR:' export.log; then exit 1; fi
+          test -s builds/release/EchoRidge.exe
+          test -s builds/release/EchoRidge.pck
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EchoRidge-Windows-release-${{ github.ref_name }}
+          path: builds/release/
+          if-no-files-found: error
+          retention-days: 90

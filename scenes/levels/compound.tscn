@@ -1,0 +1,199 @@
+[gd_scene load_steps=25 format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/compound.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="2"]
+
+[sub_resource type="BoxMesh" id="ground_mesh"]
+size = Vector3(240, 1, 240)
+
+[sub_resource type="BoxShape3D" id="ground_shape"]
+size = Vector3(240, 1, 240)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.33, 0.3, 0.22, 1)
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+albedo_color = Color(0.5, 0.47, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="WallNorth_mesh"]
+size = Vector3(120, 4, 1)
+
+[sub_resource type="BoxShape3D" id="WallNorth_shape"]
+size = Vector3(120, 4, 1)
+
+[sub_resource type="BoxMesh" id="WallSouth_mesh"]
+size = Vector3(120, 4, 1)
+
+[sub_resource type="BoxShape3D" id="WallSouth_shape"]
+size = Vector3(120, 4, 1)
+
+[sub_resource type="BoxMesh" id="WallWest_mesh"]
+size = Vector3(1, 4, 100)
+
+[sub_resource type="BoxShape3D" id="WallWest_shape"]
+size = Vector3(1, 4, 100)
+
+[sub_resource type="BoxMesh" id="WallEast_mesh"]
+size = Vector3(1, 4, 100)
+
+[sub_resource type="BoxShape3D" id="WallEast_shape"]
+size = Vector3(1, 4, 100)
+
+[sub_resource type="BoxMesh" id="Hut1_mesh"]
+size = Vector3(8, 4, 6)
+
+[sub_resource type="BoxShape3D" id="Hut1_shape"]
+size = Vector3(8, 4, 6)
+
+[sub_resource type="BoxMesh" id="Hut2_mesh"]
+size = Vector3(10, 4, 8)
+
+[sub_resource type="BoxShape3D" id="Hut2_shape"]
+size = Vector3(10, 4, 8)
+
+[sub_resource type="BoxMesh" id="Hut3_mesh"]
+size = Vector3(8, 4, 8)
+
+[sub_resource type="BoxShape3D" id="Hut3_shape"]
+size = Vector3(8, 4, 8)
+
+[sub_resource type="BoxMesh" id="Cover1_mesh"]
+size = Vector3(4, 2, 1)
+
+[sub_resource type="BoxShape3D" id="Cover1_shape"]
+size = Vector3(4, 2, 1)
+
+[sub_resource type="BoxMesh" id="Cover2_mesh"]
+size = Vector3(1, 2, 6)
+
+[sub_resource type="BoxShape3D" id="Cover2_shape"]
+size = Vector3(1, 2, 6)
+
+[node name="Compound" type="Node3D"]
+script = ExtResource("1")
+time_of_day = 2
+weather = 1
+spawn_point = Vector3(0, 1, 8)
+wind = Vector3(1.5, 0, 0.5)
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.409576, -0.286788, 0, 0.573576, 0.819152, 0.5, -0.709406, 0.496732, 0, 10, 0)
+light_energy = 1.4
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -50)
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("ground_mesh")
+material_override = SubResource("ground_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("ground_shape")
+
+[node name="WallNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -100)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallNorth"]
+mesh = SubResource("WallNorth_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="WallNorth"]
+shape = SubResource("WallNorth_shape")
+
+[node name="WallSouth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouth"]
+mesh = SubResource("WallSouth_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="WallSouth"]
+shape = SubResource("WallSouth_shape")
+
+[node name="WallWest" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 2, -50)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallWest"]
+mesh = SubResource("WallWest_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="WallWest"]
+shape = SubResource("WallWest_shape")
+
+[node name="WallEast" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 2, -50)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallEast"]
+mesh = SubResource("WallEast_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="WallEast"]
+shape = SubResource("WallEast_shape")
+
+[node name="Hut1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 2, -30)
+
+[node name="Mesh" type="MeshInstance3D" parent="Hut1"]
+mesh = SubResource("Hut1_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Hut1"]
+shape = SubResource("Hut1_shape")
+
+[node name="Hut2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2, -45)
+
+[node name="Mesh" type="MeshInstance3D" parent="Hut2"]
+mesh = SubResource("Hut2_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Hut2"]
+shape = SubResource("Hut2_shape")
+
+[node name="Hut3" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2, -75)
+
+[node name="Mesh" type="MeshInstance3D" parent="Hut3"]
+mesh = SubResource("Hut3_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Hut3"]
+shape = SubResource("Hut3_shape")
+
+[node name="Cover1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, -20)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover1"]
+mesh = SubResource("Cover1_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover1"]
+shape = SubResource("Cover1_shape")
+
+[node name="Cover2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, -60)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover2"]
+mesh = SubResource("Cover2_mesh")
+material_override = SubResource("wall_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover2"]
+shape = SubResource("Cover2_shape")
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Guard1" parent="Enemies" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 1, -20)
+patrol_points = PackedVector3Array(-40, 1, -20, -40, 1, -50)
+
+[node name="Guard2" parent="Enemies" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 1, -30)
+patrol_points = PackedVector3Array(40, 1, -30, 40, 1, -70)
+
+[node name="Guard3" parent="Enemies" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -85)
+patrol_points = PackedVector3Array(0, 1, -85, -30, 1, -90)
+
+[node name="Guard4" parent="Enemies" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1, -15)
+patrol_points = PackedVector3Array(20, 1, -15, 45, 1, -10)

@@ -1,0 +1,139 @@
+keys,en
+(optional),(optional)
+(secondary),(secondary)
+Accessibility,Accessibility
+Achievement unlocked:,Achievement unlocked:
+Achievements,Achievements
+Aim,Aim
+Aim down the scope (right click or left trigger),Aim down the scope (right click or left trigger)
+Alert: %s  |  Hostiles %d%s,Alert: %s  |  Hostiles %d%s
+All objectives complete,All objectives complete
+Apply,Apply
+Audio,Audio
+BINOCULARS,BINOCULARS
+Back,Back
+Binoculars,Binoculars
+Breath %d%%,Breath %d%%
+CARRYING BODY (E to drop),CARRYING BODY (E to drop)
+Checkpoint available,Checkpoint available
+Checkpoint could not be loaded:,Checkpoint could not be loaded:
+Compromised,Compromised
+Continue,Continue
+Controls,Controls
+Crouch,Crouch
+Dawn,Dawn
+Defaults,Defaults
+Difficulty,Difficulty
+Drop the three practice targets,Drop the three practice targets
+Dusk,Dusk
+ECHO RIDGE,ECHO RIDGE
+Echo Ridge recon,Echo Ridge recon
+Eliminate all hostiles,Eliminate all hostiles
+FAILED,FAILED
+Field of view,Field of view
+Finish a mission with 80% accuracy over five or more shots.,Finish a mission with 80% accuracy over five or more shots.
+Finish every tutorial step on the range.,Finish every tutorial step on the range.
+Finish the compound using only suppressed fire.,Finish the compound using only suppressed fire.
+Finish the compound without being detected.,Finish the compound without being detected.
+Fire,Fire
+Fire only suppressed weapons,Fire only suppressed weapons
+First blood,First blood
+Four hostiles patrol a walled compound. Clear it quietly and leave by the north gate.,Four hostiles patrol a walled compound. Clear it quietly and leave by the north gate.
+Fullscreen,Fullscreen
+Gameplay,Gameplay
+Ghost,Ghost
+Graduate,Graduate
+HOLDING %d%%,HOLDING %d%%
+HUD assists,HUD assists
+Health %d  |  %s  |  %s  |  Noise %d%%,Health %d  |  %s  |  %s  |  Noise %d%%
+Hit something 1000 m away.,Hit something 1000 m away.
+Hold breath,Hold breath
+Hold your breath (Shift or left stick) while scoped,Hold your breath (Shift or left stick) while scoped
+Interact,Interact
+Invert vertical look,Invert vertical look
+Keys,Keys
+Kill at 500 m or more.,Kill at 500 m or more.
+Kills: %d | Longest shot: %.0f m,Kills: %d | Longest shot: %.0f m
+LONG SHOT %.0f m  (Space to skip),LONG SHOT %.0f m  (Space to skip)
+Load checkpoint,Load checkpoint
+Long-shot slow motion,Long-shot slow motion
+Loud,Loud
+MISSION COMPLETE,MISSION COMPLETE
+MISSION COMPLETE - N to restart,MISSION COMPLETE - N to restart
+MISSION FAILED,MISSION FAILED
+MISSION FAILED - N to restart,MISSION FAILED - N to restart
+Make your first kill.,Make your first kill.
+Marksman,Marksman
+Mission select,Mission select
+Missions,Missions
+Mouse sensitivity,Mouse sensitivity
+Move back,Move back
+Move forward,Move forward
+Move left,Move left
+Move right,Move right
+New best score,New best score
+Night,Night
+No checkpoint yet,No checkpoint yet
+Noon,Noon
+One kilometre,One kilometre
+PAUSED,PAUSED
+Press a key...,Press a key...
+Prone,Prone
+Quick load,Quick load
+Quick save,Quick save
+Quiet professional,Quiet professional
+Quit,Quit
+Quit to menu,Quit to menu
+Raise your zero to 300 m with ] (d-pad up),Raise your zero to 300 m with ] (d-pad up)
+Range %.0f m,Range %.0f m
+Range --,Range --
+Range master,Range master
+Reach out,Reach out
+Reach the gold terminal ahead and press E,Reach the gold terminal ahead and press E
+Reach the north gate,Reach the north gate
+"Reach the terminal, pull the intel and get back to extraction.","Reach the terminal, pull the intel and get back to extraction."
+Read a range of 300 m or more off the rangefinder,Read a range of 300 m or more off the rangefinder
+Records,Records
+Reload,Reload
+Restart mission,Restart mission
+Resume,Resume
+Retry,Retry
+Return to the green extraction marker and press E,Return to the green extraction marker and press E
+Ring a plate at 600 m or beyond using the reticle marks,Ring a plate at 600 m or beyond using the reticle marks
+Ring every plate,Ring every plate
+Ring every plate on the range.,Ring every plate on the range.
+Ring the 100 m plate,Ring the 100 m plate
+Ring the 1000 m plate,Ring the 1000 m plate
+Ring the 300 m plate,Ring the 300 m plate
+SETTINGS,SETTINGS
+SUPPRESSED,SUPPRESSED
+Score: %d,Score: %d
+Settings,Settings
+Shooting range,Shooting range
+Shots: %d | Hits: %d | Accuracy: %d%%,Shots: %d | Hits: %d | Accuracy: %d%%
+Stand by,Stand by
+Stay undetected,Stay undetected
+Stealth: %s (%d detections),Stealth: %s (%d detections)
+Stock,Stock
+Stones %d%s,Stones %d%s
+Tag target,Tag target
+The compound,The compound
+Throw stone,Throw stone
+Time: %d:%02d,Time: %d:%02d
+"Tutorial. Learn the scope, rangefinder, zeroing, breath and holdover on a 1000 m range.","Tutorial. Learn the scope, rangefinder, zeroing, breath and holdover on a 1000 m range."
+Unbound,Unbound
+Unseen,Unseen
+Video,Video
+WINDED,WINDED
+WORKBENCH,WORKBENCH
+Workbench,Workbench
+Zero down,Zero down
+Zero up,Zero up
+best,best
+clear,clear
+dust,dust
+fastest,fastest
+longest,longest
+not completed,not completed
+rain,rain
+windy,windy

@@ -1,0 +1,171 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/shooting_range.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/targets/steel_plate.tscn" id="2"]
+
+[sub_resource type="BoxMesh" id="ground_mesh"]
+size = Vector3(120, 1, 1150)
+
+[sub_resource type="BoxShape3D" id="ground_shape"]
+size = Vector3(120, 1, 1150)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.3, 0.36, 0.24, 1)
+
+[sub_resource type="BoxMesh" id="pad_mesh"]
+size = Vector3(4, 0.1, 4)
+
+[sub_resource type="StandardMaterial3D" id="pad_mat"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="BoxMesh" id="berm_mesh"]
+size = Vector3(120, 6, 4)
+
+[sub_resource type="BoxShape3D" id="berm_shape"]
+size = Vector3(120, 6, 4)
+
+[node name="ShootingRange" type="Node3D"]
+script = ExtResource("1")
+time_of_day = 1
+weather = 0
+wind = Vector3(3, 0, 0)
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.409576, -0.286788, 0, 0.573576, 0.819152, 0.5, -0.709406, 0.496732, 0, 10, 0)
+light_energy = 1.4
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -550)
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("ground_mesh")
+material_override = SubResource("ground_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("ground_shape")
+
+[node name="FiringPad" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 3)
+mesh = SubResource("pad_mesh")
+material_override = SubResource("pad_mat")
+
+[node name="Berm" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -1040)
+
+[node name="Mesh" type="MeshInstance3D" parent="Berm"]
+mesh = SubResource("berm_mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Berm"]
+shape = SubResource("berm_shape")
+
+[node name="Plates" type="Node3D" parent="."]
+
+[node name="Plate100" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.4, -100)
+range_metres = 100.0
+
+[node name="Marker100" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0.25, -100)
+billboard = 1
+pixel_size = 0.008
+text = "100 m"
+font_size = 48
+
+[node name="Plate200" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 1.4, -200)
+range_metres = 200.0
+
+[node name="Marker200" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.25, -200)
+billboard = 1
+pixel_size = 0.008
+text = "200 m"
+font_size = 48
+
+[node name="Plate300" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.4, -300)
+range_metres = 300.0
+
+[node name="Marker300" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 0.25, -300)
+billboard = 1
+pixel_size = 0.008
+text = "300 m"
+font_size = 48
+
+[node name="Plate400" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.0, 1.4, -400)
+range_metres = 400.0
+
+[node name="Marker400" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2, 0.25, -400)
+billboard = 1
+pixel_size = 0.008
+text = "400 m"
+font_size = 48
+
+[node name="Plate500" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 1.4, -500)
+range_metres = 500.0
+
+[node name="Marker500" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, 0.25, -500)
+billboard = 1
+pixel_size = 0.008
+text = "500 m"
+font_size = 48
+
+[node name="Plate600" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.0, 1.4, -600)
+range_metres = 600.0
+
+[node name="Marker600" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.2, 0.25, -600)
+billboard = 1
+pixel_size = 0.008
+text = "600 m"
+font_size = 48
+
+[node name="Plate700" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5, 1.4, -700)
+range_metres = 700.0
+
+[node name="Marker700" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.3, 0.25, -700)
+billboard = 1
+pixel_size = 0.008
+text = "700 m"
+font_size = 48
+
+[node name="Plate800" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.0, 1.4, -800)
+range_metres = 800.0
+
+[node name="Marker800" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.2, 0.25, -800)
+billboard = 1
+pixel_size = 0.008
+text = "800 m"
+font_size = 48
+
+[node name="Plate900" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.5, 1.4, -900)
+range_metres = 900.0
+
+[node name="Marker900" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.3, 0.25, -900)
+billboard = 1
+pixel_size = 0.008
+text = "900 m"
+font_size = 48
+
+[node name="Plate1000" parent="Plates" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.0, 1.4, -1000)
+range_metres = 1000.0
+
+[node name="Marker1000" type="Label3D" parent="Plates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.2, 0.25, -1000)
+billboard = 1
+pixel_size = 0.008
+text = "1000 m"
+font_size = 48

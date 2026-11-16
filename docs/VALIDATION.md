@@ -1,23 +1,70 @@
 # Validation and development builds
 
-The workflow pins Godot 4.3 stable for repeatability, not as a claim that it is the latest engine. It downloads the editor and export templates from the official Godot release repository.
+CI pins Godot 4.7 stable for repeatability. Three workflows exist:
 
-On pushes, pull requests, or manual dispatch, it imports the project, checks logs for engine/script errors, runs 16 mission smoke checks, and exports a Windows x86-64 development build only after validation succeeds. Logs are retained for failed runs where available. Builds are unsigned and are not public releases.
+- **Validate and build** (`build.yml`): runs `scripts/validate.sh --export`, which imports the project, runs every suite in `tests/`, exports a Windows x86-64 development build, and uploads it as `EchoRidge-Windows-development`. CI and local validation are the same script.
+- **Projectile regression tests** (`projectiles.yml`): import plus the ballistics and projectile suites only.
+- **Windows runtime smoke test** (`windows-runtime.yml`): after a successful validate run, launches the exported executable headlessly on a Windows runner for 120 frames and checks the log.
 
-## Local validation
-Install Godot 4.3 and its export templates, then run from the project directory:
+Steps fail only on `SCRIPT ERROR:` or `FAIL:` lines. Plain `ERROR:` lines are not treated as failures because the headless dummy renderer prints `ERROR: Parameter "m" is null` for every `BoxMesh` created without a display; that line is benign. Earlier versions of the workflows matched it and never went green.
 
-```sh
-godot --headless --path . --editor --quit
-godot --headless --path . --script res://tests/smoke.gd
-mkdir -p builds/windows
-godot --headless --path . --export-debug "Windows Desktop" builds/windows/EchoRidge.exe
+## Release builds
+
+Pushing a tag such as `v0.4.0` runs `release.yml`: it validates, stamps the tag into the build, exports a Windows release build and uploads `EchoRidge-Windows-release-<tag>`. The version itself lives in `application/config/version` in project.godot. Development builds are stamped with the commit hash.
+
+## Screenshots
+
+`tools/capture.gd` renders the main menu, mission select, the compound at the hip, through the scope and through binoculars, and the range at the hip and at 12x. CI runs it under a virtual display after validation and uploads `EchoRidge-screenshots`. Locally:
+
+```bash
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --script res://tools/capture.gd -- /tmp/shots
 ```
 
-## Downloading a successful build
-In the repository's Actions tab, open a successful Validate and build run and download EchoRidge-Windows-development. Extract the complete archive and keep the EXE and PCK together. Do not infer success merely because these workflow files exist.
+Screenshots are a visual check, not a playtest: they show framing, lighting and HUD layout but not feel.
 
-## Coverage and limits
-Tests cover scene creation, player/camera initialization, targets, starting ammunition, floor collision, intel proximity, extraction requirements, development refill, and completion HUD. They do not verify shooting, aim accuracy, graphical appearance, audio, Windows launch behavior, performance, or enemy AI. A Linux headless export is not a Windows playtest.
+## Local validation
 
-These files have not yet executed in Godot at authoring time. GitHub Actions must run before any engine-test or build success can be reported. Actions availability and repository workflow permissions may affect execution. No credentials or paid services are required by the workflow; GitHub runner usage remains subject to the account's quotas and billing settings.
+```bash
+GODOT=/path/to/Godot_v4.7-stable_linux.x86_64 scripts/validate.sh
+```
+
+Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 export templates in the user data directory).
+
+## Test suites
+
+| Suite | File | Covers |
+|---|---|---|
+| Settings | `tests/settings.gd` | Defaults, unknown keys ignored, remapping and refusal, save and load round trip, reset, applying difficulty and bindings, kill cam and inverted look in a mission, event serialisation, a control for every setting, remapping by listening and cancelling, music bus volume, render scale, reduced motion, high-contrast reticle, realistic ranging, corrupt file fallback |
+| Smoke (34 checks) | `tests/smoke.gd` | Scene load, player and camera, targets, floor collision, intel and extraction rules, timed reload, reserve transfer, pause freezing reload and physics, cooldown, completion HUD |
+| Bullet camera | `tests/bulletcam.gd` | Trajectory prediction without side effects, lethal-hit prediction, plates excluded, the camera taking over in slow motion behind a visible round, HUD hidden, impact hold, hand-back, no stacked slow motion, short kills and plates ignored, skipping |
+| Combat | `tests/combat.gd` | Suppression from incoming fire and its decay, HUD warning, flank points on opposite sides, alert guards moving to flank, carrying and dropping bodies, carry noise and speed, guards finding moved bodies, body positions in saves |
+| Enemies | `tests/enemies.gd` | Perception cone, distance, stance exposure and occlusion; awareness thresholds; Patrol to Suspicious to Alert; squad contact sharing; difficulty scaling; return fire and regeneration; search and return to patrol; hearing loud, distant and suppressed shots; alert on hit; flee; body discovery; lockdown and reinforcements; navigation; mission failure |
+| Feedback | `tests/feedback.gd` | Rifle and sidearm recoil and recovery, head bob and its suppression, tracers appearing and clearing, dust and bullet holes on the wall face, hole cap, hit marker showing and fading |
+| Focus | `tests/focus.gd` | Focus-loss pause, mouse release, reload freeze, explicit resume, completed-mission input blocking |
+| Atmosphere | `tests/atmosphere.gd` | Visibility and hearing by time and weather, gusts above and below the mean without changing direction, per-level presets, sun and haze applied, guards seeing less at dusk, the rifle reading gusting wind |
+| Ballistics (8 checks) | `tests/ballistics_test.gd` | Integration step with gravity and wind, segment tracing |
+| Localisation | `tests/localisation.gd` | Every button, label, objective, tutorial step, mission title and tr() string in the source is a key in the translation table with English text, and the imported translation returns it |
+| Loadout | `tests/loadout.gd` | Stock copies, compatible and incompatible installs, clearing, persistence and invalid entries dropped, mission rig carrying parts, aiming through the installed optic, workbench apply and presets |
+| Menus | `tests/menus.gd` | Home, mission list and scene requests, settings screen apply and defaults, pause menu visibility and resume, results on completion, secondary objectives completing, score formula, checkpoint cleared on finish, continue from checkpoint |
+| Missions | `tests/missions.gd` | Objective log (hidden, progress, completion, failure, round trip), test range intel and extraction, range plate progress and long-shot secondary, compound eliminate, exfil trigger, undetected and silent objectives, kill statistics, primary failure |
+| Progression | `tests/progression.gd` | Mission ids, unlock rules for all eight achievements, no repeats, best score, fastest time and longest shot, failures storing no record, persistence, results and Records screens |
+| Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |
+| Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
+| Tutorial | `tests/tutorial.gd` | Controller bindings on every core action, stick look, bumper weapon cycle, trigger hold-to-aim, tutorial steps revealed in order, waiting for conditions, finished steps leaving the HUD, several steps completing at once |
+| Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, fictional names |
+| Aim | `tests/aim.gd` | Stances (collider, eye height, speed), sway amplitude by stance, breath hold, exhaustion and recovery, camera sway application |
+| Range | `tests/range.gd` | 1000 m range layout, rangefinder, holdover-corrected hits at 300, 600 and 1000 m, crosswind miss and drift-corrected hit at 800 m, plate reset, range completion |
+| Saves | `tests/saves.gd` | Checkpoint on objective completion, quick save, full round trip of player, weapons, stealth kit, hostiles, objectives, statistics and difficulty, staged loads applied only by the matching scene, corrupt, wrong-version and incomplete saves rejected |
+| Scope | `tests/scope.gd` | Zero turret steps and clamps, holdover, launch elevation, scope view following the camera, magnification range and clamps, reticle marks scaling with zoom, rangefinder, wind readout, kill-cam trigger and time scale |
+| Stealth | `tests/stealth.gd` | Noise by stance and motion, footsteps making a patrol suspicious, binoculars, tagging, tag list pruning, stones drawing a guard, stone count, pause gating |
+| Targets | `tests/targets.gd` | Hit zones (head, torso, limb), damage multipliers, death removal, live projectile headshot |
+
+Not covered: visual appearance, audio, aim feel, Windows launch beyond a headless 120-frame run, performance, enemy behaviour (none exists).
+
+## Playtest log
+
+Record every human playtest here: date, build (commit or run id), machine, outcome.
+
+| Date | Build | Machine | Outcome |
+|---|---|---|---|
+| none yet | | | |
