@@ -39,10 +39,10 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 1.6 Scope zero adjustment (elevation turret in 100 m steps) and holdover marks. Verify: test that zeroing to N metres gives zero drop at N.
 - [x] 1.7 Hit model: hitboxes (head, torso, limbs) on a target scene with damage multipliers. Verify: test headshot kills, limb hit does not.
 - [~] 1.8 (trigger rule, time-scale envelope and skip done; camera follow pending) Bullet time / kill cam for shots over a distance threshold, skippable, optional in settings. Verify: playtest; test that it triggers only above threshold.
-- [ ] 1.9 Impact feedback: tracer on long shots, dust and blood decals (toggle), ricochet sound, hit marker. Verify: playtest.
+- [~] 1.9 (tracers, dust puffs, capped bullet holes and a hit marker done; ricochet sound and blood toggle need audio and art) Impact feedback: tracer on long shots, dust and blood decals (toggle), ricochet sound, hit marker. Verify: playtest.
 - [x] 1.10 Sidearm: suppressed pistol with hitscan, for close range. Shotguns removed or kept as a mission-specific pickup. Verify: weapons test updated.
 - [ ] 1.11 Weapon animation: idle, aim in/out, fire with bolt cycle, reload, sprint, from Mixamo or hand-made. Verify: playtest; test that `AnimationPlayer` has required clips.
-- [ ] 1.12 Camera: head bob, recoil kick and recovery, FOV change on sprint, landing dip. Verify: playtest.
+- [~] 1.12 (recoil kick and recovery, head bob off when aiming or with reduced motion; sprint FOV and landing dip pending sprint) Camera: head bob, recoil kick and recovery, FOV change on sprint, landing dip. Verify: playtest.
 - [x] 1.13 Target range level: a 1000 m shooting range with distance markers, steel plates that ring and fall, wind variation. This is the tuning playground. Verify: playtest.
 
 **Exit gate:** A playtester can hit a plate at 600 m using the scope, wind and drop cues without being told the numbers, and says the shot feels good.

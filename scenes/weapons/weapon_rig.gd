@@ -18,6 +18,7 @@ const SUBSTEP := 1.0 / 120.0
 
 signal body_hit(body: Node3D, shape_index: int, damage: float, distance: float)
 signal fired(profile: WeaponProfile)
+signal impact(position: Vector3, normal: Vector3, body: Node3D)
 
 var profiles: Array[WeaponProfile] = []
 var active := 0
@@ -128,6 +129,7 @@ func fire_weapon() -> bool:
 			"velocity": direction * current.muzzle_velocity,
 			"age": 0.0,
 			"distance": 0.0,
+			"origin": camera.global_position,
 			"profile": current
 		})
 		fired.emit(current)
@@ -141,6 +143,7 @@ func fire_weapon() -> bool:
 		var finish := origin + camera.global_basis * local_direction * current.max_range
 		var hit := Ballistics.trace_segment(space, origin, finish, excluded)
 		if not hit.is_empty():
+			impact.emit(hit.position, hit.normal, hit.collider)
 			body_hit.emit(hit.collider, int(hit.get("shape", -1)), current.damage, origin.distance_to(hit.position))
 	fired.emit(current)
 	return true
@@ -169,6 +172,7 @@ func advance_projectiles(delta: float) -> void:
 			var hit := Ballistics.trace_segment(space, start, finish, excluded)
 			if not hit.is_empty():
 				var travelled: float = float(projectile.distance) + start.distance_to(hit.position)
+				impact.emit(hit.position, hit.normal, hit.collider)
 				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage, travelled)
 				removed = true
 				break

@@ -41,6 +41,16 @@ func run() -> void:
 	game.weapon.toggle_aim()
 	await shot("04_compound_scoped")
 	game.weapon.toggle_aim()
+	game.player.global_position = Vector3(5, 1, -14)
+	game.player.rotation.y = 0.0
+	await process_frame
+	game.weapon.select_weapon(1)
+	for i in range(6):
+		game.weapon.shot_remaining = 0.0
+		game.weapon.fire_weapon()
+	await shot("10_impacts")
+	game.weapon.select_weapon(0)
+	game.weapon.toggle_aim()
 	game.stealth.toggle_binoculars()
 	await shot("05_binoculars")
 	game.queue_free()

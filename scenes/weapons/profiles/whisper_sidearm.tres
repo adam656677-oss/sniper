@@ -20,3 +20,4 @@ drag_coefficient = 0.0
 zero_range = 0.0
 damage = 30.0
 suppressed = true
+recoil_degrees = 1.2

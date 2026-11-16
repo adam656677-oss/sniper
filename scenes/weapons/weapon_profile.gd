@@ -20,6 +20,7 @@ extends Resource
 @export var zero_range := 0.0
 @export var damage := 50.0
 @export var suppressed := false
+@export var recoil_degrees := 3.0
 
 func to_stats() -> Dictionary:
 	return {

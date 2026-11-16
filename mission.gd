@@ -12,6 +12,8 @@ extends Node3D
 @onready var stealth: StealthKit = $StealthKit
 @onready var results: ResultsScreen = $HUDLayer/Results
 @onready var scope_view: ScopeView = $ScopeView
+@onready var feedback: ShotFeedback = $ShotFeedback
+@onready var crosshair: Label = $HUDLayer/Crosshair
 var measured_range := -1.0
 var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
@@ -36,6 +38,7 @@ func _ready() -> void:
 	stealth.level = level
 	level.target_killed.connect(on_target_killed)
 	weapon.fired.connect(on_weapon_fired)
+	weapon.impact.connect(on_impact)
 	weapon.body_hit.connect(on_body_hit)
 	level.coordinator.level_changed.connect(on_alert_changed)
 	level.mission_log.objective_changed.connect(on_objective_changed)
@@ -71,13 +74,19 @@ func load_slot(slot: String) -> bool:
 	get_tree().reload_current_scene()
 	return true
 
+func on_impact(position: Vector3, normal: Vector3, body: Node3D) -> void:
+	var living := body != null and body.has_method("take_hit")
+	feedback.impact(position, normal, not living)
+
 func on_weapon_fired(profile: WeaponProfile) -> void:
+	feedback.kick(profile)
 	stats.shots += 1
 	level.report_noise(camera.global_position, 25.0 if profile.suppressed else 400.0)
 
 func on_body_hit(body: Node3D, _shape_index: int, _damage: float, _distance: float) -> void:
 	if body and body.has_method("take_hit"):
 		stats.hits += 1
+		feedback.show_hit(body.has_method("is_alive") and not body.is_alive())
 
 func on_alert_changed(level_value: int) -> void:
 	if level_value >= AlertCoordinator.Level.ALERT:
@@ -262,9 +271,25 @@ func advance_sway(delta: float) -> void:
 		sway.set_holding(is_aiming() and Input.is_action_pressed("hold_breath"))
 		sway.advance(delta)
 	var offset := sway.offset_degrees() if is_aiming() and GameState.simulation_active() else Vector2.ZERO
-	camera.rotation_degrees = Vector3(offset.y, offset.x, 0.0)
+	camera.rotation_degrees = Vector3(offset.y + feedback.recoil_degrees, offset.x, 0.0)
+	camera.position.y = feedback.bob_offset()
+
+const CROSSHAIR := "+"
+const HIT_MARKER := "X"
+
+func update_crosshair() -> void:
+	if feedback.hit_marker_time > 0.0:
+		crosshair.text = HIT_MARKER
+		crosshair.modulate = Color(1, 0.2, 0.2) if feedback.hit_marker_kill else Color(1, 1, 1)
+	else:
+		crosshair.text = CROSSHAIR
+		crosshair.modulate = Color(1, 1, 1)
 
 func _physics_process(delta: float) -> void:
+	if GameState.simulation_active():
+		feedback.advance(delta, Vector2(player.velocity.x, player.velocity.z).length(), is_aiming(), Settings.reduced_motion())
+	feedback.draw_tracers(weapon.projectiles)
+	update_crosshair()
 	weapon.wind = level.current_wind()
 	weapon.advance_weapon(delta)
 	weapon.advance_projectiles(delta)

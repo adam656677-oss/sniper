@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://mission.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/levels/shooting_range.tscn" id="2"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://scenes/ui/pause_menu.gd" id="10"]
 [ext_resource type="Script" path="res://scenes/ui/results_screen.gd" id="11"]
 [ext_resource type="Script" path="res://scenes/weapons/scope_view.gd" id="12"]
+[ext_resource type="Script" path="res://scenes/fx/shot_feedback.gd" id="13"]
 
 [node name="RangeMission" type="Node3D"]
 script = ExtResource("1")
@@ -32,6 +33,9 @@ script = ExtResource("8")
 
 [node name="StealthKit" type="Node" parent="."]
 script = ExtResource("9")
+
+[node name="ShotFeedback" type="Node3D" parent="."]
+script = ExtResource("13")
 
 [node name="ScopeView" type="SubViewport" parent="."]
 size = Vector2i(1024, 1024)
