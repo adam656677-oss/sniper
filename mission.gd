@@ -17,6 +17,8 @@ var camera: Camera3D
 
 func _ready() -> void:
 	GameState.reset()
+	Settings.apply()
+	killcam.enabled = bool(Settings.get_value("gameplay", "killcam"))
 	camera = player.camera
 	player.spawn_point = level.spawn_point
 	player.position = level.spawn_point
@@ -197,6 +199,9 @@ func update_hud() -> void:
 	var objective_lines: String = "\n".join(level.mission_log.lines())
 	hud.text = "ECHO RIDGE | prototype\n%s\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | B binoculars (fire tags) | G throw stone | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | F5 save | F9 load | Escape pause" % [
 		objective, objective_lines, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, alert_line, range_line, wind_text(), shot_line]
+
+func hip_fov() -> float:
+	return clampf(float(Settings.get_value("video", "fov")), 60.0, 110.0)
 
 func is_aiming() -> bool:
 	return camera.fov < 70.0 and not stealth.binoculars

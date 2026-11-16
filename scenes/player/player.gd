@@ -29,9 +29,10 @@ var since_damage := REGEN_DELAY
 var still_seconds := 0.0
 
 func look(relative: Vector2) -> void:
-	var sensitivity := SCOPED_SENSITIVITY if camera.fov < 30.0 else LOOK_SENSITIVITY
+	var sensitivity := (SCOPED_SENSITIVITY if camera.fov < 30.0 else LOOK_SENSITIVITY) * Settings.sensitivity()
+	var vertical := -relative.y if Settings.invert_y() else relative.y
 	rotate_y(-relative.x * sensitivity)
-	head.rotation.x = clampf(head.rotation.x - relative.y * sensitivity, -PITCH_LIMIT, PITCH_LIMIT)
+	head.rotation.x = clampf(head.rotation.x - vertical * sensitivity, -PITCH_LIMIT, PITCH_LIMIT)
 
 func set_stance(value: Stance) -> bool:
 	if not GameState.simulation_active() or not STANCE_HEIGHT.has(value):
