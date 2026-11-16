@@ -54,7 +54,8 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | W A S D | Move |
 | Mouse | Aim |
 | Left click | Fire (also resumes from pause) |
-| Right click | Toggle zoom |
+| Right click | Aim through the scope |
+| Mouse wheel | Scope magnification 4x to 12x while aiming |
 | 1, 2 | Rifle, sidearm |
 | B | Toggle binoculars (left click or T tags the hostile under the crosshair) |
 | G | Throw a stone to draw a guard |
@@ -79,4 +80,4 @@ Runs the editor import and every headless suite in `tests/`. Set `GODOT` to the 
 
 ## Limitations
 
-This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations or sounds, and the menus are unstyled. The scope is a field-of-view change with a drawn overlay, not a rendered optic. See `docs/CHECKLIST.md` for the full plan.
+This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations or sounds, and the menus are unstyled. See `docs/CHECKLIST.md` for the full plan.

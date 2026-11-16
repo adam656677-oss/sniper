@@ -46,6 +46,23 @@ func run_tests() -> void:
 	check(weapon.projectiles[0].velocity.y > low_zero_lift and low_zero_lift > 0.0, "Longer zero launches the bullet higher")
 	weapon.projectiles.clear()
 	weapon.zero_ranges[0] = 100.0
+	# Rendered scope view.
+	var scope = game.scope_view
+	check(scope.source == game.camera and scope.zoom == 4.0, "Scope view follows the player camera at 4x")
+	game.camera.global_position = Vector3(5, 3, -7)
+	game.camera.global_rotation = Vector3(0.1, 0.4, 0)
+	scope.follow()
+	check(scope.camera.global_transform.is_equal_approx(game.camera.global_transform), "Scope camera copies the player camera transform")
+	var fov_4x: float = scope.current_fov()
+	check(fov_4x < 25.0 and fov_4x > 15.0, "4x magnification narrows the scope view")
+	check(scope.zoom_in() and scope.zoom == 6.0 and scope.current_fov() < fov_4x, "Wheel up magnifies")
+	scope.set_zoom(100.0)
+	check(scope.zoom == 12.0 and not scope.zoom_in(), "Magnification clamps at 12x")
+	scope.set_zoom(1.0)
+	check(scope.zoom == 4.0 and not scope.zoom_out(), "Magnification clamps at 4x")
+	check(absf(scope.fov_for_zoom(1.0, 75.0) - 75.0) < 0.001, "1x magnification is the hip field of view")
+	game.camera.global_position = Vector3(30, 2, 0)
+	game.camera.global_rotation = Vector3.ZERO
 	# Reticle marks.
 	var overlay = game.get_node("ScopeLayer/ScopeOverlay")
 	game.camera.fov = 25.0
@@ -56,6 +73,9 @@ func run_tests() -> void:
 		if marks[i].pixels <= marks[i - 1].pixels:
 			monotonic = false
 	check(monotonic and marks[0].pixels > 0.0, "Holdover marks descend monotonically below centre")
+	scope.set_zoom(12.0)
+	check(overlay.holdover_marks()[0].pixels > marks[0].pixels * 2.0, "Marks spread out at higher magnification")
+	scope.set_zoom(4.0)
 	# Rangefinder.
 	var wall: StaticBody3D = game.level.spawn_box(Vector3(30, 2, -40), Vector3(4, 4, 1), Color.GRAY)
 	await physics_frame

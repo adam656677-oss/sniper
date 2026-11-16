@@ -37,7 +37,9 @@ func holdover_marks() -> Array[Dictionary]:
 	if not weapon.profile().simulated_projectile:
 		return marks
 	var viewport_size := get_viewport_rect().size
-	var pixels_per_radian: float = (viewport_size.y * 0.5) / tan(deg_to_rad(game.camera.fov) * 0.5)
+	var scope_fov: float = game.scope_view.current_fov() if game.get("scope_view") else game.camera.fov
+	var radius := minf(viewport_size.x, viewport_size.y) * 0.38
+	var pixels_per_radian: float = radius / tan(deg_to_rad(scope_fov) * 0.5)
 	var zero: float = weapon.zero_range()
 	var distance := zero + 100.0
 	while distance <= 1000.0:
@@ -46,12 +48,32 @@ func holdover_marks() -> Array[Dictionary]:
 		distance += 100.0
 	return marks
 
+# The magnified picture from the scope viewport, as a textured disc.
+func draw_scope_picture(center: Vector2, radius: float) -> void:
+	var game := mission()
+	if game == null or not game.get("scope_view"):
+		return
+	var texture: Texture2D = game.scope_view.get_texture()
+	if texture == null:
+		return
+	var points := PackedVector2Array()
+	var uvs := PackedVector2Array()
+	var colors := PackedColorArray()
+	for i in range(64):
+		var a := TAU * float(i) / 64.0
+		var direction := Vector2(cos(a), sin(a))
+		points.append(center + direction * radius)
+		uvs.append(Vector2(0.5, 0.5) + direction * 0.5)
+		colors.append(Color.WHITE)
+	draw_polygon(points, colors, uvs, texture)
+
 func _draw() -> void:
 	var viewport_size := get_viewport_rect().size
 	var center := viewport_size * 0.5
 	var radius := minf(viewport_size.x, viewport_size.y) * 0.38
 	var ink := Color(0.04, 0.06, 0.04, 0.9)
 	var tint := Color(0.0, 0.0, 0.0, 0.88)
+	draw_scope_picture(center, radius)
 	for i in range(96):
 		var a := TAU * float(i) / 96.0
 		var b := TAU * float(i + 1) / 96.0
@@ -71,7 +93,7 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_string(font, center + Vector2(-90, radius * 0.65), range_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
 	var game := mission()
-	draw_string(font, center + Vector2(radius * 0.45, -radius * 0.75), "ZERO %.0f m" % game.weapon.zero_range(), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
+	draw_string(font, center + Vector2(radius * 0.45, -radius * 0.75), "ZERO %.0f m | %.0fx" % [game.weapon.zero_range(), game.scope_view.zoom], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
 	for mark in holdover_marks():
 		var y: float = center.y + mark.pixels
 		if y < center.y + radius:

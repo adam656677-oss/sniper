@@ -11,6 +11,7 @@ extends Node3D
 @onready var killcam: KillCam = $KillCam
 @onready var stealth: StealthKit = $StealthKit
 @onready var results: ResultsScreen = $HUDLayer/Results
+@onready var scope_view: ScopeView = $ScopeView
 var measured_range := -1.0
 var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
@@ -25,6 +26,7 @@ func _ready() -> void:
 	player.position = level.spawn_point
 	weapon.camera = camera
 	weapon.excluded = [player.get_rid()]
+	scope_view.source = camera
 	weapon.body_hit.connect(level.on_body_hit)
 	weapon.wind = level.wind
 	level.player = player
@@ -167,6 +169,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		weapon.adjust_zero(-1)
 	elif event.is_action_pressed("skip_killcam"):
 		killcam.skip()
+	elif event.is_action_pressed("zoom_in"):
+		if is_aiming():
+			scope_view.zoom_in()
+	elif event.is_action_pressed("zoom_out"):
+		if is_aiming():
+			scope_view.zoom_out()
 	elif event.is_action_pressed("binoculars"):
 		stealth.toggle_binoculars()
 	elif event.is_action_pressed("tag"):
