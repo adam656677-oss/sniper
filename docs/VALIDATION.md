@@ -8,6 +8,16 @@ CI pins Godot 4.7 stable for repeatability. Three workflows exist:
 
 Steps fail only on `SCRIPT ERROR:` or `FAIL:` lines. Plain `ERROR:` lines are not treated as failures because the headless dummy renderer prints `ERROR: Parameter "m" is null` for every `BoxMesh` created without a display; that line is benign. Earlier versions of the workflows matched it and never went green.
 
+## Screenshots
+
+`tools/capture.gd` renders the main menu, mission select, the compound at the hip, through the scope and through binoculars, and the range at the hip and at 12x. CI runs it under a virtual display after validation and uploads `EchoRidge-screenshots`. Locally:
+
+```bash
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --script res://tools/capture.gd -- /tmp/shots
+```
+
+Screenshots are a visual check, not a playtest: they show framing, lighting and HUD layout but not feel.
+
 ## Local validation
 
 ```bash

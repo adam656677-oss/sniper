@@ -63,107 +63,107 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.4, -100)
 range_metres = 100.0
 
 [node name="Marker100" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 2.2, -100)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0.25, -100)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "100 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate200" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 1.4, -200)
 range_metres = 200.0
 
 [node name="Marker200" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 2.2, -200)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.25, -200)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "200 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate300" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.4, -300)
 range_metres = 300.0
 
 [node name="Marker300" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0, 2.2, -300)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 0.25, -300)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "300 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate400" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.0, 1.4, -400)
 range_metres = 400.0
 
 [node name="Marker400" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.2, -400)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2, 0.25, -400)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "400 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate500" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 1.4, -500)
 range_metres = 500.0
 
 [node name="Marker500" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.0, 2.2, -500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, 0.25, -500)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "500 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate600" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.0, 1.4, -600)
 range_metres = 600.0
 
 [node name="Marker600" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 2.2, -600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.2, 0.25, -600)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "600 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate700" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5, 1.4, -700)
 range_metres = 700.0
 
 [node name="Marker700" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0, 2.2, -700)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.3, 0.25, -700)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "700 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate800" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.0, 1.4, -800)
 range_metres = 800.0
 
 [node name="Marker800" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.5, 2.2, -800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.2, 0.25, -800)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "800 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate900" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.5, 1.4, -900)
 range_metres = 900.0
 
 [node name="Marker900" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.0, 2.2, -900)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.3, 0.25, -900)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "900 m"
-font_size = 64
+font_size = 48
 
 [node name="Plate1000" parent="Plates" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.0, 1.4, -1000)
 range_metres = 1000.0
 
 [node name="Marker1000" type="Label3D" parent="Plates"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.5, 2.2, -1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.2, 0.25, -1000)
 billboard = 1
-pixel_size = 0.02
+pixel_size = 0.008
 text = "1000 m"
-font_size = 64
+font_size = 48

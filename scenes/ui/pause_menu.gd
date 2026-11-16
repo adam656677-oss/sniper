@@ -25,6 +25,9 @@ func _ready() -> void:
 	button("Settings", func(): settings_screen.visible = true; panel.visible = false)
 	button("Restart mission", func(): get_tree().reload_current_scene())
 	button("Quit to menu", func(): mission.quit_to_menu())
+	var help := Label.new()
+	help.text = mission.CONTROLS_HELP if mission and mission.get("CONTROLS_HELP") else ""
+	panel.add_child(help)
 	settings_screen = SettingsScreen.new()
 	settings_screen.visible = false
 	settings_screen.closed.connect(func(): settings_screen.visible = false; panel.visible = true)

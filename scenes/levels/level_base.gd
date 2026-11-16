@@ -21,6 +21,7 @@ var triggers: Array[TriggerZone] = []
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(clear_color)
+	ensure_environment()
 	coordinator = AlertCoordinator.new()
 	coordinator.name = "AlertCoordinator"
 	add_child(coordinator)
@@ -37,6 +38,42 @@ func _ready() -> void:
 	mission_log.name = "MissionLog"
 	add_child(mission_log)
 	setup_objectives()
+
+# Sky, ambient light, tonemapping and distance haze shared by every level, plus
+# sun shadows. A level that has its own WorldEnvironment keeps it.
+func ensure_environment() -> void:
+	if has_node("Sun"):
+		var sun: DirectionalLight3D = $Sun
+		sun.shadow_enabled = true
+		sun.light_energy = 1.0
+		sun.directional_shadow_max_distance = 250.0
+	for child in get_children():
+		if child is WorldEnvironment:
+			return
+	var sky_material := ProceduralSkyMaterial.new()
+	sky_material.sky_top_color = Color(0.32, 0.5, 0.72)
+	sky_material.sky_horizon_color = Color(0.72, 0.78, 0.82)
+	sky_material.ground_horizon_color = Color(0.6, 0.6, 0.55)
+	sky_material.ground_bottom_color = Color(0.25, 0.24, 0.2)
+	var sky := Sky.new()
+	sky.sky_material = sky_material
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_SKY
+	environment.sky = sky
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	environment.ambient_light_energy = 0.35
+	environment.ambient_light_sky_contribution = 0.6
+	environment.ambient_light_color = Color(0.55, 0.6, 0.68)
+	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.tonemap_exposure = 0.85
+	environment.fog_enabled = true
+	environment.fog_light_color = Color(0.7, 0.76, 0.82)
+	environment.fog_density = 0.00012
+	environment.fog_sky_affect = 0.0
+	var world := WorldEnvironment.new()
+	world.name = "WorldEnvironment"
+	world.environment = environment
+	add_child(world)
 
 # Concrete levels declare their objectives here.
 func setup_objectives() -> void:

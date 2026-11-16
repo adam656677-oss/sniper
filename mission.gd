@@ -112,7 +112,7 @@ func wind_relative() -> Vector3:
 func wind_text() -> String:
 	var relative := wind_relative()
 	var cross := "L>R" if relative.x > 0.05 else ("R>L" if relative.x < -0.05 else "none")
-	return "Wind %.1f m/s cross %s %.1f | head %.1f" % [weapon.wind.length(), cross, absf(relative.x), relative.z]
+	return "Wind %.1f m/s  cross %s %.1f  head %s" % [weapon.wind.length(), cross, absf(relative.x), signed_text(relative.z)]
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(player):
@@ -193,35 +193,47 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				weapon.toggle_aim()
 
+const CONTROLS_HELP := "Left click fire | Right click aim | Wheel zoom | Shift hold breath | [ ] zero\nB binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact\n1 rifle | 2 sidearm | F5 quick save | F9 quick load | Escape pause | N restart"
+
+static func signed_text(value: float) -> String:
+	return "%.1f" % (0.0 if absf(value) < 0.05 else value)
+
 func update_hud() -> void:
-	var objective: String = level.objective_text()
+	var lines: Array[String] = []
 	if GameState.failed:
-		objective = "MISSION FAILED - N to restart"
+		lines.append("MISSION FAILED - N to restart")
 	elif GameState.finished:
-		objective = "MISSION COMPLETE - N to restart"
+		lines.append("MISSION COMPLETE - N to restart")
 	elif GameState.paused:
-		objective = "PAUSED - Escape to resume | N to restart"
+		lines.append("PAUSED")
+	lines.append_array(level.mission_log.lines())
+	lines.append("")
+	var weapon_line := "%s  %d / %d  %s" % [weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
+	if not weapon.projectiles.is_empty():
+		weapon_line += "  (%d in flight)" % weapon.projectiles.size()
+	lines.append(weapon_line)
 	var stance_name: String = Player.Stance.keys()[player.stance].capitalize()
 	var breath := "Breath %d%%" % int(round(sway.breath_fraction() * 100.0))
 	if sway.exhausted:
 		breath = "WINDED"
 	elif sway.holding:
 		breath = "HOLDING %d%%" % int(round(sway.breath_fraction() * 100.0))
-	var range_line := "Range --" if measured_range < 0.0 else "Range %.0f m" % measured_range
-	if weapon.profile().simulated_projectile:
-		range_line += " | Zero %.0f m" % weapon.zero_range()
-		if measured_range > 0.0:
-			range_line += " | Hold %.2f m" % weapon.holdover_at(measured_range)
-	var shot_line := ""
+	lines.append("Health %d  |  %s  |  %s  |  Noise %d%%" % [int(round(player.health)), stance_name, breath, int(round(stealth.noise_level() * 100.0))])
+	if not level.enemies.is_empty() or level.coordinator.level != AlertCoordinator.Level.CALM:
+		var tags := stealth.live_tags()
+		var tag_text := "" if tags.is_empty() else "  |  Tagged: " + ", ".join(tags.map(func(e): return "%.0f m" % player.global_position.distance_to(e.global_position)))
+		lines.append("Alert: %s  |  Hostiles %d%s" % [level.coordinator.level_name(), level.enemies.size(), tag_text])
+	if bool(Settings.get_value("gameplay", "hud_assists")):
+		var range_line := "Range --" if measured_range < 0.0 else "Range %.0f m" % measured_range
+		if weapon.profile().simulated_projectile:
+			range_line += "  |  Zero %.0f m" % weapon.zero_range()
+			if measured_range > 0.0:
+				range_line += "  |  Hold %.2f m" % weapon.holdover_at(measured_range)
+		lines.append(range_line + "  |  " + wind_text())
+	lines.append("Stones %d%s" % [stealth.stones, "  |  BINOCULARS" if stealth.binoculars else ""])
 	if killcam.active():
-		shot_line = "\nLONG SHOT %.0f m (Space to skip)" % last_long_shot
-	var noise_bar := "Noise %d%%" % int(round(stealth.noise_level() * 100.0))
-	var tags := stealth.live_tags()
-	var tag_line := "Tagged: none" if tags.is_empty() else "Tagged: " + ", ".join(tags.map(func(e): return "%s %.0f m" % [e.name, player.global_position.distance_to(e.global_position)]))
-	var alert_line := "Health %d | Alert: %s | Hostiles: %d | %s | Stones %d | %s%s" % [int(round(player.health)), level.coordinator.level_name(), level.enemies.size(), noise_bar, stealth.stones, tag_line, " | BINOCULARS" if stealth.binoculars else ""]
-	var objective_lines: String = "\n".join(level.mission_log.lines())
-	hud.text = "ECHO RIDGE | prototype\n%s\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | B binoculars (fire tags) | G throw stone | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | F5 save | F9 load | Escape pause" % [
-		objective, objective_lines, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, alert_line, range_line, wind_text(), shot_line]
+		lines.append("LONG SHOT %.0f m  (Space to skip)" % last_long_shot)
+	hud.text = "\n".join(lines)
 
 func hip_fov() -> float:
 	return clampf(float(Settings.get_value("video", "fov")), 60.0, 110.0)

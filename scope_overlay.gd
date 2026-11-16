@@ -19,12 +19,8 @@ func _physics_process(_delta: float) -> void:
 	visible = scoped and GameState.simulation_active()
 	if not visible:
 		return
-	var origin: Vector3 = game.camera.global_position
-	var finish: Vector3 = origin - game.camera.global_basis.z * 300.0
-	var query := PhysicsRayQueryParameters3D.create(origin, finish)
-	query.exclude = [game.player.get_rid()]
-	var hit: Dictionary = game.get_world_3d().direct_space_state.intersect_ray(query)
-	range_text = "RANGE --" if hit.is_empty() else "SURFACE %.0f m" % origin.distance_to(hit.position)
+	var measured: float = game.measured_range
+	range_text = "RANGE --" if measured < 0.0 else "RANGE %.0f m" % measured
 	queue_redraw()
 
 # Reticle marks: screen offset below centre for each 100 m beyond the zero.
@@ -94,11 +90,12 @@ func _draw() -> void:
 	draw_string(font, center + Vector2(-90, radius * 0.65), range_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
 	var game := mission()
 	draw_string(font, center + Vector2(radius * 0.45, -radius * 0.75), "ZERO %.0f m | %.0fx" % [game.weapon.zero_range(), game.scope_view.zoom], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
+	var last_label_y := -1000.0
 	for mark in holdover_marks():
 		var y: float = center.y + mark.pixels
 		if y < center.y + radius:
 			draw_line(Vector2(center.x - 12, y), Vector2(center.x + 12, y), ink, 1.0)
-			draw_string(font, Vector2(center.x + 16, y + 4), "%d" % int(mark.range), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
-	var wind: Vector3 = mission().weapon.wind
-	draw_string(font, center + Vector2(-150, radius * 0.78), "Wind X/Z: %.1f / %.1f m/s" % [wind.x, wind.z], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
-	draw_string(font, center + Vector2(-120, -radius * 0.75), "PROTOTYPE - UNCALIBRATED", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
+			if int(mark.range) % 200 == 0 and mark.pixels - last_label_y >= 12.0:
+				draw_string(font, Vector2(center.x + 16, y + 4), "%d" % int(mark.range), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
+				last_label_y = mark.pixels
+	draw_string(font, center + Vector2(-150, radius * 0.78), game.wind_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
