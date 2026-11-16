@@ -5,13 +5,14 @@ extends Control
 
 const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
 
-enum Screen { HOME, MISSIONS, SETTINGS }
+enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH }
 
 var screen: int = Screen.HOME
 var scene_changer: Callable
 var home: VBoxContainer
 var missions: VBoxContainer
 var settings_screen: SettingsScreen
+var workbench: WorkbenchScreen
 var continue_button: Button
 var status: Label
 
@@ -31,6 +32,7 @@ func _ready() -> void:
 	home.add_child(title)
 	continue_button = button(home, "Continue", continue_checkpoint)
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
+	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
 	button(home, "Settings", func(): show_screen(Screen.SETTINGS))
 	button(home, "Quit", func(): get_tree().quit())
 	status = Label.new()
@@ -47,6 +49,9 @@ func _ready() -> void:
 	settings_screen = SettingsScreen.new()
 	settings_screen.closed.connect(func(): show_screen(Screen.HOME))
 	column.add_child(settings_screen)
+	workbench = WorkbenchScreen.new()
+	workbench.closed.connect(func(): show_screen(Screen.HOME))
+	column.add_child(workbench)
 	show_screen(Screen.HOME)
 
 func button(parent: Node, text: String, callback: Callable) -> Button:
@@ -61,6 +66,9 @@ func show_screen(value: int) -> void:
 	home.visible = screen == Screen.HOME
 	missions.visible = screen == Screen.MISSIONS
 	settings_screen.visible = screen == Screen.SETTINGS
+	workbench.visible = screen == Screen.WORKBENCH
+	if screen == Screen.WORKBENCH:
+		workbench.load_into_controls()
 	continue_button.disabled = not SaveSystem.has_save(SaveSystem.CHECKPOINT_SLOT)
 	status.text = "Checkpoint available" if not continue_button.disabled else "No checkpoint yet"
 	if screen == Screen.SETTINGS:

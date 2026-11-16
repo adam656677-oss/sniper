@@ -1,6 +1,6 @@
 # Modular gunsmith foundation
 
-Status: isolated calculation module, not yet connected to gameplay or CI. Tests are authored, not reported as executed. No visual workbench or component meshes are included. Existing missions remain unchanged.
+Status: connected. The Loadout autoload persists installed parts per family to user://loadout.cfg and applies them to each WeaponProfile when a mission builds its weapon rig; the main menu Workbench screen edits them. Tests are authored, not reported as executed. No visual workbench or component meshes are included. Existing missions remain unchanged.
 
 `gunsmith.gd` calculates effective stats from an unchanged base profile plus one installed part per slot. Recalculate from the base, never from a previously upgraded profile. Invalid combinations return an empty dictionary. The module does not read or write ammunition.
 

@@ -17,6 +17,7 @@ Planning and status live in `docs/`:
 | `main.tscn`, `mission.gd` | Mission root: wires level, player, weapon rig and HUD; routes input actions |
 | `autoload/game_state.gd` | `GameState` autoload: paused, finished, failed, intel, difficulty |
 | `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, difficulty, kill cam |
+| `autoload/loadout.gd` | `Loadout` autoload: installed gunsmith parts per weapon family |
 | `autoload/save_system.gd` | `SaveSystem` autoload: versioned JSON saves, checkpoints, quick save and load |
 | `scenes/player/` | First-person body and camera |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
@@ -28,7 +29,7 @@ Planning and status live in `docs/`:
 | `scenes/missions/` | `MissionLog` objectives and `TriggerZone` |
 | `scenes/weapons/aim_sway.gd` | Breath-hold and sway model |
 | `scenes/player/stealth_kit.gd` | Binoculars, tagging, footstep noise, stones |
-| `scenes/ui/` | HUD, main menu, mission catalog, settings screen, pause menu, results screen |
+| `scenes/ui/` | HUD, main menu, mission catalog, settings screen, workbench, pause menu, results screen |
 | `scope_overlay.gd` | Scope reticle |
 | `ballistics.gd`, `gunsmith.gd` | Pure calculation modules |
 | `tests/` | Headless test suites run by `scripts/validate.sh` and CI |

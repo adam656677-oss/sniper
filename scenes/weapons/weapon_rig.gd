@@ -38,7 +38,7 @@ func _ready() -> void:
 	spread_rng.randomize()
 	if profiles.is_empty():
 		for path in DEFAULT_PROFILES:
-			profiles.append(load(path) as WeaponProfile)
+			profiles.append(Loadout.apply_to(load(path) as WeaponProfile))
 	for profile in profiles:
 		stored.append({"ammo": profile.capacity, "reserve": profile.reserve, "cooldown": 0.0})
 		zero_ranges.append(profile.zero_range)
