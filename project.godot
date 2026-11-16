@@ -12,6 +12,12 @@ Settings="*res://autoload/settings.gd"
 SaveSystem="*res://autoload/save_system.gd"
 Loadout="*res://autoload/loadout.gd"
 
+[debug]
+
+file_logging/enable_file_logging=true
+file_logging/log_path="user://logs/echo_ridge.log"
+file_logging/max_log_files=5
+
 [display]
 window/size/viewport_width=1280
 window/size/viewport_height=720

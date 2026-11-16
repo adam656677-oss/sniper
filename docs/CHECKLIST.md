@@ -96,7 +96,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 4.8 Gunsmith workbench: wire `gunsmith.gd` to `WeaponProfile`, workbench UI between missions, per-weapon saved configuration. Verify: existing gunsmith tests plus save round trip.
 - [ ] 4.9 Tutorial: the target range from 1.13 as a guided first mission. Verify: playtest with someone new.
 - [ ] 4.10 Localisation hooks: all strings through `tr()`, CSV with English. Verify: test that no user-facing literal strings remain in scripts (lint script).
-- [~] 4.11 (corrupt, incomplete and wrong-version saves are rejected with a reason; error log file pending) Crash and error handling: unhandled error logging to user directory, safe fallback on corrupt save. Verify: test corrupt save fallback.
+- [x] 4.11 Crash and error handling: engine log written to user://logs (five rotating files), corrupt, incomplete and wrong-version saves rejected with a reason. Verify: test corrupt save fallback.
 
 **Exit gate:** A stranger can install the build, start a new game, play the tutorial and Mission 1 to the results screen, change settings, quit and resume from a checkpoint, with no instructions from the team.
 

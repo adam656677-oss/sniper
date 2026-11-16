@@ -2,9 +2,9 @@
 
 Audited 2026-11-15 against commit `71c37b9` (branch `main`). Every claim below was reproduced locally with Godot 4.7 stable headless unless marked otherwise.
 
-## Update 2026-11-15 (branch `adam/eager-brown-kubebc`)
+## Update 2026-11-16 (branch `adam/eager-brown-kubebc`)
 
-Items 0.1 through 0.8 and 0.11 of the checklist are done on this branch. The build is repaired and CI is green (first Windows build artefact produced). The four-layer inheritance chain is gone: the project is now `mission.gd` (root) + `GameState` autoload + `Player` scene + `WeaponRig` node with `WeaponProfile` resources + `TestRange` level scene + HUD and scope overlay. Input goes through `InputMap` actions. Weapon names are fictional. All six suites pass locally on a fresh import. The audit below describes `main` as found.
+Since the audit below, the branch has repaired the build, repinned to Godot 4.7, and completed or substantially built: Phase 0 entirely (except owner items 0.10 and 0.12); Phase 1 ballistics, stances, breath hold, hit zones, range-finding, zero turret, sidearm, 1000 m range and a rendered scope; Phase 2 perception, state machine, squad alerts, return fire, body discovery, lockdown, stealth kit, player health and difficulty; Phase 4 mission framework, saves and checkpoints, settings and remapping, menus, results and the workbench. Seventeen headless suites run locally and in CI, which has been green on every push. The audit below describes `main` as found on 2026-11-15.
 
 ## Headline
 
