@@ -71,6 +71,8 @@ size = Vector3(1, 2, 6)
 
 [node name="Compound" type="Node3D"]
 script = ExtResource("1")
+time_of_day = 2
+weather = 1
 spawn_point = Vector3(0, 1, 8)
 wind = Vector3(1.5, 0, 0.5)
 

@@ -41,6 +41,7 @@ func _ready() -> void:
 	GameState.mission_finished.connect(on_mission_over)
 	GameState.mission_failed.connect(on_mission_over)
 	SaveSystem.apply_pending(self)
+	update_hud()
 
 func on_mission_over() -> void:
 	if not GameState.failed:
@@ -209,7 +210,7 @@ func update_hud() -> void:
 	elif GameState.paused:
 		lines.append("PAUSED")
 	lines.append_array(level.mission_log.lines())
-	lines.append("")
+	lines.append(level.conditions_text())
 	var weapon_line := "%s  %d / %d  %s" % [weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
 	if not weapon.projectiles.is_empty():
 		weapon_line += "  (%d in flight)" % weapon.projectiles.size()
@@ -259,6 +260,7 @@ func advance_sway(delta: float) -> void:
 	camera.rotation_degrees = Vector3(offset.y, offset.x, 0.0)
 
 func _physics_process(delta: float) -> void:
+	weapon.wind = level.current_wind()
 	weapon.advance_weapon(delta)
 	weapon.advance_projectiles(delta)
 	advance_sway(delta)

@@ -41,6 +41,8 @@ albedo_color = Color(0.1, 0.8, 0.4, 1)
 
 [node name="TestRange" type="Node3D"]
 script = ExtResource("1")
+time_of_day = 0
+weather = 0
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, 0.409576, -0.286788, 0, 0.573576, 0.819152, 0.5, -0.709406, 0.496732, 0, 10, 0)

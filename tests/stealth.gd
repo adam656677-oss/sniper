@@ -21,6 +21,8 @@ func run_tests() -> void:
 	await physics_frame
 	await physics_frame
 	var level = game.level
+	level.time_of_day = 1
+	level.weather = 0
 	var player = game.player
 	var stealth = game.stealth
 	for enemy in level.enemies:

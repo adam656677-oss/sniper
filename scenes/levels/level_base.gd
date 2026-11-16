@@ -10,7 +10,12 @@ signal target_killed(body: Node3D, distance: float)
 
 @export var spawn_point := Vector3(0, 1, 3)
 @export var clear_color := Color(0.45, 0.62, 0.74)
-@export var wind := Vector3(2.0, 0.0, 0.0) # Air-mass velocity in m/s, world frame.
+@export var wind := Vector3(2.0, 0.0, 0.0) # Base air-mass velocity in m/s, world frame.
+@export_enum("Dawn", "Noon", "Dusk", "Night") var time_of_day := 1
+@export_enum("Clear", "Windy", "Rain", "Dust") var weather := 0
+
+const Atmosphere = preload("res://scenes/levels/atmosphere.gd")
+var clock := 0.0
 
 var targets: Array[StaticBody3D] = []
 var enemies: Array = []
@@ -42,17 +47,21 @@ func _ready() -> void:
 # Sky, ambient light, tonemapping and distance haze shared by every level, plus
 # sun shadows. A level that has its own WorldEnvironment keeps it.
 func ensure_environment() -> void:
+	var time_preset: Dictionary = Atmosphere.TIME[time_of_day]
+	var weather_preset: Dictionary = Atmosphere.WEATHER[weather]
 	if has_node("Sun"):
 		var sun: DirectionalLight3D = $Sun
 		sun.shadow_enabled = true
-		sun.light_energy = 1.0
+		sun.light_energy = float(time_preset.sun_energy)
+		sun.light_color = time_preset.sun_color
+		sun.rotation_degrees = Vector3(float(time_preset.sun_pitch), -30.0, 0.0)
 		sun.directional_shadow_max_distance = 250.0
 	for child in get_children():
 		if child is WorldEnvironment:
 			return
 	var sky_material := ProceduralSkyMaterial.new()
-	sky_material.sky_top_color = Color(0.32, 0.5, 0.72)
-	sky_material.sky_horizon_color = Color(0.72, 0.78, 0.82)
+	sky_material.sky_top_color = time_preset.sky_top
+	sky_material.sky_horizon_color = time_preset.horizon
 	sky_material.ground_horizon_color = Color(0.6, 0.6, 0.55)
 	sky_material.ground_bottom_color = Color(0.25, 0.24, 0.2)
 	var sky := Sky.new()
@@ -61,14 +70,14 @@ func ensure_environment() -> void:
 	environment.background_mode = Environment.BG_SKY
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	environment.ambient_light_energy = 0.35
-	environment.ambient_light_sky_contribution = 0.6
+	environment.ambient_light_energy = float(time_preset.ambient)
+	environment.ambient_light_sky_contribution = 0.3
 	environment.ambient_light_color = Color(0.55, 0.6, 0.68)
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.tonemap_exposure = 0.85
 	environment.fog_enabled = true
-	environment.fog_light_color = Color(0.7, 0.76, 0.82)
-	environment.fog_density = 0.00012
+	environment.fog_light_color = time_preset.horizon.lerp(Color(0.7, 0.68, 0.6) if weather == Atmosphere.Weather.DUST else Color(0.7, 0.76, 0.82), 0.5)
+	environment.fog_density = float(weather_preset.fog)
 	environment.fog_sky_affect = 0.0
 	var world := WorldEnvironment.new()
 	world.name = "WorldEnvironment"
@@ -129,7 +138,7 @@ func spawn_reinforcements(_position: Vector3) -> void:
 	pass
 
 func report_noise(position: Vector3, radius: float, loudness: float = 1.0) -> void:
-	coordinator.report_noise(position, radius, null, loudness)
+	coordinator.report_noise(position, radius * hearing_factor(), null, loudness)
 
 # One flat navigation polygon at ground level. Enough for the prototype arenas;
 # baked meshes replace this with the terrain work.
@@ -147,8 +156,22 @@ func build_flat_navmesh(center: Vector3, size: Vector2) -> NavigationRegion3D:
 	add_child(region)
 	return region
 
+# Fraction of normal enemy sight range under current light and weather.
+func visibility_factor() -> float:
+	return Atmosphere.visibility(time_of_day, weather)
+
+func hearing_factor() -> float:
+	return Atmosphere.hearing(weather)
+
+func current_wind() -> Vector3:
+	return Atmosphere.wind_at(wind, weather, clock)
+
+func conditions_text() -> String:
+	return "%s, %s" % [["Dawn", "Noon", "Dusk", "Night"][time_of_day], ["clear", "windy", "rain", "dust"][weather]]
+
 func _physics_process(delta: float) -> void:
 	if GameState.simulation_active():
+		clock += delta
 		coordinator.advance(delta)
 		if player:
 			for zone in triggers:

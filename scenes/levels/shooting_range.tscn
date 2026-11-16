@@ -26,6 +26,8 @@ size = Vector3(120, 6, 4)
 
 [node name="ShootingRange" type="Node3D"]
 script = ExtResource("1")
+time_of_day = 1
+weather = 0
 wind = Vector3(3, 0, 0)
 
 [node name="Sun" type="DirectionalLight3D" parent="."]

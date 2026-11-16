@@ -42,6 +42,12 @@ func run() -> void:
 	await shot("05_binoculars")
 	game.queue_free()
 	await process_frame
+	game = load("res://main.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	await shot("08_echo_ridge_dawn")
+	game.queue_free()
+	await process_frame
 	game = load("res://range_mission.tscn").instantiate()
 	root.add_child(game)
 	await process_frame

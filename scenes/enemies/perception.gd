@@ -43,12 +43,16 @@ func visibility_of(point: Vector3, exposure: float, max_distance: float = VIEW_D
 			return 0.0
 	return clampf(1.0 - distance / max_distance, 0.0, 1.0) * clampf(exposure, 0.0, 1.0)
 
+func conditions_factor() -> float:
+	var level = body().get("level")
+	return level.visibility_factor() if level and level.has_method("visibility_factor") else 1.0
+
 func visibility_of_player(player: Node) -> float:
 	if player == null or not is_instance_valid(player):
 		return 0.0
 	var head: Vector3 = player.camera.global_position if player.get("camera") else player.global_position
 	var exposure: float = player.exposure() if player.has_method("exposure") else 1.0
-	return visibility_of(head, exposure)
+	return visibility_of(head, exposure, VIEW_DISTANCE * conditions_factor())
 
 func accumulate(visibility: float, delta: float) -> void:
 	var dt := maxf(delta, 0.0)
