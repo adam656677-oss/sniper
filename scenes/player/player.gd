@@ -10,6 +10,7 @@ const FALL_RESET_Y := -15.0
 const LOOK_SENSITIVITY := 0.002
 const SCOPED_SENSITIVITY := 0.0007
 const PITCH_LIMIT := 1.4
+const STICK_LOOK_SPEED := 2.6 # radians per second at full deflection and sensitivity 1
 const STANCE_HEIGHT := {Stance.STAND: 1.8, Stance.CROUCH: 1.2, Stance.PRONE: 0.6}
 const STANCE_EYE_HEIGHT := {Stance.STAND: 0.65, Stance.CROUCH: 0.35, Stance.PRONE: 0.05}
 const STANCE_SPEED := {Stance.STAND: 5.0, Stance.CROUCH: 2.5, Stance.PRONE: 1.0}
@@ -37,6 +38,16 @@ func look(relative: Vector2) -> void:
 	var vertical := -relative.y if Settings.invert_y() else relative.y
 	rotate_y(-relative.x * sensitivity)
 	head.rotation.x = clampf(head.rotation.x - vertical * sensitivity, -PITCH_LIMIT, PITCH_LIMIT)
+
+# Right-stick look, applied per physics step. Scoped aim is slower, as with the mouse.
+func stick_look(delta: float) -> void:
+	var stick := Input.get_vector("look_left", "look_right", "look_up", "look_down")
+	if stick == Vector2.ZERO:
+		return
+	var scale := STICK_LOOK_SPEED * Settings.sensitivity() * (0.35 if camera.fov < 30.0 else 1.0) * delta
+	var vertical := -stick.y if Settings.invert_y() else stick.y
+	rotate_y(-stick.x * scale)
+	head.rotation.x = clampf(head.rotation.x - vertical * scale, -PITCH_LIMIT, PITCH_LIMIT)
 
 func set_stance(value: Stance) -> bool:
 	if not GameState.simulation_active() or not STANCE_HEIGHT.has(value):
@@ -89,10 +100,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	if not GameState.simulation_active():
 		return
+	stick_look(delta)
 	var input := Vector3.ZERO
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		input.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-		input.z = Input.get_action_strength("move_back") - Input.get_action_strength("move_forward")
+	var move := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	input.x = move.x
+	input.z = move.y
 	var direction := basis * input.normalized()
 	velocity.x = direction.x * move_speed()
 	velocity.z = direction.z * move_speed()

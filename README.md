@@ -70,6 +70,10 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | F5 / F9 | Quick save / quick load (falls back to the last checkpoint) |
 | N | Restart |
 
+### Controller
+
+Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click holds breath, right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses.
+
 ## Validation
 
 ```bash

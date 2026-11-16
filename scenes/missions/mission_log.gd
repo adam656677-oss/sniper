@@ -100,11 +100,15 @@ func line(objective: Dictionary) -> String:
 		text += " FAILED"
 	return text
 
+# Completed optional objectives are dropped from the HUD list to keep it short.
 func lines() -> Array[String]:
 	var result: Array[String] = []
 	for objective in objectives:
-		if objective.status != Status.HIDDEN:
-			result.append(line(objective))
+		if objective.status == Status.HIDDEN:
+			continue
+		if objective.kind == Kind.OPTIONAL and objective.status == Status.COMPLETE and String(objective.id).begins_with("t_"):
+			continue
+		result.append(line(objective))
 	return result
 
 func to_dict() -> Dictionary:

@@ -30,6 +30,7 @@ func _ready() -> void:
 	weapon.body_hit.connect(level.on_body_hit)
 	weapon.wind = level.wind
 	level.player = player
+	level.mission = self
 	stealth.camera = camera
 	stealth.player = player
 	stealth.level = level
@@ -156,6 +157,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		weapon.begin_reload()
 	elif event.is_action_pressed("interact"):
 		interact()
+	elif event.is_action_pressed("next_weapon"):
+		weapon.select_weapon((weapon.active + 1) % weapon.profiles.size())
 	elif event.is_action_pressed("weapon_1"):
 		weapon.select_weapon(0)
 	elif event.is_action_pressed("weapon_2"):
@@ -184,7 +187,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		stealth.tag()
 	elif event.is_action_pressed("throw"):
 		stealth.throw_stone()
-	elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	elif event.is_action_released("aim") and weapon.aiming and (bool(Settings.get_value("controls", "hold_to_aim")) or event is InputEventJoypadMotion):
+		weapon.toggle_aim()
+	elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		if event.is_action_pressed("fire"):
 			if stealth.binoculars:
 				stealth.tag()

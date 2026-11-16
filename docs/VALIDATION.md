@@ -42,6 +42,7 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 
 | Missions | `tests/missions.gd` | Objective log (hidden, progress, completion, failure, round trip), test range intel and extraction, range plate progress and long-shot secondary, compound eliminate, exfil trigger, undetected and silent objectives, kill statistics, primary failure |
 | Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |
 | Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
+| Tutorial | `tests/tutorial.gd` | Controller bindings on every core action, stick look, bumper weapon cycle, trigger hold-to-aim, tutorial steps revealed in order, waiting for conditions, finished steps leaving the HUD, several steps completing at once |
 | Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, fictional names |
 | Aim | `tests/aim.gd` | Stances (collider, eye height, speed), sway amplitude by stance, breath hold, exhaustion and recovery, camera sway application |
 | Range | `tests/range.gd` | 1000 m range layout, rangefinder, holdover-corrected hits at 300, 600 and 1000 m, crosswind miss and drift-corrected hit at 800 m, plate reset, range completion |

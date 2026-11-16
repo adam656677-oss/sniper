@@ -21,6 +21,7 @@ var targets: Array[StaticBody3D] = []
 var enemies: Array = []
 var coordinator: AlertCoordinator
 var player: Node3D
+var mission: Node
 var mission_log: MissionLog
 var triggers: Array[TriggerZone] = []
 
