@@ -65,7 +65,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | C | Toggle crouch |
 | Z | Toggle prone |
 | R | Reload |
-| E | Collect intel at the gold terminal, extract at the green pad |
+| E | Interact: collect intel, extract, pick up or drop a body |
 | Escape | Pause or resume |
 | F5 / F9 | Quick save / quick load (falls back to the last checkpoint) |
 | N | Restart |

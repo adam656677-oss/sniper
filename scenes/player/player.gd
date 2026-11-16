@@ -27,6 +27,10 @@ var stance := Stance.STAND
 var health := MAX_HEALTH
 var since_damage := REGEN_DELAY
 var still_seconds := 0.0
+var suppression := 0.0
+var carrying: Node3D = null
+const SUPPRESSION_DECAY := 0.25
+const CARRY_SPEED := 2.0
 
 func look(relative: Vector2) -> void:
 	var sensitivity := (SCOPED_SENSITIVITY if camera.fov < 30.0 else LOOK_SENSITIVITY) * Settings.sensitivity()
@@ -48,10 +52,14 @@ func toggle_stance(value: Stance) -> bool:
 	return set_stance(Stance.STAND if stance == value else value)
 
 func move_speed() -> float:
-	return STANCE_SPEED[stance]
+	return minf(STANCE_SPEED[stance], CARRY_SPEED) if carrying else STANCE_SPEED[stance]
+
+func suppress(amount: float) -> void:
+	if GameState.simulation_active():
+		suppression = clampf(suppression + amount, 0.0, 1.0)
 
 func sway_multiplier() -> float:
-	return STANCE_SWAY[stance]
+	return STANCE_SWAY[stance] * (1.0 + suppression * 2.0)
 
 # How visible this stance is to enemy perception, 0..1.
 func exposure() -> float:
@@ -95,5 +103,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	still_seconds = still_seconds + delta if Vector2(velocity.x, velocity.z).length() < 0.1 else 0.0
 	advance_health(delta)
+	suppression = maxf(0.0, suppression - SUPPRESSION_DECAY * delta)
+	if carrying and is_instance_valid(carrying):
+		carrying.global_position = global_position + basis.z * 0.8 + Vector3(0, -0.3, 0)
 	if position.y < FALL_RESET_Y:
 		respawn()

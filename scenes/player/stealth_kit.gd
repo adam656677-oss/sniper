@@ -28,10 +28,11 @@ var level: Node
 func noise_level() -> float:
 	if player == null:
 		return 0.0
+	var carry_noise := 0.25 if is_carrying() else 0.0
 	var moving: bool = Vector2(player.velocity.x, player.velocity.z).length() > 0.1
 	if not moving:
 		return 0.0
-	return float(STANCE_NOISE.get(player.stance, 1.0))
+	return minf(1.0, float(STANCE_NOISE.get(player.stance, 1.0)) + carry_noise)
 
 func set_binoculars(value: bool) -> bool:
 	if not GameState.simulation_active() or camera == null:
@@ -87,6 +88,46 @@ func throw_stone() -> bool:
 		landing = hit.position
 	level.report_noise(landing, STONE_NOISE_RADIUS, 0.5)
 	stone_thrown.emit(landing)
+	return true
+
+const CARRY_REACH := 2.5
+
+func nearest_body() -> Node3D:
+	if level == null or player == null or not level.has_node("Enemies"):
+		return null
+	var best: Node3D = null
+	var best_distance := CARRY_REACH
+	for child in level.get_node("Enemies").get_children():
+		if child.has_method("is_alive") and not child.is_alive():
+			var distance: float = player.global_position.distance_to(child.global_position)
+			if distance <= best_distance:
+				best = child
+				best_distance = distance
+	return best
+
+func is_carrying() -> bool:
+	return player != null and player.carrying != null
+
+func pick_up_body() -> bool:
+	if not GameState.simulation_active() or is_carrying():
+		return false
+	var body := nearest_body()
+	if body == null:
+		return false
+	player.carrying = body
+	body.carried = true
+	body.collision_layer = 0
+	return true
+
+func drop_body() -> bool:
+	if not is_carrying():
+		return false
+	var body: Node3D = player.carrying
+	player.carrying = null
+	body.carried = false
+	body.global_position = player.global_position + player.basis.z * 1.0 + Vector3(0, -0.5, 0)
+	body.collision_layer = 1
+	level.coordinator.move_body(String(body.name), body.global_position)
 	return true
 
 func advance(delta: float) -> void:

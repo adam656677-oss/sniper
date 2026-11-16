@@ -16,7 +16,7 @@ const CALM_AFTER_SECONDS := 30.0
 
 var level: int = Level.CALM
 var enemies: Array = []
-var bodies: PackedVector3Array = PackedVector3Array()
+var bodies: Dictionary = {} # body name -> world position
 var alert_time := 0.0
 var quiet_time := 0.0
 var deaths_while_alert := 0
@@ -62,8 +62,12 @@ func report_noise(position: Vector3, radius: float, source: Node = null, loudnes
 			var heard := 1.0 if distance <= radius * 0.25 else 0.5
 			enemy.on_noise(position, minf(heard, loudness))
 
-func report_body(position: Vector3) -> void:
-	bodies.append(position)
+func report_body(body_name: String, position: Vector3) -> void:
+	bodies[body_name] = position
+
+func move_body(body_name: String, position: Vector3) -> void:
+	if bodies.has(body_name):
+		bodies[body_name] = position
 
 func report_death(_enemy: Node) -> void:
 	if level >= Level.ALERT:

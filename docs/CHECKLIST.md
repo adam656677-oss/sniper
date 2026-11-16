@@ -55,8 +55,8 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 2.2 Perception component: vision cone with distance falloff, occlusion raycasts to multiple body points, light-level factor, hearing with sound events (gunshot radius by weapon and suppressor, footsteps by stance and surface). Verify: test detection times at distances, in cover, in shadow.
 - [x] 2.3 Behaviour state machine: Patrol, Suspicious, Investigate, Alert, Search, Flee, Dead. Timeouts and de-escalation. Verify: test transitions for scripted stimuli.
 - [x] 2.4 Squad coordination: `AlertCoordinator` shares last known position, escalates mission alert level (Calm, Suspicious, Alert, Lockdown), spawns reinforcement patrol on Lockdown. Verify: test escalation rules.
-- [~] 2.5 (return fire with stillness and distance accuracy done; suppression effect and flanking pending) Enemy combat: return fire with inaccuracy that improves while the player stays still; suppression of player (screen effect); flanking move toward last known position. Verify: test accuracy curve; playtest.
-- [~] 2.6 (discovery and escalation done; carrying bodies pending) Body awareness: enemies discover bodies and escalate; player can move bodies. Verify: test body discovery escalates.
+- [x] 2.5 Enemy combat: return fire with inaccuracy that improves while the player stays still; suppression of player (screen effect); flanking move toward last known position. Verify: test accuracy curve; playtest.
+- [x] 2.6 Body awareness: enemies discover bodies and escalate; player can move bodies. Verify: test body discovery escalates.
 - [ ] 2.7 Enemy animations: idle, walk, run, aim, fire, hit reactions, death variants, alert gestures. Verify: playtest.
 - [x] 2.8 Player stealth tools: binoculars with target tagging, noise meter, stone distraction. (Outline-through-walls visual comes with Phase 3.) Verify: test tagging persists, noise meter responds.
 - [x] 2.9 Player damage, health regeneration or medkits, death and checkpoint reload. Verify: test damage and respawn.

@@ -71,8 +71,14 @@ func capture(mission: Node) -> Dictionary:
 		"dead_enemies": dead_enemies,
 		"dead_targets": dead_targets,
 		"plates": plates,
-		"coordinator": {"level": level.coordinator.level, "bodies": level.coordinator.bodies.size()}
+		"coordinator": {"level": level.coordinator.level, "bodies": bodies_to_save(level.coordinator.bodies)}
 	}
+
+static func bodies_to_save(bodies: Dictionary) -> Dictionary:
+	var result := {}
+	for body_name in bodies:
+		result[body_name] = vec(bodies[body_name])
+	return result
 
 static func vec(v: Vector3) -> Array:
 	return [v.x, v.y, v.z]
@@ -182,6 +188,10 @@ func apply(mission: Node, data: Dictionary) -> void:
 		if data.get("stats", {}).has(key):
 			mission.stats[key] = data.stats[key]
 	level.coordinator.level = int(data.get("coordinator", {}).get("level", 0))
+	var saved_bodies = data.get("coordinator", {}).get("bodies", {})
+	if saved_bodies is Dictionary:
+		for body_name in saved_bodies:
+			level.coordinator.bodies[String(body_name)] = unvec(saved_bodies[body_name])
 	level.restore_triggers()
 	mission.update_hud()
 	loaded.emit(String(data.get("slot", "")))

@@ -30,6 +30,8 @@ const FIRE_INTERVAL := 1.2
 const DAMAGE_PER_HIT := 20.0
 const SHOT_NOISE_RADIUS := 300.0
 const ARRIVE_DISTANCE := 1.5
+const SUPPRESSION_PER_MISS := 0.35
+const FLANK_DISTANCE := 15.0
 
 @export var patrol_points: PackedVector3Array = PackedVector3Array()
 
@@ -44,7 +46,10 @@ var has_last_known := false
 var search_point := Vector3.ZERO
 var has_search_point := false
 var arrived_time := -1.0
-var seen_bodies: PackedVector3Array = PackedVector3Array()
+var seen_bodies: Dictionary = {} # body name -> position where this guard saw it
+var flank_point := Vector3.ZERO
+var has_flank_point := false
+var carried := false
 var rng := RandomNumberGenerator.new()
 var level: Node = null
 var coordinator: AlertCoordinator = null
@@ -85,6 +90,7 @@ func change_state(new_state: int) -> void:
 	state_time = 0.0
 	arrived_time = -1.0
 	has_search_point = false
+	has_flank_point = false
 	state_changed.emit(self, state)
 
 func take_hit(shape_index: int, damage: float) -> float:
@@ -109,7 +115,7 @@ func die() -> void:
 	velocity = Vector3.ZERO
 	state_changed.emit(self, state)
 	if coordinator:
-		coordinator.report_body(global_position)
+		coordinator.report_body(String(name), global_position)
 	died.emit(self)
 
 func become_alert() -> void:
@@ -172,9 +178,22 @@ func shoot_at_player() -> void:
 	var hit := rng.randf() < probability
 	if hit and target.has_method("take_damage"):
 		target.take_damage(DAMAGE_PER_HIT)
+	if target.has_method("suppress"):
+		target.suppress(SUPPRESSION_PER_MISS if not hit else SUPPRESSION_PER_MISS * 0.5)
 	fired_at_player.emit(self, hit)
 	if coordinator:
 		coordinator.report_noise(global_position, SHOT_NOISE_RADIUS, self)
+
+# A point beside the last known position, off to one side of the line from this
+# guard, so guards converging on a contact approach from different angles.
+func choose_flank_point() -> Vector3:
+	var approach := last_known - global_position
+	approach.y = 0.0
+	if approach.length() < 0.1:
+		return last_known
+	var side := approach.normalized().cross(Vector3.UP)
+	var sign := 1.0 if (hash(name) & 1) == 0 else -1.0
+	return last_known + side * FLANK_DISTANCE * sign
 
 func face(point: Vector3) -> void:
 	var flat := Vector3(point.x, global_position.y, point.z)
@@ -245,11 +264,12 @@ func flee_point() -> Vector3:
 func check_bodies() -> void:
 	if coordinator == null:
 		return
-	for body_position in coordinator.bodies:
-		if seen_bodies.has(body_position):
+	for body_name in coordinator.bodies:
+		var body_position: Vector3 = coordinator.bodies[body_name]
+		if seen_bodies.has(body_name) and seen_bodies[body_name].distance_to(body_position) < 2.0:
 			continue
 		if perception.visibility_of(body_position + Vector3(0, 0.3, 0), 1.0, Perception.BODY_VIEW_DISTANCE) > 0.0:
-			seen_bodies.append(body_position)
+			seen_bodies[body_name] = body_position
 			on_body_seen(body_position)
 
 func tick(delta: float) -> void:
@@ -299,11 +319,16 @@ func tick(delta: float) -> void:
 				change_state(State.FLEE)
 				return
 			if visibility > 0.0 and target:
+				has_flank_point = false
 				stand_still(dt)
 				face(target.global_position)
 				shoot_at_player()
 			else:
-				move_toward_point(last_known, ALERT_SPEED, dt)
+				if not has_flank_point:
+					flank_point = choose_flank_point()
+					has_flank_point = true
+				var goal := flank_point if not arrived_at(flank_point) else last_known
+				move_toward_point(goal, ALERT_SPEED, dt)
 				if since_seen >= LOSE_SIGHT_SECONDS:
 					change_state(State.SEARCH)
 		State.SEARCH:

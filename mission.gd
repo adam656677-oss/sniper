@@ -119,6 +119,8 @@ func _notification(what: int) -> void:
 		GameState.set_paused(true)
 
 func interact() -> void:
+	if stealth.drop_body() or stealth.pick_up_body():
+		return
 	level.interact(player.position)
 	check_outcome()
 
@@ -230,7 +232,14 @@ func update_hud() -> void:
 			if measured_range > 0.0:
 				range_line += "  |  Hold %.2f m" % weapon.holdover_at(measured_range)
 		lines.append(range_line + "  |  " + wind_text())
-	lines.append("Stones %d%s" % [stealth.stones, "  |  BINOCULARS" if stealth.binoculars else ""])
+	var extras := ""
+	if stealth.binoculars:
+		extras += "  |  BINOCULARS"
+	if stealth.is_carrying():
+		extras += "  |  CARRYING BODY (E to drop)"
+	if player.suppression > 0.3:
+		extras += "  |  SUPPRESSED"
+	lines.append("Stones %d%s" % [stealth.stones, extras])
 	if killcam.active():
 		lines.append("LONG SHOT %.0f m  (Space to skip)" % last_long_shot)
 	hud.text = "\n".join(lines)
