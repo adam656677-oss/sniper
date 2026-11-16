@@ -16,6 +16,8 @@ var targets: Array[StaticBody3D] = []
 var enemies: Array = []
 var coordinator: AlertCoordinator
 var player: Node3D
+var mission_log: MissionLog
+var triggers: Array[TriggerZone] = []
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(clear_color)
@@ -31,6 +33,23 @@ func _ready() -> void:
 		for child in $Enemies.get_children():
 			if child is CharacterBody3D and child.has_method("tick"):
 				register_enemy(child)
+	mission_log = MissionLog.new()
+	mission_log.name = "MissionLog"
+	add_child(mission_log)
+	setup_objectives()
+
+# Concrete levels declare their objectives here.
+func setup_objectives() -> void:
+	pass
+
+func add_trigger(trigger_name: String, center: Vector3, size: Vector3) -> TriggerZone:
+	var zone := TriggerZone.new()
+	zone.name = trigger_name
+	zone.size = size
+	add_child(zone)
+	zone.global_position = center
+	triggers.append(zone)
+	return zone
 
 func register_enemy(enemy: Node) -> void:
 	if enemy in enemies:
@@ -72,6 +91,9 @@ func build_flat_navmesh(center: Vector3, size: Vector2) -> NavigationRegion3D:
 func _physics_process(delta: float) -> void:
 	if GameState.simulation_active():
 		coordinator.advance(delta)
+		if player:
+			for zone in triggers:
+				zone.check(player.global_position)
 
 func register_target(body: StaticBody3D) -> void:
 	targets.append(body)
@@ -100,10 +122,16 @@ func interact(_point: Vector3) -> void:
 	pass
 
 func objective_text() -> String:
-	return "Eliminate all targets"
+	var active := mission_log.first_active_primary()
+	if active.is_empty():
+		return "All objectives complete" if mission_log.all_primary_complete() else "Stand by"
+	return mission_log.line(active)
 
 func is_complete() -> bool:
-	return false
+	return mission_log.all_primary_complete()
+
+func is_failed() -> bool:
+	return mission_log.any_primary_failed()
 
 # Code-built box for tests and quick prototyping. Level geometry itself lives in the scene file.
 func spawn_box(pos: Vector3, size: Vector3, color: Color) -> StaticBody3D:

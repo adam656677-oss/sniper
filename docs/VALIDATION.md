@@ -24,6 +24,7 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 
 | Enemies | `tests/enemies.gd` | Perception cone, distance, stance exposure and occlusion; awareness thresholds; Patrol to Suspicious to Alert; squad contact sharing; difficulty scaling; return fire and regeneration; search and return to patrol; hearing loud, distant and suppressed shots; alert on hit; flee; body discovery; lockdown and reinforcements; navigation; mission failure |
 | Focus | `tests/focus.gd` | Focus-loss pause, mouse release, reload freeze, explicit resume, completed-mission input blocking |
 | Ballistics (8 checks) | `tests/ballistics_test.gd` | Integration step with gravity and wind, segment tracing |
+| Missions | `tests/missions.gd` | Objective log (hidden, progress, completion, failure, round trip), test range intel and extraction, range plate progress and long-shot secondary, compound eliminate, exfil trigger, undetected and silent objectives, kill statistics, primary failure |
 | Projectiles | `tests/projectiles.gd` | Rifle projectile travel, drop, range limit, target hits |
 | Gunsmith | `tests/gunsmith.gd` | Part compatibility and stat calculation |
 | Weapons | `tests/weapons.gd` | Weapon switching, per-weapon ammunition, fictional names |

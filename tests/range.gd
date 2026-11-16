@@ -46,7 +46,7 @@ func run_tests() -> void:
 	var level = game.level
 	check(level.plates.size() == 10 and level.plates[0].range_metres == 100.0 and level.plates[9].range_metres == 1000.0, "Ten plates from 100 m to 1000 m")
 	check(level.get_node("Plates").get_child_count() == 20, "Each plate has a distance marker")
-	check(level.objective_text().begins_with("Ring every plate (0 / 10)"), "Objective counts rung plates")
+	check(level.objective_text() == "[ ] Ring every plate (0/10)", "Objective counts rung plates")
 	check(not level.is_complete() and not state.finished, "Range starts incomplete")
 	var plate300 = level.plate_at(300.0)
 	game.camera.global_position = Vector3(0, 1.4, 0)

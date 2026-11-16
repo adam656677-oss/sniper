@@ -11,11 +11,19 @@ func near_terminal(point: Vector3) -> bool:
 func near_extraction(point: Vector3) -> bool:
 	return point.distance_to(extraction_point) < INTERACT_DISTANCE
 
-func interact(point: Vector3) -> void:
-	if near_terminal(point):
-		GameState.collect_intel()
-	if GameState.intel and near_extraction(point):
-		GameState.finish_mission()
+func setup_objectives() -> void:
+	mission_log.add("intel", "Reach the gold terminal ahead and press E")
+	mission_log.add("extract", "Return to the green extraction marker and press E", MissionLog.Kind.PRIMARY, 1, true)
+	mission_log.add("targets", "Drop the three practice targets", MissionLog.Kind.OPTIONAL, 3)
 
-func objective_text() -> String:
-	return "Return to the green extraction marker and press E" if GameState.intel else "Reach the gold terminal ahead and press E"
+func on_target_died(body: Node3D) -> void:
+	super.on_target_died(body)
+	mission_log.progress("targets")
+
+func interact(point: Vector3) -> void:
+	if near_terminal(point) and not GameState.intel:
+		GameState.collect_intel()
+		mission_log.complete("intel")
+		mission_log.activate("extract")
+	if GameState.intel and near_extraction(point):
+		mission_log.complete("extract")

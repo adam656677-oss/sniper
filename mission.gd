@@ -12,6 +12,7 @@ extends Node3D
 @onready var stealth: StealthKit = $StealthKit
 var measured_range := -1.0
 var last_long_shot := 0.0
+var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
 var camera: Camera3D
 
 func _ready() -> void:
@@ -29,12 +30,28 @@ func _ready() -> void:
 	stealth.level = level
 	level.target_killed.connect(on_target_killed)
 	weapon.fired.connect(on_weapon_fired)
+	weapon.body_hit.connect(on_body_hit)
+	level.coordinator.level_changed.connect(on_alert_changed)
 
 func on_weapon_fired(profile: WeaponProfile) -> void:
+	stats.shots += 1
 	level.report_noise(camera.global_position, 25.0 if profile.suppressed else 400.0)
+
+func on_body_hit(body: Node3D, _shape_index: int, _damage: float, _distance: float) -> void:
+	if body and body.has_method("take_hit"):
+		stats.hits += 1
+
+func on_alert_changed(level_value: int) -> void:
+	if level_value >= AlertCoordinator.Level.ALERT:
+		stats.detections += 1
+
+func accuracy() -> float:
+	return 0.0 if stats.shots == 0 else float(stats.hits) / float(stats.shots)
 	update_hud()
 
 func on_target_killed(_body: Node3D, distance: float) -> void:
+	stats.kills += 1
+	stats.longest_kill = maxf(stats.longest_kill, distance)
 	if killcam.consider(distance):
 		last_long_shot = distance
 
@@ -67,6 +84,15 @@ func _notification(what: int) -> void:
 
 func interact() -> void:
 	level.interact(player.position)
+	check_outcome()
+
+func check_outcome() -> void:
+	if GameState.finished:
+		return
+	if level.is_failed():
+		GameState.fail_mission()
+	elif level.is_complete():
+		GameState.finish_mission()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
@@ -144,8 +170,9 @@ func update_hud() -> void:
 	var tags := stealth.live_tags()
 	var tag_line := "Tagged: none" if tags.is_empty() else "Tagged: " + ", ".join(tags.map(func(e): return "%s %.0f m" % [e.name, player.global_position.distance_to(e.global_position)]))
 	var alert_line := "Health %d | Alert: %s | Hostiles: %d | %s | Stones %d | %s%s" % [int(round(player.health)), level.coordinator.level_name(), level.enemies.size(), noise_bar, stealth.stones, tag_line, " | BINOCULARS" if stealth.binoculars else ""]
-	hud.text = "ECHO RIDGE | prototype\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | B binoculars (fire tags) | G throw stone | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | Escape pause" % [
-		objective, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, alert_line, range_line, wind_text(), shot_line]
+	var objective_lines: String = "\n".join(level.mission_log.lines())
+	hud.text = "ECHO RIDGE | prototype\n%s\n%s\n%s | Ammo %d / %d | %s | Targets left: %d | In flight: %d\n%s | %s | %s\n%s | %s%s\n1-2 weapon | Left fire | Right aim | B binoculars (fire tags) | G throw stone | Shift hold breath | C crouch | Z prone | [ ] zero | R reload | E interact | Escape pause" % [
+		objective, objective_lines, weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text(), level.targets.size(), weapon.projectiles.size(), stance_name, breath, alert_line, range_line, wind_text(), shot_line]
 
 func is_aiming() -> bool:
 	return camera.fov < 70.0 and not stealth.binoculars
@@ -165,8 +192,9 @@ func _physics_process(delta: float) -> void:
 	killcam.advance(delta)
 	stealth.advance(delta)
 	measured_range = measure_range() if is_aiming() or stealth.binoculars else -1.0
-	if not GameState.finished and level.is_complete():
-		GameState.finish_mission()
+	if GameState.simulation_active():
+		stats.elapsed += delta
+	check_outcome()
 	if GameState.finished:
 		weapon.projectiles.clear()
 	update_hud()

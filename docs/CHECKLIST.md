@@ -87,7 +87,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 ## Phase 4: Vertical slice mission and game shell
 
 - [ ] 4.1 Mission 1 design doc: objectives, map, enemy placement, routes, three approaches. Verify: review.
-- [ ] 4.2 Mission framework: objectives (primary, secondary, optional), mission phases, triggers, scripted events, failure conditions, extraction. Verify: test objective completion and failure.
+- [x] 4.2 Mission framework: objectives (primary, secondary, optional), mission phases, triggers, scripted events, failure conditions, extraction. Verify: test objective completion and failure.
 - [ ] 4.3 Build Mission 1 on the terrain from 3.3. Verify: playtest start to finish.
 - [ ] 4.4 Checkpoints and save/load: serialise mission state, player state, enemy states, with versioned save format. Verify: test save, restart, load round trip.
 - [ ] 4.5 Main menu, pause menu, mission select, results screen (score, accuracy, longest shot, stealth rating). Verify: test navigation; playtest.
