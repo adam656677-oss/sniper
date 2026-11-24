@@ -1,8 +1,6 @@
 # Validation and development builds
 
-The workflow pins Godot 4.3 stable for repeatability, not as a claim that it is the latest engine. It downloads the editor and export templates from the official Godot release repository.
-
-On pushes, pull requests, or manual dispatch, the workflow imports the project, checks logs for engine/script errors, runs the 28 checks in `tests/smoke.gd`, and attempts a Windows x86-64 development export only after validation succeeds. Logs are retained for failed runs where available. Builds are unsigned and are not public releases. The workflow definition is not proof that a run has passed.
+The project targets Godot 4.3 stable for repeatability. Do not treat the existence of a workflow or test script as proof that validation has passed.
 
 ## Local validation
 
@@ -11,16 +9,25 @@ Install Godot 4.3 and its export templates, then run from the project directory:
 ```sh
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/smoke.gd
+godot --headless --path . --script res://tests/enemy_ai_smoke.gd
 mkdir -p builds/windows
 godot --headless --path . --export-debug "Windows Desktop" builds/windows/EchoRidge.exe
 ```
 
-## Downloading a successful build
+Run the import step first so Godot registers the `EchoRidgeEnemy` global class used by the isolated enemy test.
 
-In the repository's Actions tab, open a successful Validate and build run and download `EchoRidge-Windows-development`. Extract the complete archive and keep the EXE and PCK together. Do not infer success merely because these workflow files exist.
+## Existing mission smoke suite
 
-## Coverage and limits
+`tests/smoke.gd` covers scene creation, player/camera initialization, targets, starting ammunition, floor collision, intel proximity, extraction requirements, reload timing and reserve accounting, pause behavior, cooldown gating, and completion HUD/restrictions.
 
-The smoke suite covers scene creation, player/camera initialization, targets, starting ammunition, floor collision, intel proximity, extraction requirements, reload timing and reserve accounting, pause behavior, cooldown gating, and completion HUD/restrictions. It does not verify enemy AI, graphical appearance, audio, Windows launch behavior, performance, or the feel of the combat. A Linux headless export is not a Windows playtest.
+## Enemy AI smoke suite
 
-At the time this document was updated, no new Godot engine run or Windows launch had been performed as part of this documentation change. GitHub Actions must complete successfully before engine-test or build success can be reported. Actions availability and repository workflow permissions may affect execution. No credentials or paid services are required by the workflow; GitHub runner usage remains subject to the account's quotas and billing settings.
+`tests/enemy_ai_smoke.gd` checks that the enemy scene loads, starts in the expected state, accepts an investigation stimulus, takes damage, enters the dead state, and is removed from the scene.
+
+The enemy test is a foundation test, not proof of full enemy gameplay. It does not yet validate waypoint navigation, perception/occlusion in a complete encounter, cover selection, player damage, animation, or combat balance.
+
+## Windows build and playtest
+
+A successful export is not a Windows playtest. Launch the packaged build on Windows, verify the EXE and PCK work together, complete the mission, and record any errors or performance issues before calling the build verified. Do not label a development export as a release.
+
+No Godot engine run, smoke-test pass, or Windows launch is claimed for the current branch until those steps have actually completed. No paid services or assets are required for these tests.
