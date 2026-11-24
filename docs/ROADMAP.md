@@ -13,34 +13,35 @@ The project is a Godot 4.3 prototype with a procedural test environment and a fi
 - Three fictional weapon profiles, reload/ammunition handling, and shotgun pellet raycasts.
 - Recon-rifle projectile travel with gravity and configurable wind acceleration in `ballistics.gd`.
 - Intel collection and extraction objectives.
-- A headless smoke-test script and a GitHub Actions validation/build workflow.
+- An isolated enemy prototype in `enemy.tscn` / `enemy_ai.gd`, with idle, patrol, investigate, engage, and dead states; range/FOV/line-of-sight perception; a stimulus entry point; health/damage; and detection/attack signals.
+- Existing mission smoke tests plus a separate enemy AI smoke-test script.
 
 Known limitations:
 - The environment is primitive procedural blockout geometry.
-- The three targets are static test objects; there is no enemy character or enemy AI.
+- The mission still uses static block targets; the enemy prototype is not integrated into the main mission.
+- Enemy movement uses direct steering, not NavigationAgent3D/pathfinding. Cover, squad behavior, and player damage are not implemented.
 - No production character animation, takedown system, final audio, campaign save/checkpoints, or finished art direction.
 - Scope is currently a field-of-view/overlay prototype, not a finished optic.
-- Existing smoke tests do not establish visual quality, Windows runtime behavior, or gameplay feel. A successful export is not a substitute for playtesting.
+- Smoke scripts have not been run in Godot for this branch. Tests do not establish visual quality, Windows runtime behavior, or gameplay feel. A successful export is not a substitute for playtesting.
 
 ## Milestones
 
 ### 0 — Stabilize the prototype
 - Keep Godot 4.3 as the pinned baseline until an intentional engine upgrade is tested.
-- Reconcile documentation with the actual scripts and CI workflow.
-- Run the headless import and smoke suite; fix errors before adding dependent systems.
+- Reconcile documentation with the actual scripts and validation configuration.
+- Run the headless import and smoke suites; fix errors before adding dependent systems.
 - Verify a Windows development export and record what was actually tested.
 
 **Exit criteria:** clean import, passing smoke tests, reproducible Windows development build, and documentation that matches the repository.
 
-### 1 — Enemy foundation
-- Add a modular enemy character scene with health, damage response, and clear state ownership.
-- Implement a small state machine: idle, patrol, investigate, alert, engage, and dead.
-- Add player visibility checks with range, field-of-view, and line-of-sight obstruction.
-- Add a simple sound/noise stimulus interface so gunshots and player actions can attract enemies.
-- Begin with deterministic waypoint patrol and simple movement; introduce NavigationAgent3D only with a tested navigation mesh.
-- Add tests for state transitions, detection boundaries, damage, and death.
+### 1 — Complete enemy foundation
+- Integrate the isolated enemy scene into a dedicated test encounter without changing the existing mission flow.
+- Connect weapon impacts and player actions to the enemy stimulus interface.
+- Add tested navigation-mesh pathfinding, obstacle avoidance, and reliable patrol routes.
+- Add readable alert/search behavior, cover selection, and player damage only after perception and movement are reliable.
+- Expand tests for patrol waypoint progression, visibility boundaries, occlusion, stimulus response, engagement, and damage.
 
-**Exit criteria:** one enemy can patrol, detect the player fairly, investigate a stimulus, engage, take damage, and die without breaking the existing mission.
+**Exit criteria:** one enemy can patrol, detect the player fairly, investigate a stimulus, navigate the test space, engage, take damage, and die without breaking the existing mission.
 
 ### 2 — Combat encounter vertical slice
 - Add one compact encounter with cover, sightlines, readable entry routes, and a clear objective.
@@ -95,4 +96,4 @@ Known limitations:
 
 ## Immediate next task
 
-Complete milestone 0 validation, then implement milestone 1 as an isolated enemy scene and state machine. Do not replace the current test mission until the enemy can be tested in isolation and then integrated behind a controlled feature change.
+Run both smoke scripts in Godot 4.3 and fix any parse/runtime issues. Then integrate the enemy into a dedicated isolated test encounter, connect gunfire stimuli, and add navigation only after a navigation mesh is present and tested.
