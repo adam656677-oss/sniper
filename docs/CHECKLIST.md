@@ -77,7 +77,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [ ] 3.7 Player and weapon models: first-person arms, rifle with scope and bipod, pistol, binoculars. Verify: playtest.
 - [ ] 3.8 Characters: at least two enemy variants (patrol, officer) with material variation. Verify: playtest.
 - [ ] 3.9 VFX: muzzle flash, smoke, shell eject, impacts per surface, blood (toggle), dust from movement, distant explosions. Verify: playtest.
-- [ ] 3.10 Audio: weapon shots with distance layers and reflections, suppressed variants, bolt, reload, footsteps per surface, foley, ambience beds, enemy voice barks (alert, search, hit), dynamic music stems by alert level, mix bus with ducking. Verify: test bus layout; playtest.
+- [~] 3.10 Audio: procedural positional event foundation added for player rifle, suppressed, sidearm, reload, impact, stance-aware footsteps and enemy weapon reports; gameplay events are wired and automated PCM/playback tests added. Recorded weapon layers, reflections, surface-specific footsteps, foley, ambience beds, enemy voice barks, dynamic music and a dedicated mix bus with ducking remain. Verify: test bus layout; Windows audio-device playtest.
 - [ ] 3.11 Performance pass: occlusion culling, LOD distances, texture streaming budgets, shadow cascade tuning, GPU profile under 16 ms. Verify: automated frame-time capture in a scripted fly-through.
 
 **Exit gate:** A 60-second capture of the mission looks like a current-generation game to someone who has not seen the project.

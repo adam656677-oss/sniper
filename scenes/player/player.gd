@@ -29,6 +29,7 @@ var health := MAX_HEALTH
 var since_damage := REGEN_DELAY
 var still_seconds := 0.0
 var suppression := 0.0
+var footstep_clock := 0.0
 var carrying: Node3D = null
 const SUPPRESSION_DECAY := 0.25
 const CARRY_SPEED := 2.0
@@ -84,6 +85,24 @@ func take_damage(amount: float) -> void:
 	if health == 0.0:
 		GameState.fail_mission()
 
+func footstep_interval() -> float:
+	match stance:
+		Stance.CROUCH:
+			return 0.72
+		Stance.PRONE:
+			return 1.05
+	return 0.48
+
+func advance_footsteps(delta: float) -> void:
+	if not is_on_floor() or Vector2(velocity.x, velocity.z).length() < 0.35:
+		footstep_clock = 0.0
+		return
+	footstep_clock += maxf(delta, 0.0)
+	if footstep_clock >= footstep_interval():
+		footstep_clock = fmod(footstep_clock, footstep_interval())
+		var volume_offset := -7.0 if stance == Stance.STAND else (-10.0 if stance == Stance.CROUCH else -14.0)
+		AudioDirector.play_event("footstep", global_position + Vector3(0, -0.65, 0), volume_offset, randf_range(0.94, 1.06))
+
 func advance_health(delta: float) -> void:
 	since_damage += delta
 	if since_damage >= REGEN_DELAY and health < MAX_HEALTH:
@@ -113,6 +132,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y -= GRAVITY * delta
 	move_and_slide()
+	advance_footsteps(delta)
 	still_seconds = still_seconds + delta if Vector2(velocity.x, velocity.z).length() < 0.1 else 0.0
 	advance_health(delta)
 	suppression = maxf(0.0, suppression - SUPPRESSION_DECAY * delta)

@@ -13,6 +13,7 @@ Settings="*res://autoload/settings.gd"
 SaveSystem="*res://autoload/save_system.gd"
 Loadout="*res://autoload/loadout.gd"
 Progression="*res://autoload/progression.gd"
+AudioDirector="*res://autoload/audio_director.gd"
 
 [debug]
 

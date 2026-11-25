@@ -99,6 +99,8 @@ func begin_reload() -> bool:
 	if not GameState.simulation_active() or reload_remaining > 0.0 or ammo >= profile().capacity or reserve_ammo <= 0:
 		return false
 	reload_remaining = profile().reload_seconds
+	if camera:
+		AudioDirector.play_event("reload_click", camera.global_position)
 	return true
 
 func advance_weapon(delta: float) -> void:
@@ -121,6 +123,7 @@ func fire_weapon() -> bool:
 		return false
 	ammo -= 1
 	var current := profile()
+	AudioDirector.play_weapon_report(current, camera.global_position)
 	shot_remaining = current.shot_interval
 	if current.simulated_projectile:
 		var params := ballistic_params()
@@ -145,6 +148,7 @@ func fire_weapon() -> bool:
 		var finish := origin + camera.global_basis * local_direction * current.max_range
 		var hit := Ballistics.trace_segment(space, origin, finish, excluded)
 		if not hit.is_empty():
+			AudioDirector.play_event("impact", hit.position)
 			impact.emit(hit.position, hit.normal, hit.collider)
 			body_hit.emit(hit.collider, int(hit.get("shape", -1)), current.damage, origin.distance_to(hit.position))
 	fired.emit(current)
@@ -173,6 +177,7 @@ func advance_projectiles(delta: float) -> void:
 				finish = start.move_toward(finish, range_left)
 			var hit := Ballistics.trace_segment(space, start, finish, excluded)
 			if not hit.is_empty():
+				AudioDirector.play_event("impact", hit.position)
 				var travelled: float = float(projectile.distance) + start.distance_to(hit.position)
 				impact.emit(hit.position, hit.normal, hit.collider)
 				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage, travelled)
