@@ -62,7 +62,8 @@ func candidate() -> Variant:
 	return best
 
 func can_start() -> bool:
-	return not active and GameState.simulation_active() and candidate() != null
+	var state := get_node_or_null("/root/GameState")
+	return not active and state != null and bool(state.call("simulation_active")) and candidate() != null
 
 func start() -> bool:
 	if not can_start():
