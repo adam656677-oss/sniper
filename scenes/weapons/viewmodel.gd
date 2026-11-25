@@ -393,9 +393,7 @@ func _spawn_muzzle_smoke() -> void:
 	gradient.set_color(0, Color(0.48, 0.50, 0.52, 0.20))
 	gradient.add_point(0.42, Color(0.43, 0.45, 0.47, 0.11))
 	gradient.set_color(1, Color(0.38, 0.40, 0.42, 0.0))
-	var ramp := GradientTexture1D.new()
-	ramp.gradient = gradient
-	smoke.color_ramp = ramp
+	smoke.color_ramp = gradient
 	var cloud := SphereMesh.new()
 	cloud.radius = 0.045
 	cloud.height = 0.09
