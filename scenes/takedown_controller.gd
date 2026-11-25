@@ -10,7 +10,7 @@ const CAMERA_MOVE_SECONDS := 0.38
 const FINISH_SECONDS := 1.25
 const KILL_AT_SECONDS := 0.58
 
-var mission: Node
+var mission: Variant
 var player: Variant
 var level: Variant
 var return_camera: Camera3D
@@ -28,7 +28,7 @@ var player_was_processing := true
 var level_was_processing := true
 var enemy_processing: Array[Dictionary] = []
 
-func bind(owner: Node) -> void:
+func bind(owner: Variant) -> void:
 	mission = owner
 	player = owner.player
 	level = owner.level
