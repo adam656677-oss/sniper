@@ -144,6 +144,39 @@ func _build_model(profile: WeaponProfile) -> void:
 		weapon_root.add_child(magazine)
 		_box(magazine, "MagazineBody", Vector3(0.11, 0.20, 0.13), Vector3(0, -0.17, -0.12), metal)
 
+	# Small original details improve silhouette readability without external assets.
+	var detail_mat := _material(Color(0.12, 0.13, 0.12), 0.68, 0.38)
+	var glass_mat := _material(Color(0.035, 0.07, 0.075, 0.9), 0.35, 0.12)
+	if profile.family == "sidearm":
+		# Slide serrations, frame pins, grip texture and an under-barrel accessory rail.
+		for i in range(5):
+			var z := -0.075 - float(i) * 0.035
+			_box(weapon_root, "SlideSerrationL%d" % i, Vector3(0.009, 0.045, 0.012), Vector3(-0.078, 0.065, z), detail_mat)
+			_box(weapon_root, "SlideSerrationR%d" % i, Vector3(0.009, 0.045, 0.012), Vector3(0.078, 0.065, z), detail_mat)
+		_cylinder(weapon_root, "FramePinFront", 0.012, 0.012, Vector3(0.083, -0.015, -0.055), edges)
+		_cylinder(weapon_root, "FramePinRear", 0.012, 0.012, Vector3(0.083, -0.015, 0.045), edges)
+		_box(weapon_root, "AccessoryRail", Vector3(0.07, 0.025, 0.16), Vector3(0, -0.055, -0.27), detail_mat)
+		for i in range(4):
+			_box(weapon_root, "GripRib%d" % i, Vector3(0.124, 0.012, 0.012), Vector3(0, -0.10 - float(i) * 0.035, 0.0), detail_mat)
+		if profile.suppressed:
+			_cylinder(weapon_root, "Suppressor", 0.042, 0.24, Vector3(0, 0.035, -0.55), metal)
+			_box(weapon_root, "SuppressorCollar", Vector3(0.09, 0.09, 0.035), Vector3(0, 0.035, -0.43), edges)
+	else:
+		# Continuous top rail with raised cross slots and a subtle tinted optic lens.
+		_box(weapon_root, "PicatinnyRail", Vector3(0.11, 0.025, 0.50), Vector3(0, 0.105, -0.34), detail_mat)
+		for i in range(12):
+			_box(weapon_root, "RailSlot%d" % i, Vector3(0.13, 0.012, 0.018), Vector3(0, 0.124, -0.12 - float(i) * 0.04), edges)
+		_cylinder(weapon_root, "OpticLens", 0.034, 0.012, Vector3(0, 0.17, -0.225), glass_mat)
+		for i in range(6):
+			var z := -0.30 - float(i) * 0.045
+			_box(weapon_root, "HandguardVentL%d" % i, Vector3(0.012, 0.025, 0.022), Vector3(-0.078, 0.01, z), detail_mat)
+			_box(weapon_root, "HandguardVentR%d" % i, Vector3(0.012, 0.025, 0.022), Vector3(0.078, 0.01, z), detail_mat)
+		for i in range(4):
+			_box(weapon_root, "GripRib%d" % i, Vector3(0.115, 0.012, 0.014), Vector3(0, -0.12 - float(i) * 0.035, -0.02), detail_mat)
+		if profile.suppressed:
+			_cylinder(weapon_root, "Suppressor", 0.043, 0.30, Vector3(0, 0.015, -1.02), metal)
+			_box(weapon_root, "SuppressorCollar", Vector3(0.085, 0.085, 0.04), Vector3(0, 0.015, -0.79), edges)
+
 	muzzle_flash = MeshInstance3D.new()
 	muzzle_flash.name = "MuzzleFlash"
 	var flash_mesh := SphereMesh.new()
@@ -151,7 +184,7 @@ func _build_model(profile: WeaponProfile) -> void:
 	flash_mesh.height = 0.11
 	muzzle_flash.mesh = flash_mesh
 	muzzle_flash.material_override = _material(Color(1.0, 0.55, 0.16), 0.0, 0.2)
-	muzzle_flash.position = Vector3(0, 0.035, -0.51 if profile.family == "sidearm" else -1.02)
+	muzzle_flash.position = Vector3(0, 0.035, (-0.69 if profile.suppressed else -0.51) if profile.family == "sidearm" else (-1.20 if profile.suppressed else -1.02))
 	muzzle_flash.visible = false
 	weapon_root.add_child(muzzle_flash)
 	flash_light = OmniLight3D.new()
