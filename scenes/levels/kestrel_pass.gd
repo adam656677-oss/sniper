@@ -94,7 +94,16 @@ func _build_environment() -> void:
 	var wall_mat := Color(0.34, 0.32, 0.27)
 	spawn_box(Vector3(-48, 2, -82), Vector3(2, 4, 92), wall_mat).name = "WestPerimeter"
 	spawn_box(Vector3(48, 2, -82), Vector3(2, 4, 92), wall_mat).name = "EastPerimeter"
-	spawn_box(Vector3(0, 2, -128), Vector3(98, 4, 2), wall_mat).name = "NorthPerimeter"
+	spawn_box(Vector3(-32, 2, -128), Vector3(34, 4, 2), wall_mat).name = "NorthPerimeterWest"
+	spawn_box(Vector3(32, 2, -128), Vector3(34, 4, 2), wall_mat).name = "NorthPerimeterEast"
+	spawn_box(Vector3(-23, 1.5, -130), Vector3(1, 3, 24), Color(0.28, 0.29, 0.27)).name = "CulvertWestWall"
+	spawn_box(Vector3(-17, 1.5, -130), Vector3(1, 3, 24), Color(0.28, 0.29, 0.27)).name = "CulvertEastWall"
+	spawn_box(Vector3(-20, 3, -130), Vector3(7, 0.8, 24), Color(0.24, 0.25, 0.23)).name = "CulvertRoof"
+	spawn_box(Vector3(-20, 1.0, -130), Vector3(7, 0.25, 24), Color(0.30, 0.30, 0.27)).name = "CulvertFloor"
+	spawn_box(Vector3(-14, 2.0, -128), Vector3(1.5, 4, 2), wall_mat).name = "NorthGatePostWest"
+	spawn_box(Vector3(14, 2.0, -128), Vector3(1.5, 4, 2), wall_mat).name = "NorthGatePostEast"
+	spawn_box(Vector3(8, 1.1, -134), Vector3(8, 2.2, 4), Color(0.20, 0.24, 0.20)).name = "NorthGateTruck"
+	spawn_box(Vector3(10, 2.4, -135), Vector3(3.5, 1.8, 3.2), Color(0.24, 0.27, 0.23)).name = "NorthGateTruckCab"
 	spawn_box(Vector3(-31, 2, -36), Vector3(36, 4, 2), wall_mat).name = "SouthWestPerimeter"
 	spawn_box(Vector3(31, 2, -36), Vector3(36, 4, 2), wall_mat).name = "SouthEastPerimeter"
 
