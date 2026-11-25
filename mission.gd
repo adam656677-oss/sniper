@@ -1,6 +1,6 @@
 extends Node3D
 
-const TakedownController = preload("res://scenes/takedown_controller.gd")
+const TakedownControllerScript = preload("res://scenes/takedown_controller.gd")
 
 # Mission root: wires the level, player, weapon rig and HUD together and
 # routes input to the right system. Simulation state lives in GameState.
@@ -21,7 +21,7 @@ var measured_range := -1.0
 var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
 var camera: Camera3D
-var takedown: TakedownController
+var takedown: Variant
 
 func _ready() -> void:
 	GameState.reset()
@@ -32,7 +32,7 @@ func _ready() -> void:
 	player.position = level.spawn_point
 	weapon.camera = camera
 	viewmodel.bind_weapon(weapon)
-	takedown = TakedownController.new()
+	takedown = TakedownControllerScript.new()
 	takedown.name = "TakedownController"
 	add_child(takedown)
 	takedown.bind(self)
