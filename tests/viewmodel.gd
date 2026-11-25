@@ -37,6 +37,10 @@ func run_tests() -> void:
 	game.weapon.advance_weapon(0.25)
 	viewmodel.advance(0.25, false, game.weapon.reload_remaining, 0.0)
 	check(viewmodel.magazine.position.y < -0.16, "Reload state animates the magazine and weapon position")
+	viewmodel.advance(0.016, false, viewmodel.reload_duration * 0.40, 0.0)
+	check(viewmodel.magazine.position.y < -0.45 and viewmodel.weapon_root.rotation.x < -0.05, "Mid-reload pose holds the magazine low and dips the weapon")
+	viewmodel.advance(0.016, false, viewmodel.reload_duration * 0.03, 0.0)
+	check(absf(viewmodel.magazine.position.y + 0.16) < 0.01 and absf(viewmodel.weapon_root.rotation.x) < 0.01, "Late-reload pose seats the magazine and settles the weapon")
 	game.queue_free()
 	await process_frame
 	if failures == 0:
