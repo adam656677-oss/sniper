@@ -21,6 +21,7 @@ run_step() {
   echo "== $name"
   if ! timeout 120s "$GODOT" --headless --path . "$@" >"$log" 2>&1; then
     echo "   process exited non-zero (see $log)"
+    cat "$log"
     failures=$((failures + 1))
     return
   fi
