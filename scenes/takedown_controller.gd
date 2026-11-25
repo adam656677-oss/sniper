@@ -107,7 +107,7 @@ func advance(delta: float) -> void:
 	if elapsed >= KILL_AT_SECONDS and not kill_applied:
 		kill_applied = true
 		if is_instance_valid(target) and target.is_alive():
-			var distance := player.global_position.distance_to(target.global_position)
+			var distance: float = player.global_position.distance_to(target.global_position)
 			level.target_killed.emit(target, distance)
 			target.die()
 	if elapsed >= FINISH_SECONDS:
