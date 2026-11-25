@@ -70,8 +70,8 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 
 - [ ] 3.1 Asset licence ledger `assets/LICENSES.md` and Git LFS enabled **(owner)**. Verify: review; a model commits through LFS.
 - [ ] 3.2 Switch to the Forward+ renderer; configure SDFGI or VoxelGI, volumetric fog, SSAO, SSR, TAA, physical light units, ACES tonemap. Verify: playtest at target hardware for 60 fps at 1080p; test that project settings match.
-- [ ] 3.3 Terrain: Terrain3D add-on, 1 km² heightmap, four blended ground textures, grass and detail meshes with distance culling. Verify: playtest frame time budget.
-- [ ] 3.4 Environment kit: rocks, trees (with wind sway and LODs), buildings, walls, roads, props, vehicles. Source per `docs/TOOLING.md`. Verify: review of ledger; playtest.
+- [~] 3.3 Terrain: Kestrel Pass now has a procedural multi-scale earth/rock ground shader; the playable mission remains a compact flat blockout. Terrain3D, a 1 km² heightmap, true texture splat maps, grass and distance-culling detail meshes remain. Verify: Windows visual review and playtest frame-time budget.
+- [~] 3.4 Environment kit: existing blockout buildings, walls, road, fuel tanks, radio mast and low-poly pine clusters remain; the new ground material adds procedural earth/rock variation. Production rocks, authored trees with wind sway/LODs, detailed buildings, props and vehicles remain. Verify: review of ledger; playtest.
 - [x] 3.5 (dawn, noon, dusk and night presets with sky, sun, ambient, haze and shadows; cloud shadows pending art) Lighting and atmosphere: sun angle and sky per mission, time of day presets (dawn, noon, dusk, night), fog layers, cloud shadows. Verify: playtest.
 - [~] 3.6 (clear, windy, rain and dust presets driving gusting ballistic wind, haze, enemy sight and hearing; rain and dust particles pending art) Weather: wind strength and direction tied to ballistics, rain and dust storms as visibility modifiers. Verify: test weather affects wind vector; playtest.
 - [ ] 3.7 Player and weapon models: first-person arms, rifle with scope and bipod, pistol, binoculars. Verify: playtest.
