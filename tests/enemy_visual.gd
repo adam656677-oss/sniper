@@ -17,13 +17,13 @@ func run_tests() -> void:
 	root.add_child(game)
 	await process_frame
 	await physics_frame
-	var enemy: Enemy = game.level.enemies[0]
+	var enemy = game.level.enemies[0]
 	var visual: EnemyVisual = enemy.get_node("VisualRig")
 	check(visual != null and visual.get_child_count() >= 9, "Enemy has a generated humanoid visual rig")
 	check(not enemy.get_node("Head/HeadMesh").visible and not enemy.get_node("Torso/TorsoMesh").visible, "Old blockout cubes are hidden")
 	check(enemy.get_node("Head") is CollisionShape3D and enemy.get_node("Torso") is CollisionShape3D, "Original hit-zone collision shapes remain intact")
 	check(not visual.held_weapon.visible, "Patrol pose keeps the held weapon lowered")
-	enemy.change_state(Enemy.State.ALERT)
+	enemy.change_state(3)
 	visual._process(0.2)
 	check(visual.held_weapon.visible and visual.left_arm.rotation.x < 0.0, "Alert state raises the weapon into a combat-ready pose")
 	enemy.velocity = Vector3(1, 0, 0)
