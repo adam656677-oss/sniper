@@ -6,7 +6,7 @@ Each item has a **verify** note. `test` means a headless `SceneTree` script in `
 
 Legend: `[ ]` not started, `[~]` in progress, `[x]` done and verified. Update this file in the same pull request as the work.
 
-Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Current state: `docs/STATUS.md`. Tools and access: `docs/TOOLING.md`.
+Game flow and architecture diagrams: `docs/GAME-FLOW.md`. Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Current state: `docs/STATUS.md`. Tools and access: `docs/TOOLING.md`.
 
 ---
 
@@ -39,7 +39,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 1.6 Scope zero adjustment (elevation turret in 100 m steps) and holdover marks. Verify: test that zeroing to N metres gives zero drop at N.
 - [x] 1.7 Hit model: hitboxes (head, torso, limbs) on a target scene with damage multipliers. Verify: test headshot kills, limb hit does not.
 - [x] 1.8 Bullet time / kill cam for shots over a distance threshold, skippable, optional in settings. Verify: playtest; test that it triggers only above threshold.
-- [~] 1.9 (tracers, dust puffs, capped bullet holes and a hit marker done; ricochet sound and blood toggle need audio and art) Impact feedback: tracer on long shots, dust and blood decals (toggle), ricochet sound, hit marker. Verify: playtest.
+- [~] 1.9 (tracers, hit marker, capped bullet holes, dust/chip, metal sparks, wood splinters and earth/stone dust are implemented; ricochet direction/audio, authored decals and optional blood toggle remain) Impact feedback: material-aware projectile response, readable hit confirmation and optional gore setting. Verify: Windows visual/audio playtest.
 - [x] 1.10 Sidearm: suppressed pistol with hitscan, for close range. Shotguns removed or kept as a mission-specific pickup. Verify: weapons test updated.
 - [~] 1.11 Weapon animation: procedural idle/aim sway, recoil, firing cycle and staged reload pose now include a separate tumbling magazine prop, weapon dip, magazine seating and slide release; authored idle, aim in/out, bolt cycle, sprint, hand animation and production clips remain. Verify: Windows playtest; test animation timing and required authored clips.
 - [~] 1.12 (recoil kick and recovery, head bob off when aiming or with reduced motion; sprint FOV and landing dip pending sprint) Camera: head bob, recoil kick and recovery, FOV change on sprint, landing dip. Verify: playtest.
@@ -51,7 +51,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 
 ## Phase 2: Enemies and stealth
 
-- [~] 2.1 (hit zones, navigation and death done; humanoid model and ragdoll come with Phase 3 art) Enemy scene: humanoid model, skeleton, hitboxes from 1.7, ragdoll on death, `NavigationAgent3D`. Verify: test spawn, navigation to a point, death ragdoll activates.
+- [~] 2.1 (hit zones, navigation, death handling and a procedural humanoid visual rig are implemented; production skeletal mesh, authored rig, ragdoll physics and animation clips remain) Enemy scene: production humanoid model, skeleton, hitboxes from 1.7, ragdoll on death, `NavigationAgent3D`. Verify: test spawn, navigation to a point, death ragdoll activates.
 - [x] 2.2 Perception component: vision cone with distance falloff, occlusion raycasts to multiple body points, light-level factor, hearing with sound events (gunshot radius by weapon and suppressor, footsteps by stance and surface). Verify: test detection times at distances, in cover, in shadow.
 - [x] 2.3 Behaviour state machine: Patrol, Suspicious, Investigate, Alert, Search, Flee, Dead. Timeouts and de-escalation. Verify: test transitions for scripted stimuli.
 - [x] 2.4 Squad coordination: `AlertCoordinator` shares last known position, escalates mission alert level (Calm, Suspicious, Alert, Lockdown), spawns reinforcement patrol on Lockdown. Verify: test escalation rules.
@@ -76,7 +76,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [~] 3.6 (clear, windy, rain and dust presets driving gusting ballistic wind, haze, enemy sight and hearing; rain and dust particles pending art) Weather: wind strength and direction tied to ballistics, rain and dust storms as visibility modifiers. Verify: test weather affects wind vector; playtest.
 - [ ] 3.7 Player and weapon models: first-person arms, rifle with scope and bipod, pistol, binoculars. Verify: playtest.
 - [ ] 3.8 Characters: at least two enemy variants (patrol, officer) with material variation. Verify: playtest.
-- [~] 3.9 VFX: short muzzle-flash mesh/light pulse, tracer, dust impact puff, bullet holes and hit marker exist; first-person brass casing ejection now animates with gravity and spin and is capped/cleaned up. Smoke trails, surface-specific impact effects, optional blood, movement dust and distant explosions remain. Verify: Windows visual playtest.
+- [~] 3.9 VFX: muzzle flash, tracer, dust/chip impacts, capped bullet holes, hit marker, metal sparks, wood splinters, earth/stone dust, first-person brass casing ejection and short muzzle-smoke wisps (with a denser suppressed-weapon signature) are implemented. Production decals, world-space debris/physics, optional blood, movement dust, distant explosions and final authored VFX remain. Verify: Windows visual playtest.
 - [~] 3.10 Audio: procedural positional event foundation added for player rifle, suppressed, sidearm, reload, impact, stance-aware footsteps and enemy weapon reports; gameplay events are wired and automated PCM/playback tests added. Recorded weapon layers, reflections, surface-specific footsteps, foley, ambience beds, enemy voice barks, dynamic music and a dedicated mix bus with ducking remain. Verify: test bus layout; Windows audio-device playtest.
 - [ ] 3.11 Performance pass: occlusion culling, LOD distances, texture streaming budgets, shadow cascade tuning, GPU profile under 16 ms. Verify: automated frame-time capture in a scripted fly-through.
 
@@ -131,6 +131,10 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 **Exit gate:** Signed release build on the store or download page, with documented specs and known issues.
 
 ---
+
+## Current verified foundation (2026-11-25)
+
+The main branch now includes the cinematic menu/UI pass, Kestrel Pass procedural terrain and ridge dressing foundations, positional audio event foundation, brass casing ejection, material-aware bullet impact particles, and muzzle-smoke presentation. These are procedural foundations, not final authored AAA assets. The latest completed work is reflected in the phase items above; never mark an item `[x]` solely because code exists or CI passes when its verify note requires a human Windows playtest, asset review, performance capture or release-owner action.
 
 ## Working agreements that keep the checklist honest
 
