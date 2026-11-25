@@ -29,10 +29,11 @@ func run_tests() -> void:
 	var report: AudioStreamWAV = director._streams["rifle_report"]
 	var suppressed: AudioStreamWAV = director._streams["suppressed_report"]
 	check(report.data.size() > suppressed.data.size(), "Suppressed cue is shorter than the unsuppressed report")
-	var old_sfx: float = float(Settings.get_value("audio", "sfx"))
-	Settings.set_value("audio", "sfx", 0.0)
+	var settings: Node = root.get_node("Settings")
+	var old_sfx: float = float(settings.get_value("audio", "sfx"))
+	settings.set_value("audio", "sfx", 0.0)
 	check(not director.play_event("rifle_report", Vector3.ZERO), "SFX mute prevents playback")
-	Settings.set_value("audio", "sfx", old_sfx)
+	settings.set_value("audio", "sfx", old_sfx)
 	check(director.play_event("reload_click", Vector3(1, 2, 3)), "A positional event can be played")
 	check(director._voices.size() > 0, "Playback creates a tracked 3D voice")
 	check(not director.play_event("not_a_real_event", Vector3.ZERO), "Unknown event names fail safely")
