@@ -38,9 +38,12 @@ func run_tests() -> void:
 	for child in menu.missions.get_children():
 		if child is Button:
 			buttons.append(child)
-	check(buttons.size() == 4 and buttons[0].text == "Shooting range" and buttons[3].text == "Back", "Mission list shows every mission and a back button")
-	press(buttons[2])
-	check(requested == ["res://compound_mission.tscn"], "Choosing a mission requests its scene")
+	check(buttons.size() == 5 and buttons[0].text == "Shooting range" and buttons[1].text == "Kestrel Pass" and buttons[4].text == "Back", "Mission list shows every mission and a back button")
+	press(buttons[1])
+	check(requested == ["res://kestrel_mission.tscn"], "Choosing Kestrel Pass requests its campaign scene")
+	requested.clear()
+	press(buttons[3])
+	check(requested == ["res://compound_mission.tscn"], "Choosing the compound still requests its original scene")
 	check(menu.start_mission(99) == "", "Out-of-range missions are ignored")
 	menu.show_screen(menu.Screen.SETTINGS)
 	check(menu.settings_screen.visible and not menu.home.visible, "Settings screen replaces the home screen")
