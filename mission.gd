@@ -14,6 +14,7 @@ extends Node3D
 @onready var scope_view: ScopeView = $ScopeView
 @onready var feedback: ShotFeedback = $ShotFeedback
 @onready var crosshair: Label = $HUDLayer/Crosshair
+@onready var viewmodel: WeaponViewmodel = $Player/Head/Camera3D/WeaponViewmodel
 var measured_range := -1.0
 var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
@@ -27,6 +28,7 @@ func _ready() -> void:
 	player.spawn_point = level.spawn_point
 	player.position = level.spawn_point
 	weapon.camera = camera
+	viewmodel.bind_weapon(weapon)
 	weapon.excluded = [player.get_rid()]
 	scope_view.source = camera
 	weapon.body_hit.connect(level.on_body_hit)
@@ -304,6 +306,7 @@ func _physics_process(delta: float) -> void:
 	$HUDLayer.visible = not killcam.following
 	weapon.wind = level.current_wind()
 	weapon.advance_weapon(delta)
+	viewmodel.advance(delta, weapon.aiming, weapon.reload_remaining, Vector2(player.velocity.x, player.velocity.z).length())
 	weapon.advance_projectiles(delta)
 	advance_sway(delta)
 	killcam.advance(delta)
