@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/levels/kestrel_pass.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="2"]
+[ext_resource type="Shader" path="res://scenes/levels/kestrel_ground.gdshader" id="3"]
 
 [sub_resource type="BoxMesh" id="ground_mesh"]
 size = Vector3(400, 1, 400)
@@ -9,9 +10,8 @@ size = Vector3(400, 1, 400)
 [sub_resource type="BoxShape3D" id="ground_shape"]
 size = Vector3(400, 1, 400)
 
-[sub_resource type="StandardMaterial3D" id="ground_mat"]
-albedo_color = Color(0.22, 0.25, 0.20, 1)
-roughness = 0.98
+[sub_resource type="ShaderMaterial" id="ground_mat"]
+shader = ExtResource("3")
 
 [node name="KestrelPass" type="Node3D"]
 script = ExtResource("1")
