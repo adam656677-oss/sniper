@@ -44,10 +44,10 @@ func _on_hit_received(_source: Node, _shape_index: int, damage: float) -> void:
 	hit_reaction_strength = clampf(damage / 60.0, 0.2, 1.0)
 	var target: Node3D = enemy.player() as Node3D
 	if target:
-		var incoming := enemy.global_position - target.global_position
+		var incoming: Vector3 = enemy.global_position - target.global_position
 		incoming.y = 0.0
 		if incoming.length() > 0.01:
-			var local_direction := enemy.global_basis.inverse() * incoming.normalized()
+			var local_direction: Vector3 = enemy.global_basis.inverse() * incoming.normalized()
 			hit_reaction_side = 1.0 if local_direction.x >= 0.0 else -1.0
 
 func _hide_blockout_meshes() -> void:
