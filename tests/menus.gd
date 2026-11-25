@@ -30,6 +30,7 @@ func run_tests() -> void:
 	await process_frame
 	menu.scene_changer = func(path): requested.append(path)
 	check(menu.screen == menu.Screen.HOME and menu.home.visible and not menu.missions.visible, "Menu opens on the home screen")
+	check(menu.theme != null and menu.get_node_or_null("TacticalBackdrop") != null, "Main menu loads the shared tactical theme and shader backdrop")
 	check(menu.continue_button.disabled, "Continue is disabled without a checkpoint")
 	check(menu.build_label().begins_with("v0.4.0 ("), "The menu shows the version and build")
 	check(menu.continue_checkpoint() == "" and requested.is_empty(), "Continue without a checkpoint changes nothing")
@@ -66,6 +67,7 @@ func run_tests() -> void:
 	var pause = game.get_node("HUDLayer/PauseMenu")
 	var results = game.results
 	check(not pause.visible and not results.visible, "Menus start hidden in a mission")
+	check(pause.theme != null and results.theme != null, "Pause and results screens share the tactical interface theme")
 	state.set_paused(true)
 	await physics_frame
 	await physics_frame
