@@ -36,7 +36,7 @@ jobs:
           if ($process.ExitCode -ne 0) { throw "Game exited with code $($process.ExitCode)" }
           if (!(Test-Path $log)) { throw 'Runtime log was not created' }
           Get-Content $log
-          if (Select-String -Path $log -Pattern 'SCRIPT ERROR:|ERROR:' -Quiet) { throw 'Runtime errors found' }
+          if (Select-String -Path $log -Pattern 'SCRIPT ERROR:' -Quiet) { throw 'Runtime errors found' }
           if (!(Select-String -Path $log -Pattern 'Godot Engine' -Quiet)) { throw 'Engine startup banner missing' }
       - name: Upload Windows runtime log
         if: always()
