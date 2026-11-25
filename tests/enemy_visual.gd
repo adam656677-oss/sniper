@@ -18,7 +18,7 @@ func run_tests() -> void:
 	await process_frame
 	await physics_frame
 	var enemy = game.level.enemies[0]
-	var visual: EnemyVisual = enemy.get_node("VisualRig")
+	var visual = enemy.get_node("VisualRig") as EnemyVisual
 	check(visual != null and visual.get_child_count() >= 9, "Enemy has a generated humanoid visual rig")
 	check(not enemy.get_node("Head/HeadMesh").visible and not enemy.get_node("Torso/TorsoMesh").visible, "Old blockout cubes are hidden")
 	check(enemy.get_node("Head") is CollisionShape3D and enemy.get_node("Torso") is CollisionShape3D, "Original hit-zone collision shapes remain intact")
