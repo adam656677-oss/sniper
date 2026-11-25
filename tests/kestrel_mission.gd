@@ -27,7 +27,7 @@ func run_tests() -> void:
 	check(level.enemies.size() == 9 and level.find_enemy("Commander") != null, "Eight guards and a named commander are registered")
 	check(level.spawn_point == Vector3(0, 1, 170), "Insertion begins in the south gully")
 	check(level.get_node_or_null("CulvertRoof") != null and level.get_node_or_null("NorthGateTruck") != null, "Depot has a traversable culvert route and north gate truck cover")
-	var dressing: Node3D = level.get_node_or_null("EnvironmentDressing")
+	var dressing = level.get_node_or_null("EnvironmentDressing")
 	check(dressing != null and dressing.get_child_count() >= 40, "Kestrel ridge has a deterministic tree, rock and scrub dressing pass")
 	check(dressing != null and dressing.find_children("*", "CollisionObject3D", true, false).is_empty(), "Decorative ridge dressing does not add collision or navigation blockers")
 	check(level.mission_log.status("commander") == MissionLog.Status.ACTIVE, "Commander is the first primary objective")
