@@ -92,6 +92,10 @@ func _cylinder(parent: Node3D, label: String, radius: float, height: float, at: 
 func _build_model(profile: WeaponProfile) -> void:
 	if model_root:
 		model_root.queue_free()
+	slide = null
+	magazine = null
+	muzzle_flash = null
+	flash_light = null
 	model_root = Node3D.new()
 	model_root.name = "GeneratedViewmodel"
 	add_child(model_root)
