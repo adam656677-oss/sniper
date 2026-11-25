@@ -12,7 +12,7 @@ const HELMET := Color(0.10, 0.13, 0.12)
 const BOOT := Color(0.045, 0.05, 0.045)
 const METAL := Color(0.065, 0.075, 0.07)
 
-var enemy: Enemy
+var enemy: Variant
 var clock := 0.0
 var torso: Node3D
 var head: Node3D
@@ -28,7 +28,7 @@ var held_weapon: Node3D
 var collapsed := false
 
 func _ready() -> void:
-	enemy = get_parent() as Enemy
+	enemy = get_parent()
 	_hide_blockout_meshes()
 	_build_humanoid()
 
@@ -159,11 +159,11 @@ func _process(delta: float) -> void:
 	if not enemy or not is_instance_valid(enemy):
 		return
 	clock += delta
-	var dead := enemy.state == Enemy.State.DEAD
+	var dead := enemy.state == 6
 	var moving := Vector2(enemy.velocity.x, enemy.velocity.z).length() > 0.25 and not dead
 	var stride := sin(clock * 8.0) * (0.55 if moving else 0.025)
 	var blend := minf(1.0, delta * 9.0)
-	var aiming := enemy.state == Enemy.State.ALERT
+	var aiming := enemy.state == 3
 	left_leg.rotation.x = lerpf(left_leg.rotation.x, stride, blend)
 	right_leg.rotation.x = lerpf(right_leg.rotation.x, -stride, blend)
 	left_calf.rotation.x = lerpf(left_calf.rotation.x, maxf(0.0, -stride) * 0.65, blend)
@@ -174,7 +174,7 @@ func _process(delta: float) -> void:
 	right_forearm.rotation.x = lerpf(right_forearm.rotation.x, -0.55 if aiming else 0.0, blend)
 	torso.position.y = lerpf(torso.position.y, 0.37 + (absf(sin(clock * 8.0)) * 0.025 if moving else sin(clock * 1.8) * 0.006), blend)
 	head.rotation.y = lerpf(head.rotation.y, sin(clock * 0.75) * 0.035 if not aiming else 0.0, blend)
-	held_weapon.visible = aiming or enemy.state == Enemy.State.SEARCH
+	held_weapon.visible = aiming or enemy.state == 4
 	if dead:
 		rotation.z = lerpf(rotation.z, 1.25, blend)
 		position.y = lerpf(position.y, -0.45, blend)
