@@ -10,6 +10,7 @@ const EDGE_METAL := Color(0.19, 0.20, 0.19)
 const POLYMER := Color(0.055, 0.06, 0.055)
 const RUBBER := Color(0.025, 0.03, 0.028)
 const CLOTH := Color(0.12, 0.14, 0.13)
+const MAX_CASINGS := 8
 
 var weapon: Variant
 var model_root: Node3D
@@ -25,6 +26,7 @@ var flash_remaining := 0.0
 var slide_remaining := 0.0
 var switch_remaining := 0.0
 var reload_duration := 2.0
+var casings: Array[Dictionary] = []
 var base_position := Vector3(0.25, -0.22, -0.48)
 var aim_position := Vector3(0.04, -0.16, -0.40)
 
@@ -55,6 +57,56 @@ func on_fired(_profile: WeaponProfile) -> void:
 		muzzle_flash.visible = true
 	if flash_light:
 		flash_light.visible = true
+	_spawn_casing()
+
+func _spawn_casing() -> void:
+	if not model_root:
+		return
+	var casing := MeshInstance3D.new()
+	casing.name = "EjectedCasing"
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = 0.011
+	mesh.bottom_radius = 0.011
+	mesh.height = 0.045
+	mesh.radial_segments = 8
+	casing.mesh = mesh
+	var brass := StandardMaterial3D.new()
+	brass.albedo_color = Color(0.52, 0.34, 0.12)
+	brass.metallic = 0.78
+	brass.roughness = 0.34
+	casing.material_override = brass
+	casing.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	model_root.add_child(casing)
+	casing.position = Vector3(0.15, 0.04, -0.36)
+	casings.append({
+		"node": casing,
+		"velocity": Vector3(randf_range(0.9, 1.5), randf_range(0.65, 1.15), randf_range(-0.35, 0.25)),
+		"age": 0.0
+	})
+	while casings.size() > MAX_CASINGS:
+		var oldest: Dictionary = casings.pop_front()
+		if is_instance_valid(oldest.node):
+			oldest.node.queue_free()
+
+func _advance_casings(delta: float) -> void:
+	for index in range(casings.size() - 1, -1, -1):
+		var casing: Dictionary = casings[index]
+		var node: MeshInstance3D = casing.node
+		if not is_instance_valid(node):
+			casings.remove_at(index)
+			continue
+		var velocity: Vector3 = casing.velocity
+		velocity.y -= 3.8 * delta
+		node.position += velocity * delta
+		node.rotate_object_local(Vector3.RIGHT, delta * 17.0)
+		node.rotate_object_local(Vector3.FORWARD, delta * 11.0)
+		casing.velocity = velocity
+		casing.age = float(casing.age) + delta
+		if float(casing.age) >= 0.95:
+			node.queue_free()
+			casings.remove_at(index)
+		else:
+			casings[index] = casing
 
 func _material(color: Color, metallic: float = 0.0, roughness: float = 0.72) -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
@@ -92,6 +144,7 @@ func _cylinder(parent: Node3D, label: String, radius: float, height: float, at: 
 func _build_model(profile: WeaponProfile) -> void:
 	if model_root:
 		model_root.queue_free()
+	casings.clear()
 	slide = null
 	magazine = null
 	muzzle_flash = null
@@ -201,6 +254,7 @@ func advance(delta: float, aiming: bool, reload_remaining: float, move_speed: fl
 	if not weapon or not active_profile:
 		return
 	clock += delta
+	_advance_casings(delta)
 	if weapon.profile() != active_profile:
 		set_profile(weapon.profile())
 	recoil = move_toward(recoil, 0.0, delta * 1.9)
