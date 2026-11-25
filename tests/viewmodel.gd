@@ -24,13 +24,18 @@ func run_tests() -> void:
 	game.weapon.fire_weapon()
 	check(viewmodel.recoil > 0.0 and viewmodel.muzzle_flash.visible, "Firing triggers recoil and a brief muzzle flash")
 	check(viewmodel.casings.size() == 1, "Firing ejects a brass casing")
+	check(viewmodel.muzzle_smokes.size() == 1 and viewmodel.muzzle_smokes[0].node.amount == 6, "An unsuppressed shot creates a brief muzzle smoke puff")
 	viewmodel.advance(0.08, false, 0.0, 0.0)
 	check(not viewmodel.muzzle_flash.visible, "Muzzle flash fades after its short pulse")
 	viewmodel.advance(1.0, false, 0.0, 0.0)
 	check(viewmodel.casings.is_empty(), "Ejected casing expires after its short visual arc")
+	check(viewmodel.muzzle_smokes.is_empty(), "Muzzle smoke expires after its short linger")
 	check(game.weapon.select_weapon(1), "A handgun can be selected")
 	viewmodel.advance(0.05, false, 0.0, 0.0)
 	check(viewmodel.active_profile == game.weapon.profile(), "Viewmodel changes model when weapon selection changes")
+	game.weapon.shot_remaining = 0.0
+	game.weapon.fire_weapon()
+	check(viewmodel.muzzle_smokes.size() == 1 and viewmodel.muzzle_smokes[0].node.amount == 10, "The suppressed sidearm creates a denser, longer-lived smoke wisp")
 	check(viewmodel.magazine != null, "Handgun magazine is represented separately for reload presentation")
 	game.weapon.ammo -= 1
 	check(game.weapon.begin_reload(), "Handgun reload begins")
