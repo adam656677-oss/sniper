@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/weapon_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Sentinel service pistol"
+family = "sidearm"
+capacity = 17
+reserve = 51
+reload_seconds = 1.8
+shot_interval = 0.22
+pellets = 1
+spread = 0.009
+max_range = 70.0
+aim_fov = 58.0
+simulated_projectile = false
+muzzle_velocity = 0.0
+drag_coefficient = 0.0
+zero_range = 0.0
+damage = 34.0
+suppressed = false
+recoil_degrees = 1.35
