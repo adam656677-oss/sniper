@@ -70,6 +70,21 @@ func run_tests() -> void:
 	weapon.advance_projectiles(0.2)
 	check(fx.holes.size() == 1 and fx.get_child_count() >= children_before + 2, "A wall hit leaves a dust puff and a hole")
 	check(fx.holes[0].global_position.z > -19.5 - 0.05 and fx.holes[0].global_position.z < -19.4, "The hole sits on the wall face")
+	var metal_surface: StaticBody3D = game.level.spawn_box(Vector3(40, 1, -20), Vector3(2, 2, 1), Color(0.3, 0.3, 0.3))
+	metal_surface.name = "FuelTankTest"
+	var wood_surface: StaticBody3D = game.level.spawn_box(Vector3(44, 1, -20), Vector3(2, 2, 1), Color(0.4, 0.25, 0.1))
+	wood_surface.name = "WoodCrateTest"
+	var earth_surface: StaticBody3D = game.level.spawn_box(Vector3(48, 1, -20), Vector3(2, 2, 1), Color(0.2, 0.2, 0.15))
+	earth_surface.name = "DirtGroundTest"
+	check(game.impact_surface_for(metal_surface) == "metal", "Fuel and metal props resolve to spark impacts")
+	check(game.impact_surface_for(wood_surface) == "wood", "Wood props resolve to splinter impacts")
+	check(game.impact_surface_for(earth_surface) == "earth", "Ground and road props resolve to dust impacts")
+	fx.impact(Vector3(40, 1, -20), Vector3.UP, true, game.impact_surface_for(metal_surface))
+	check(fx.last_impact_surface == "metal" and fx.last_impact_particle_count == 12, "Metal impacts emit a compact bright spark burst")
+	fx.impact(Vector3(44, 1, -20), Vector3.UP, true, game.impact_surface_for(wood_surface))
+	check(fx.last_impact_surface == "wood" and fx.last_impact_particle_count == 14, "Wood impacts emit splinter particles")
+	fx.impact(Vector3(48, 1, -20), Vector3.UP, true, game.impact_surface_for(earth_surface))
+	check(fx.last_impact_surface == "earth" and fx.last_impact_particle_count == 18, "Earth impacts emit a broader dust puff")
 	for i in range(70):
 		fx.add_hole(Vector3(i, 0, 0), Vector3.UP)
 	check(fx.holes.size() == fx.MAX_HOLES, "Bullet holes are capped")
