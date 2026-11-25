@@ -79,7 +79,7 @@ func start() -> bool:
 	player.set_physics_process(false)
 	level.set_physics_process(false)
 	for item in level.enemies:
-		var enemy := item as Enemy
+		var enemy = item
 		if enemy:
 			enemy_processing.append({"enemy": enemy, "enabled": enemy.is_physics_processing()})
 			enemy.set_physics_process(false)
