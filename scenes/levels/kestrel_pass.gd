@@ -120,6 +120,7 @@ func _build_environment() -> void:
 	_add_radio_mast(Vector3(radio_point.x, 0, radio_point.z))
 	_add_ledger_marker(ledger_point)
 	_add_tree_cluster()
+	_add_environment_dressing()
 
 	# A broken road leads from the gully through the gate and out to the saddle.
 	spawn_box(Vector3(0, 0.03, 8), Vector3(12, 0.06, 350), Color(0.19, 0.19, 0.17)).name = "PassRoad"
@@ -226,3 +227,131 @@ func _add_tree_cluster() -> void:
 			pine.roughness = 0.96
 			foliage.material_override = pine
 			tree.add_child(foliage)
+
+
+# Decorative dressing is deliberately mesh-only: it adds a stronger mountain
+# silhouette without changing collision, navigation, objective or sightline logic.
+func _add_environment_dressing() -> void:
+	var dressing := Node3D.new()
+	dressing.name = "EnvironmentDressing"
+	add_child(dressing)
+
+	var tree_positions := [
+		Vector3(-188, 0, 78), Vector3(-166, 0, 104), Vector3(-190, 0, 132),
+		Vector3(-174, 0, 158), Vector3(-190, 0, -8), Vector3(-182, 0, -42),
+		Vector3(-190, 0, -78), Vector3(184, 0, 58), Vector3(190, 0, 92),
+		Vector3(164, 0, 122), Vector3(188, 0, 150), Vector3(190, 0, -14),
+		Vector3(184, 0, -48), Vector3(190, 0, -82), Vector3(-148, 0, -164),
+		Vector3(-108, 0, -188), Vector3(108, 0, -188), Vector3(150, 0, -164)
+	]
+	for i in range(tree_positions.size()):
+		_add_dressed_pine(dressing, "RidgePine_%02d" % i, tree_positions[i], 0.82 + float(i % 4) * 0.12, i)
+
+	var rock_positions := [
+		Vector3(-146, 0, 36), Vector3(-158, 0, 54), Vector3(-142, 0, 76),
+		Vector3(-166, 0, 138), Vector3(-148, 0, 158), Vector3(-176, 0, -22),
+		Vector3(-160, 0, -66), Vector3(-148, 0, -112), Vector3(-132, 0, -160),
+		Vector3(146, 0, 32), Vector3(160, 0, 54), Vector3(144, 0, 78),
+		Vector3(166, 0, 136), Vector3(150, 0, 158), Vector3(178, 0, -24),
+		Vector3(160, 0, -68), Vector3(148, 0, -116), Vector3(132, 0, -160)
+	]
+	for i in range(rock_positions.size()):
+		var width := 1.4 + float(i % 3) * 0.55
+		_add_dressed_rock(dressing, "RidgeRock_%02d" % i, rock_positions[i], Vector3(width, 0.9 + float(i % 2) * 0.45, width * 0.82), i)
+
+	var scrub_positions := [
+		Vector3(-104, 0, 132), Vector3(104, 0, 138), Vector3(-96, 0, -158),
+		Vector3(96, 0, -158), Vector3(-184, 0, 14), Vector3(184, 0, 12),
+		Vector3(-122, 0, -180), Vector3(122, 0, -180), Vector3(-154, 0, 88),
+		Vector3(154, 0, 92)
+	]
+	for i in range(scrub_positions.size()):
+		_add_scrub_cluster(dressing, "RidgeScrub_%02d" % i, scrub_positions[i], i)
+
+
+func _add_dressed_pine(parent: Node3D, tree_name: String, at: Vector3, scale_factor: float, variant: int) -> void:
+	var tree := Node3D.new()
+	tree.name = tree_name
+	tree.position = at
+	tree.rotation.y = float(variant % 7) * 0.71
+	tree.scale = Vector3.ONE * scale_factor
+	parent.add_child(tree)
+
+	var bark := StandardMaterial3D.new()
+	bark.albedo_color = Color(0.19, 0.15, 0.11)
+	bark.roughness = 0.98
+	var trunk := MeshInstance3D.new()
+	var trunk_mesh := CylinderMesh.new()
+	trunk_mesh.top_radius = 0.10
+	trunk_mesh.bottom_radius = 0.22
+	trunk_mesh.height = 3.2
+	trunk.mesh = trunk_mesh
+	trunk.position.y = 1.6
+	trunk.material_override = bark
+	tree.add_child(trunk)
+
+	var pine_colors: Array[Color] = [
+		Color(0.055, 0.105, 0.075), Color(0.075, 0.13, 0.085),
+		Color(0.09, 0.145, 0.095), Color(0.065, 0.12, 0.09)
+	]
+	for tier in range(4):
+		var foliage := MeshInstance3D.new()
+		var cone := CylinderMesh.new()
+		cone.top_radius = 0.035
+		cone.bottom_radius = 1.55 - float(tier) * 0.25
+		cone.height = 2.65
+		cone.radial_segments = 9
+		foliage.mesh = cone
+		foliage.position.y = 2.1 + float(tier) * 1.12
+		var needles := StandardMaterial3D.new()
+		needles.albedo_color = pine_colors[(variant + tier) % pine_colors.size()]
+		needles.roughness = 0.97
+		foliage.material_override = needles
+		tree.add_child(foliage)
+
+
+func _add_dressed_rock(parent: Node3D, rock_name: String, at: Vector3, rock_scale: Vector3, variant: int) -> void:
+	var rock := MeshInstance3D.new()
+	rock.name = rock_name
+	var mesh := SphereMesh.new()
+	mesh.radius = 1.0
+	mesh.height = 2.0
+	mesh.radial_segments = 12
+	mesh.rings = 6
+	rock.mesh = mesh
+	rock.position = at + Vector3(0, rock_scale.y * 0.72, 0)
+	rock.scale = rock_scale
+	rock.rotation = Vector3(float(variant % 3) * 0.11, float(variant) * 0.37, float(variant % 4) * 0.09)
+	var stone := StandardMaterial3D.new()
+	var shades: Array[Color] = [
+		Color(0.25, 0.26, 0.24), Color(0.31, 0.29, 0.25),
+		Color(0.35, 0.34, 0.30), Color(0.22, 0.24, 0.23)
+	]
+	stone.albedo_color = shades[variant % shades.size()]
+	stone.roughness = 0.94
+	rock.material_override = stone
+	parent.add_child(rock)
+
+
+func _add_scrub_cluster(parent: Node3D, scrub_name: String, at: Vector3, variant: int) -> void:
+	var scrub := Node3D.new()
+	scrub.name = scrub_name
+	scrub.position = at
+	scrub.rotation.y = float(variant) * 0.63
+	parent.add_child(scrub)
+	var colors: Array[Color] = [Color(0.13, 0.17, 0.11), Color(0.17, 0.19, 0.12), Color(0.12, 0.15, 0.10)]
+	for i in range(3):
+		var tuft := MeshInstance3D.new()
+		var mesh := SphereMesh.new()
+		mesh.radius = 0.72
+		mesh.height = 1.0
+		mesh.radial_segments = 8
+		mesh.rings = 4
+		tuft.mesh = mesh
+		tuft.position = Vector3(float(i - 1) * 0.55, 0.38 + float(i % 2) * 0.08, float(i % 2) * 0.35)
+		tuft.scale = Vector3(1.0, 0.72, 0.82)
+		var leaves := StandardMaterial3D.new()
+		leaves.albedo_color = colors[(variant + i) % colors.size()]
+		leaves.roughness = 0.99
+		tuft.material_override = leaves
+		scrub.add_child(tuft)
