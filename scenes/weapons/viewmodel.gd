@@ -12,6 +12,7 @@ const RUBBER := Color(0.025, 0.03, 0.028)
 const CLOTH := Color(0.12, 0.14, 0.13)
 const MAX_CASINGS := 8
 const MAX_DROPPED_MAGAZINES := 2
+const MAX_MUZZLE_SMOKES := 3
 
 var weapon: Variant
 var model_root: Node3D
@@ -29,6 +30,7 @@ var switch_remaining := 0.0
 var reload_duration := 2.0
 var casings: Array[Dictionary] = []
 var dropped_magazines: Array[Dictionary] = []
+var muzzle_smokes: Array[Dictionary] = []
 var magazine_ejected_for_reload := false
 var reload_was_active := false
 var base_position := Vector3(0.25, -0.22, -0.48)
@@ -57,6 +59,7 @@ func on_fired(_profile: WeaponProfile) -> void:
 	recoil = minf(recoil + (0.10 if active_profile and active_profile.family == "sidearm" else 0.075), 0.22)
 	flash_remaining = 0.055
 	slide_remaining = 0.085
+	_spawn_muzzle_smoke()
 	if muzzle_flash:
 		muzzle_flash.visible = true
 	if flash_light:
@@ -150,6 +153,7 @@ func _build_model(profile: WeaponProfile) -> void:
 		model_root.queue_free()
 	casings.clear()
 	_clear_dropped_magazines()
+	_clear_muzzle_smokes()
 	magazine_ejected_for_reload = false
 	reload_was_active = false
 	slide = null
@@ -263,6 +267,7 @@ func advance(delta: float, aiming: bool, reload_remaining: float, move_speed: fl
 	clock += delta
 	_advance_casings(delta)
 	_advance_dropped_magazines(delta)
+	_advance_muzzle_smokes(delta)
 	if weapon.profile() != active_profile:
 		set_profile(weapon.profile())
 	recoil = move_toward(recoil, 0.0, delta * 1.9)
@@ -366,3 +371,71 @@ func _clear_dropped_magazines() -> void:
 		if is_instance_valid(item.node):
 			item.node.queue_free()
 	dropped_magazines.clear()
+
+
+func _spawn_muzzle_smoke() -> void:
+	if not weapon_root or not muzzle_flash or not active_profile:
+		return
+	var smoke := CPUParticles3D.new()
+	smoke.name = "MuzzleSmoke"
+	smoke.one_shot = true
+	smoke.explosiveness = 0.72
+	smoke.amount = 10 if active_profile.suppressed else 6
+	smoke.lifetime = 1.0 if active_profile.suppressed else 0.58
+	smoke.direction = Vector3(0.0, 0.12, -1.0)
+	smoke.spread = 24.0
+	smoke.gravity = Vector3(0.0, 0.12, 0.0)
+	smoke.initial_velocity_min = 0.08 if active_profile.suppressed else 0.18
+	smoke.initial_velocity_max = 0.22 if active_profile.suppressed else 0.42
+	smoke.scale_amount_min = 0.055
+	smoke.scale_amount_max = 0.12 if active_profile.suppressed else 0.075
+	var gradient := Gradient.new()
+	gradient.set_color(0, Color(0.48, 0.50, 0.52, 0.20))
+	gradient.add_point(0.42, Color(0.43, 0.45, 0.47, 0.11))
+	gradient.set_color(1, Color(0.38, 0.40, 0.42, 0.0))
+	var ramp := GradientTexture1D.new()
+	ramp.gradient = gradient
+	smoke.color_ramp = ramp
+	var cloud := SphereMesh.new()
+	cloud.radius = 0.045
+	cloud.height = 0.09
+	cloud.radial_segments = 6
+	cloud.rings = 3
+	smoke.mesh = cloud
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.55, 0.57, 0.59, 0.28)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.vertex_color_use_as_albedo = true
+	smoke.material_override = material
+	smoke.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	weapon_root.add_child(smoke)
+	smoke.position = muzzle_flash.position
+	smoke.emitting = true
+	muzzle_smokes.append({"node": smoke, "age": 0.0, "lifetime": smoke.lifetime})
+	while muzzle_smokes.size() > MAX_MUZZLE_SMOKES:
+		var oldest: Dictionary = muzzle_smokes.pop_front()
+		if is_instance_valid(oldest.node):
+			oldest.node.queue_free()
+
+
+func _advance_muzzle_smokes(delta: float) -> void:
+	for index in range(muzzle_smokes.size() - 1, -1, -1):
+		var item: Dictionary = muzzle_smokes[index]
+		var node: CPUParticles3D = item.node
+		if not is_instance_valid(node):
+			muzzle_smokes.remove_at(index)
+			continue
+		item.age = float(item.age) + delta
+		if float(item.age) >= float(item.lifetime) + 0.12:
+			node.queue_free()
+			muzzle_smokes.remove_at(index)
+		else:
+			muzzle_smokes[index] = item
+
+
+func _clear_muzzle_smokes() -> void:
+	for item in muzzle_smokes:
+		if is_instance_valid(item.node):
+			item.node.queue_free()
+	muzzle_smokes.clear()
