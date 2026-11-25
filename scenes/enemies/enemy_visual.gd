@@ -159,11 +159,11 @@ func _process(delta: float) -> void:
 	if not enemy or not is_instance_valid(enemy):
 		return
 	clock += delta
-	var dead := enemy.state == 6
-	var moving := Vector2(enemy.velocity.x, enemy.velocity.z).length() > 0.25 and not dead
+	var dead: bool = int(enemy.state) == 6
+	var moving: bool = Vector2(enemy.velocity.x, enemy.velocity.z).length() > 0.25 and not dead
 	var stride := sin(clock * 8.0) * (0.55 if moving else 0.025)
 	var blend := minf(1.0, delta * 9.0)
-	var aiming := enemy.state == 3
+	var aiming: bool = int(enemy.state) == 3
 	left_leg.rotation.x = lerpf(left_leg.rotation.x, stride, blend)
 	right_leg.rotation.x = lerpf(right_leg.rotation.x, -stride, blend)
 	left_calf.rotation.x = lerpf(left_calf.rotation.x, maxf(0.0, -stride) * 0.65, blend)
