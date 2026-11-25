@@ -1,5 +1,7 @@
 extends SceneTree
 
+const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
+
 var failures := 0
 
 func check(value: bool, label: String) -> void:
