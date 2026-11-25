@@ -76,7 +76,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [~] 3.6 (clear, windy, rain and dust presets driving gusting ballistic wind, haze, enemy sight and hearing; rain and dust particles pending art) Weather: wind strength and direction tied to ballistics, rain and dust storms as visibility modifiers. Verify: test weather affects wind vector; playtest.
 - [ ] 3.7 Player and weapon models: first-person arms, rifle with scope and bipod, pistol, binoculars. Verify: playtest.
 - [ ] 3.8 Characters: at least two enemy variants (patrol, officer) with material variation. Verify: playtest.
-- [ ] 3.9 VFX: muzzle flash, smoke, shell eject, impacts per surface, blood (toggle), dust from movement, distant explosions. Verify: playtest.
+- [~] 3.9 VFX: short muzzle-flash mesh/light pulse, tracer, dust impact puff, bullet holes and hit marker exist; first-person brass casing ejection now animates with gravity and spin and is capped/cleaned up. Smoke trails, surface-specific impact effects, optional blood, movement dust and distant explosions remain. Verify: Windows visual playtest.
 - [~] 3.10 Audio: procedural positional event foundation added for player rifle, suppressed, sidearm, reload, impact, stance-aware footsteps and enemy weapon reports; gameplay events are wired and automated PCM/playback tests added. Recorded weapon layers, reflections, surface-specific footsteps, foley, ambience beds, enemy voice barks, dynamic music and a dedicated mix bus with ducking remain. Verify: test bus layout; Windows audio-device playtest.
 - [ ] 3.11 Performance pass: occlusion culling, LOD distances, texture streaming budgets, shadow cascade tuning, GPU profile under 16 ms. Verify: automated frame-time capture in a scripted fly-through.
 
