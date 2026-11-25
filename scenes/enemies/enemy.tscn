@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemies/enemy.gd" id="1"]
 [ext_resource type="Script" path="res://scenes/enemies/perception.gd" id="2"]
+[ext_resource type="Script" path="res://scenes/enemies/enemy_visual.gd" id="3"]
 
 [sub_resource type="BoxShape3D" id="head_shape"]
 size = Vector3(0.3, 0.3, 0.3)
@@ -60,3 +61,6 @@ script = ExtResource("2")
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 path_desired_distance = 1.0
 target_desired_distance = 1.0
+
+[node name="VisualRig" type="Node3D" parent="."]
+script = ExtResource("3")
