@@ -88,7 +88,28 @@ func load_slot(slot: String) -> bool:
 
 func on_impact(position: Vector3, normal: Vector3, body: Node3D) -> void:
 	var living := body != null and body.has_method("take_hit")
-	feedback.impact(position, normal, not living)
+	feedback.impact(position, normal, not living, impact_surface_for(body))
+
+
+func impact_surface_for(body: Node3D) -> String:
+	if body == null:
+		return "earth"
+	if body.has_meta("impact_surface"):
+		return String(body.get_meta("impact_surface"))
+	if body.is_in_group("surface_metal"):
+		return "metal"
+	if body.is_in_group("surface_wood"):
+		return "wood"
+	if body.is_in_group("surface_earth"):
+		return "earth"
+	var label := String(body.name).to_lower()
+	if label.contains("fuel") or label.contains("truck") or label.contains("metal"):
+		return "metal"
+	if label.contains("wood") or label.contains("crate") or label.contains("door"):
+		return "wood"
+	if label.contains("ground") or label.contains("terrain") or label.contains("road"):
+		return "earth"
+	return "stone"
 
 func on_weapon_fired(profile: WeaponProfile) -> void:
 	if profile.simulated_projectile and not weapon.projectiles.is_empty():

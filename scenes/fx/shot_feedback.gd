@@ -18,6 +18,8 @@ var tracer_mesh := ImmediateMesh.new()
 var tracer_instance: MeshInstance3D
 var hit_marker_time := 0.0
 var hit_marker_kill := false
+var last_impact_surface := "stone"
+var last_impact_particle_count := 0
 
 func _ready() -> void:
 	tracer_instance = MeshInstance3D.new()
@@ -70,23 +72,59 @@ func draw_tracers(projectiles: Array[Dictionary]) -> void:
 func tracer_count() -> int:
 	return tracer_mesh.get_surface_count()
 
-func impact(position: Vector3, normal: Vector3, leave_hole: bool) -> void:
+func impact(position: Vector3, normal: Vector3, leave_hole: bool, surface_type: String = "stone") -> void:
+	var surface := surface_type.to_lower()
+	if surface not in ["metal", "wood", "earth", "stone"]:
+		surface = "stone"
+	last_impact_surface = surface
 	var puff := CPUParticles3D.new()
 	puff.one_shot = true
-	puff.amount = 16
-	puff.lifetime = 0.6
-	puff.explosiveness = 0.9
+	puff.explosiveness = 0.95
 	puff.direction = normal if normal != Vector3.ZERO else Vector3.UP
-	puff.spread = 35.0
-	puff.initial_velocity_min = 1.0
-	puff.initial_velocity_max = 3.0
-	puff.gravity = Vector3(0, -3, 0)
-	puff.scale_amount_min = 0.05
-	puff.scale_amount_max = 0.15
-	puff.color = Color(0.55, 0.5, 0.42)
-	var quad := QuadMesh.new()
-	quad.size = Vector2(0.3, 0.3)
-	puff.mesh = quad
+	puff.spread = 28.0 if surface == "metal" else 38.0
+	puff.gravity = Vector3(0, -9.0, 0) if surface == "metal" else (Vector3(0, -5.0, 0) if surface == "wood" else Vector3(0, -3.0, 0))
+	var particle_material := StandardMaterial3D.new()
+	particle_material.vertex_color_use_as_albedo = true
+	particle_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	match surface:
+		"metal":
+			puff.amount = 12
+			puff.lifetime = 0.42
+			puff.initial_velocity_min = 2.5
+			puff.initial_velocity_max = 7.5
+			puff.scale_amount_min = 0.018
+			puff.scale_amount_max = 0.045
+			puff.color = Color(1.0, 0.58, 0.18)
+			particle_material.emission_enabled = true
+			particle_material.emission = Color(1.0, 0.36, 0.08)
+			var spark_mesh := BoxMesh.new()
+			spark_mesh.size = Vector3(0.018, 0.12, 0.018)
+			puff.mesh = spark_mesh
+		"wood":
+			puff.amount = 14
+			puff.lifetime = 0.55
+			puff.initial_velocity_min = 1.2
+			puff.initial_velocity_max = 3.8
+			puff.scale_amount_min = 0.025
+			puff.scale_amount_max = 0.09
+			puff.color = Color(0.66, 0.48, 0.28)
+			var splinter_mesh := BoxMesh.new()
+			splinter_mesh.size = Vector3(0.025, 0.11, 0.018)
+			puff.mesh = splinter_mesh
+		_:
+			puff.amount = 18 if surface == "earth" else 16
+			puff.lifetime = 0.65 if surface == "earth" else 0.6
+			puff.initial_velocity_min = 0.8
+			puff.initial_velocity_max = 2.2 if surface == "earth" else 3.0
+			puff.scale_amount_min = 0.05
+			puff.scale_amount_max = 0.15
+			puff.color = Color(0.42, 0.31, 0.20) if surface == "earth" else Color(0.55, 0.5, 0.42)
+			var dust_mesh := QuadMesh.new()
+			dust_mesh.size = Vector2(0.3, 0.3)
+			puff.mesh = dust_mesh
+	last_impact_particle_count = puff.amount
+	puff.material_override = particle_material
+	puff.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(puff)
 	puff.global_position = position
 	puff.emitting = true
