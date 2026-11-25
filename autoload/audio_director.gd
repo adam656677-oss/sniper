@@ -6,6 +6,7 @@ const SAMPLE_RATE := 22050
 const MAX_ACTIVE_VOICES := 24
 const EVENT_CONFIG := {
 	"rifle_report": {"duration": 0.72, "pitch": 1.0, "gain": 1.0, "low": 62.0, "crack": 1800.0},
+	"enemy_report": {"duration": 0.62, "pitch": 1.0, "gain": 0.62, "low": 78.0, "crack": 1550.0},
 	"suppressed_report": {"duration": 0.24, "pitch": 1.0, "gain": 0.36, "low": 105.0, "crack": 950.0},
 	"sidearm_report": {"duration": 0.38, "pitch": 1.0, "gain": 0.72, "low": 92.0, "crack": 1450.0},
 	"reload_click": {"duration": 0.10, "pitch": 1.0, "gain": 0.22, "low": 520.0, "crack": 2600.0},
