@@ -100,7 +100,7 @@ func _build_environment() -> void:
 	spawn_box(Vector3(-38, 1.5, -130), Vector3(1, 3, 24), Color(0.28, 0.29, 0.27)).name = "CulvertWestWall"
 	spawn_box(Vector3(-32, 1.5, -130), Vector3(1, 3, 24), Color(0.28, 0.29, 0.27)).name = "CulvertEastWall"
 	spawn_box(Vector3(-35, 3, -130), Vector3(7, 0.8, 24), Color(0.24, 0.25, 0.23)).name = "CulvertRoof"
-	spawn_box(Vector3(-35, 1.0, -130), Vector3(7, 0.25, 24), Color(0.30, 0.30, 0.27)).name = "CulvertFloor"
+	spawn_box(Vector3(-35, 0.125, -130), Vector3(7, 0.25, 24), Color(0.30, 0.30, 0.27)).name = "CulvertFloor"
 	spawn_box(Vector3(-14, 2.0, -128), Vector3(1.5, 4, 2), wall_mat).name = "NorthGatePostWest"
 	spawn_box(Vector3(14, 2.0, -128), Vector3(1.5, 4, 2), wall_mat).name = "NorthGatePostEast"
 	spawn_box(Vector3(8, 1.1, -134), Vector3(8, 2.2, 4), Color(0.20, 0.24, 0.20)).name = "NorthGateTruck"
