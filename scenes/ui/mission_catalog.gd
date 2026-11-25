@@ -4,6 +4,7 @@ extends RefCounted
 
 const MISSIONS := [
 	{"id": "range", "title": "Shooting range", "scene": "res://range_mission.tscn", "brief": "Tutorial. Learn the scope, rangefinder, zeroing, breath and holdover on a 1000 m range."},
+	{"id": "kestrel_pass", "title": "Kestrel Pass", "scene": "res://kestrel_mission.tscn", "brief": "Dawn recon at a fictional border depot. Eliminate the commander, recover the ledger and reach the north saddle. Disable the radio mast to prevent lockdown reinforcements."},
 	{"id": "echo_ridge", "title": "Echo Ridge recon", "scene": "res://main.tscn", "brief": "Reach the terminal, pull the intel and get back to extraction."},
 	{"id": "compound", "title": "The compound", "scene": "res://compound_mission.tscn", "brief": "Four hostiles patrol a walled compound. Clear it quietly and leave by the north gate."},
 ]
