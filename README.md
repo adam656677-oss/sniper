@@ -4,7 +4,8 @@ Single-player first-person sniper game prototype built in Godot 4.7. Open `proje
 
 Planning and status live in `docs/`:
 
-- `docs/CHECKLIST.md`: the phased production checklist and exit gates.
+- `docs/CHECKLIST.md`: the master start-to-finish production checklist, verification requirements and release exit gates.
+- `docs/GAME-FLOW.md`: architecture and gameplay flow diagrams showing how the systems work together.
 - `docs/STATUS.md`: audit of what works, what is broken and why.
 - `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`: design document and open questions.
 - `docs/TOOLING.md`: tools, asset sources, licences and what the owner needs to provide.
