@@ -183,6 +183,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		weapon.select_weapon(1)
 	elif event.is_action_pressed("weapon_3"):
 		weapon.select_weapon(2)
+	elif event.is_action_pressed("weapon_4"):
+		weapon.select_weapon(3)
 	elif event.is_action_pressed("crouch"):
 		player.toggle_stance(Player.Stance.CROUCH)
 	elif event.is_action_pressed("prone"):
@@ -219,7 +221,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				weapon.toggle_aim()
 
-const CONTROLS_HELP := "Left click fire | Right click aim | Wheel zoom | Shift hold breath | [ ] zero\nB binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact\n1 rifle | 2 sidearm | F5 quick save | F9 quick load | Escape pause | N restart"
+const CONTROLS_HELP := "Left click fire | Right click aim | Wheel zoom | Shift hold breath | [ ] zero\nB binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact\n1 rifle | 2–4 handguns | F5 quick save | F9 quick load | Escape pause | N restart"
 
 static func signed_text(value: float) -> String:
 	return "%.1f" % (0.0 if absf(value) < 0.05 else value)
