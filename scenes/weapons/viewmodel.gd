@@ -276,12 +276,26 @@ func advance(delta: float, aiming: bool, reload_remaining: float, move_speed: fl
 	target.x += sway_x
 	target.y += sway_y - bob
 	target.z += recoil * 0.55
-	var reload_blend := 0.0
+	var reload_progress := 0.0
 	if reload_remaining > 0.0:
-		reload_blend = sin(PI * clampf(1.0 - reload_remaining / reload_duration, 0.0, 1.0))
-		target.y -= 0.12 * reload_blend
-		target.x += 0.08 * reload_blend
+		reload_progress = clampf(1.0 - reload_remaining / reload_duration, 0.0, 1.0)
+	var reload_dip := _smooth_range(reload_progress, 0.0, 0.20) * (1.0 - _smooth_range(reload_progress, 0.78, 1.0))
+	var magazine_drop := _smooth_range(reload_progress, 0.04, 0.25) * (1.0 - _smooth_range(reload_progress, 0.58, 0.84))
+	var slide_release := _smooth_range(reload_progress, 0.84, 0.94) * (1.0 - _smooth_range(reload_progress, 0.95, 0.995))
+	target.y -= 0.085 * reload_dip
+	target.x += 0.045 * reload_dip
 	position = position.lerp(target, minf(1.0, delta * 12.0))
-	rotation = Vector3(-recoil * 0.7, sway_x * 0.8, sway_y * 0.8)
+	rotation = Vector3(-recoil * 0.7 - 0.10 * reload_dip, sway_x * 0.8, sway_y * 0.8 + 0.035 * reload_dip)
+	if weapon_root:
+		weapon_root.position.y = -0.035 * reload_dip
+		weapon_root.rotation.x = -0.12 * reload_dip
+		weapon_root.rotation.z = 0.035 * reload_dip
 	if magazine:
-		magazine.position.y = -0.16 - (0.20 * reload_blend if reload_remaining > 0.0 else 0.0)
+		magazine.position.y = -0.16 - 0.34 * magazine_drop
+		magazine.rotation.x = 0.16 * magazine_drop
+	if slide:
+		slide.position.z = -0.025 if slide_remaining > 0.0 else -0.04 * slide_release
+
+func _smooth_range(value: float, start: float, finish: float) -> float:
+	var amount := clampf((value - start) / maxf(finish - start, 0.0001), 0.0, 1.0)
+	return amount * amount * (3.0 - 2.0 * amount)
