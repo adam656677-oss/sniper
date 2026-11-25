@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/weapon_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Ironclad heavy pistol"
+family = "sidearm"
+capacity = 10
+reserve = 40
+reload_seconds = 2.0
+shot_interval = 0.38
+pellets = 1
+spread = 0.006
+max_range = 85.0
+aim_fov = 56.0
+simulated_projectile = false
+muzzle_velocity = 0.0
+drag_coefficient = 0.0
+zero_range = 0.0
+damage = 48.0
+suppressed = false
+recoil_degrees = 2.4
