@@ -11,7 +11,7 @@ const POLYMER := Color(0.055, 0.06, 0.055)
 const RUBBER := Color(0.025, 0.03, 0.028)
 const CLOTH := Color(0.12, 0.14, 0.13)
 
-var weapon: WeaponRig
+var weapon: Variant
 var model_root: Node3D
 var weapon_root: Node3D
 var slide: Node3D
@@ -32,7 +32,7 @@ func _ready() -> void:
 	position = base_position
 	visible = false
 
-func bind_weapon(rig: WeaponRig) -> void:
+func bind_weapon(rig: Variant) -> void:
 	weapon = rig
 	if not weapon.fired.is_connected(on_fired):
 		weapon.fired.connect(on_fired)
