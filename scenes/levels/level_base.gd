@@ -106,6 +106,12 @@ func register_enemy(enemy: Node) -> void:
 	enemy.coordinator = coordinator
 	coordinator.register(enemy)
 	enemy.died.connect(on_enemy_died)
+	if enemy.has_signal("fired_at_player"):
+		enemy.fired_at_player.connect(_on_enemy_fired_at_player)
+
+func _on_enemy_fired_at_player(enemy: Enemy, _hit: bool) -> void:
+	if is_instance_valid(enemy):
+		AudioDirector.play_event("enemy_report", enemy.global_position, -3.0, randf_range(0.96, 1.04))
 
 func on_enemy_died(enemy: Node) -> void:
 	enemies.erase(enemy)
