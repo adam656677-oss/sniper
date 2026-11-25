@@ -57,7 +57,7 @@ Game flow and architecture diagrams: `docs/GAME-FLOW.md`. Design reference: `doc
 - [x] 2.4 Squad coordination: `AlertCoordinator` shares last known position, escalates mission alert level (Calm, Suspicious, Alert, Lockdown), spawns reinforcement patrol on Lockdown. Verify: test escalation rules.
 - [x] 2.5 Enemy combat: return fire with inaccuracy that improves while the player stays still; suppression of player (screen effect); flanking move toward last known position. Verify: test accuracy curve; playtest.
 - [x] 2.6 Body awareness: enemies discover bodies and escalate; player can move bodies. Verify: test body discovery escalates.
-- [ ] 2.7 Enemy animations: idle, walk, run, aim, fire, hit reactions, death variants, alert gestures. Verify: playtest.
+- [~] 2.7 Enemy animations: procedural idle/walk posing and a short directional stagger/recoil on non-lethal hits are implemented and tested. Authored idle, walk/run, aim/fire clips, hit-zone-specific reactions, alert gestures, multiple death variants and ragdoll remain. Verify: Windows playtest; validate hit reaction timing and readable silhouettes.
 - [x] 2.8 Player stealth tools: binoculars with target tagging, noise meter, stone distraction. (Outline-through-walls visual comes with Phase 3.) Verify: test tagging persists, noise meter responds.
 - [x] 2.9 Player damage, health regeneration or medkits, death and checkpoint reload. Verify: test damage and respawn.
 - [x] 2.10 Difficulty settings affecting perception rates, enemy accuracy, HUD assists. Verify: test that difficulty scales the numbers.
