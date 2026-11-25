@@ -50,11 +50,11 @@ func candidate() -> Variant:
 		var enemy = item
 		if enemy == null or not enemy.is_alive() or enemy.state == 3 or enemy.state == 5:
 			continue
-		var distance := player.global_position.distance_to(enemy.global_position)
+		var distance: float = player.global_position.distance_to(enemy.global_position)
 		if distance > best_distance:
 			continue
-		var to_player := (player.global_position - enemy.global_position).normalized()
-		var enemy_forward := -enemy.global_basis.z
+		var to_player: Vector3 = (player.global_position - enemy.global_position).normalized()
+		var enemy_forward: Vector3 = -enemy.global_basis.z
 		if enemy_forward.dot(to_player) > -0.25:
 			continue
 		best = enemy
@@ -85,8 +85,8 @@ func start() -> bool:
 			enemy.set_physics_process(false)
 	start_transform = return_camera.global_transform
 	target_focus = target.global_position + Vector3(0, 0.85, 0)
-	var midpoint := (player.global_position + target.global_position) * 0.5
-	var end_position := midpoint + Vector3(0, 2.0, 0) + player.global_basis.x * 1.7 + player.global_basis.z * 2.7
+	var midpoint: Vector3 = (player.global_position + target.global_position) * 0.5
+	var end_position: Vector3 = midpoint + Vector3(0, 2.0, 0) + player.global_basis.x * 1.7 + player.global_basis.z * 2.7
 	var end_basis := Basis.looking_at(target_focus - end_position, Vector3.UP)
 	finish_transform = Transform3D(end_basis, end_position)
 	cinematic_camera.global_transform = start_transform
