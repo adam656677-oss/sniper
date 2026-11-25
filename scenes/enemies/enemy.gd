@@ -9,6 +9,7 @@ const HitZones = preload("res://scenes/targets/hit_zones.gd")
 enum State { PATROL, SUSPICIOUS, INVESTIGATE, ALERT, SEARCH, FLEE, DEAD }
 
 signal died(enemy: Enemy)
+signal hit_received(enemy: Enemy, shape_index: int, damage: float)
 signal state_changed(enemy: Enemy, state: int)
 signal fired_at_player(enemy: Enemy, hit: bool)
 
@@ -98,6 +99,7 @@ func take_hit(shape_index: int, damage: float) -> float:
 		return 0.0
 	var dealt: float = maxf(damage, 0.0) * HitZones.multiplier(HitZones.zone_for_shape(self, shape_index))
 	health = maxf(0.0, health - dealt)
+	hit_received.emit(self, shape_index, dealt)
 	if health == 0.0:
 		die()
 	elif state != State.ALERT and state != State.FLEE:
