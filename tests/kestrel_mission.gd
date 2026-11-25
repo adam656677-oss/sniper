@@ -26,6 +26,7 @@ func run_tests() -> void:
 	var level = game.level
 	check(level.enemies.size() == 9 and level.find_enemy("Commander") != null, "Eight guards and a named commander are registered")
 	check(level.spawn_point == Vector3(0, 1, 170), "Insertion begins in the south gully")
+	check(level.get_node_or_null("CulvertRoof") != null and level.get_node_or_null("NorthGateTruck") != null, "Depot has a traversable culvert route and north gate truck cover")
 	check(level.mission_log.status("commander") == MissionLog.Status.ACTIVE, "Commander is the first primary objective")
 	check(level.mission_log.status("ledger") == MissionLog.Status.HIDDEN and level.mission_log.status("exfil") == MissionLog.Status.HIDDEN, "Ledger and exfil unlock in campaign order")
 	check(level.exfil_zone != null and not level.exfil_zone.enabled, "North saddle extraction stays locked until the ledger is recovered")
