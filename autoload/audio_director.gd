@@ -36,7 +36,7 @@ func play_event(event_name: String, world_position: Vector3, volume_db: float = 
 		return false
 	_prune_voices()
 	if _voices.size() >= MAX_ACTIVE_VOICES:
-		var oldest := _voices.pop_front()
+		var oldest: AudioStreamPlayer3D = _voices.pop_front()
 		if is_instance_valid(oldest):
 			oldest.stop()
 			oldest.queue_free()
