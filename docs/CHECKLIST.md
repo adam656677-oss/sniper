@@ -41,7 +41,7 @@ Design reference: `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`. Curr
 - [x] 1.8 Bullet time / kill cam for shots over a distance threshold, skippable, optional in settings. Verify: playtest; test that it triggers only above threshold.
 - [~] 1.9 (tracers, dust puffs, capped bullet holes and a hit marker done; ricochet sound and blood toggle need audio and art) Impact feedback: tracer on long shots, dust and blood decals (toggle), ricochet sound, hit marker. Verify: playtest.
 - [x] 1.10 Sidearm: suppressed pistol with hitscan, for close range. Shotguns removed or kept as a mission-specific pickup. Verify: weapons test updated.
-- [~] 1.11 Weapon animation: procedural idle/aim sway, recoil, firing cycle and staged reload pose now animate the magazine release/drop, weapon dip, magazine seating and slide release; authored idle, aim in/out, bolt cycle, sprint, hand animation and production clips remain. Verify: Windows playtest; test animation timing and required authored clips.
+- [~] 1.11 Weapon animation: procedural idle/aim sway, recoil, firing cycle and staged reload pose now include a separate tumbling magazine prop, weapon dip, magazine seating and slide release; authored idle, aim in/out, bolt cycle, sprint, hand animation and production clips remain. Verify: Windows playtest; test animation timing and required authored clips.
 - [~] 1.12 (recoil kick and recovery, head bob off when aiming or with reduced motion; sprint FOV and landing dip pending sprint) Camera: head bob, recoil kick and recovery, FOV change on sprint, landing dip. Verify: playtest.
 - [x] 1.13 Target range level: a 1000 m shooting range with distance markers, steel plates that ring and fall, wind variation. This is the tuning playground. Verify: playtest.
 

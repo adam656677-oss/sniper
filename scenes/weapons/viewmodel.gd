@@ -11,6 +11,7 @@ const POLYMER := Color(0.055, 0.06, 0.055)
 const RUBBER := Color(0.025, 0.03, 0.028)
 const CLOTH := Color(0.12, 0.14, 0.13)
 const MAX_CASINGS := 8
+const MAX_DROPPED_MAGAZINES := 2
 
 var weapon: Variant
 var model_root: Node3D
@@ -27,6 +28,9 @@ var slide_remaining := 0.0
 var switch_remaining := 0.0
 var reload_duration := 2.0
 var casings: Array[Dictionary] = []
+var dropped_magazines: Array[Dictionary] = []
+var magazine_ejected_for_reload := false
+var reload_was_active := false
 var base_position := Vector3(0.25, -0.22, -0.48)
 var aim_position := Vector3(0.04, -0.16, -0.40)
 
@@ -145,6 +149,9 @@ func _build_model(profile: WeaponProfile) -> void:
 	if model_root:
 		model_root.queue_free()
 	casings.clear()
+	_clear_dropped_magazines()
+	magazine_ejected_for_reload = false
+	reload_was_active = false
 	slide = null
 	magazine = null
 	muzzle_flash = null
@@ -255,6 +262,7 @@ func advance(delta: float, aiming: bool, reload_remaining: float, move_speed: fl
 		return
 	clock += delta
 	_advance_casings(delta)
+	_advance_dropped_magazines(delta)
 	if weapon.profile() != active_profile:
 		set_profile(weapon.profile())
 	recoil = move_toward(recoil, 0.0, delta * 1.9)
@@ -277,8 +285,17 @@ func advance(delta: float, aiming: bool, reload_remaining: float, move_speed: fl
 	target.y += sway_y - bob
 	target.z += recoil * 0.55
 	var reload_progress := 0.0
-	if reload_remaining > 0.0:
+	var reload_active := reload_remaining > 0.0
+	if reload_active:
 		reload_progress = clampf(1.0 - reload_remaining / reload_duration, 0.0, 1.0)
+	if reload_active and not reload_was_active:
+		magazine_ejected_for_reload = false
+	if reload_active and reload_progress >= 0.24 and not magazine_ejected_for_reload:
+		_spawn_dropped_magazine()
+		magazine_ejected_for_reload = true
+	if not reload_active and reload_was_active:
+		magazine_ejected_for_reload = false
+	reload_was_active = reload_active
 	var reload_dip := _smooth_range(reload_progress, 0.0, 0.20) * (1.0 - _smooth_range(reload_progress, 0.78, 1.0))
 	var magazine_drop := _smooth_range(reload_progress, 0.04, 0.25) * (1.0 - _smooth_range(reload_progress, 0.58, 0.84))
 	var slide_release := _smooth_range(reload_progress, 0.84, 0.94) * (1.0 - _smooth_range(reload_progress, 0.95, 0.995))
@@ -293,9 +310,59 @@ func advance(delta: float, aiming: bool, reload_remaining: float, move_speed: fl
 	if magazine:
 		magazine.position.y = -0.16 - 0.34 * magazine_drop
 		magazine.rotation.x = 0.16 * magazine_drop
+		magazine.visible = not magazine_ejected_for_reload or reload_progress >= 0.84
 	if slide:
 		slide.position.z = -0.025 if slide_remaining > 0.0 else -0.04 * slide_release
 
 func _smooth_range(value: float, start: float, finish: float) -> float:
 	var amount := clampf((value - start) / maxf(finish - start, 0.0001), 0.0, 1.0)
 	return amount * amount * (3.0 - 2.0 * amount)
+
+
+func _spawn_dropped_magazine() -> void:
+	if not magazine or not model_root or not magazine.visible:
+		return
+	var dropped := magazine.duplicate(true) as Node3D
+	dropped.name = "DroppedMagazine"
+	model_root.add_child(dropped)
+	dropped.transform = model_root.global_transform.affine_inverse() * magazine.global_transform
+	dropped_magazines.append({
+		"node": dropped,
+		"velocity": Vector3(randf_range(0.18, 0.42), randf_range(0.15, 0.32), randf_range(0.12, 0.30)),
+		"spin": Vector3(randf_range(-5.0, 5.0), randf_range(-7.0, 7.0), randf_range(-5.0, 5.0)),
+		"age": 0.0
+	})
+	while dropped_magazines.size() > MAX_DROPPED_MAGAZINES:
+		var oldest: Dictionary = dropped_magazines.pop_front()
+		if is_instance_valid(oldest.node):
+			oldest.node.queue_free()
+
+
+func _advance_dropped_magazines(delta: float) -> void:
+	for index in range(dropped_magazines.size() - 1, -1, -1):
+		var item: Dictionary = dropped_magazines[index]
+		var node: Node3D = item.node
+		if not is_instance_valid(node):
+			dropped_magazines.remove_at(index)
+			continue
+		var velocity: Vector3 = item.velocity
+		velocity.y -= 2.4 * delta
+		node.position += velocity * delta
+		var spin: Vector3 = item.spin
+		node.rotate_object_local(Vector3.RIGHT, spin.x * delta)
+		node.rotate_object_local(Vector3.UP, spin.y * delta)
+		node.rotate_object_local(Vector3.FORWARD, spin.z * delta)
+		item.velocity = velocity
+		item.age = float(item.age) + delta
+		if float(item.age) >= 1.35:
+			node.queue_free()
+			dropped_magazines.remove_at(index)
+		else:
+			dropped_magazines[index] = item
+
+
+func _clear_dropped_magazines() -> void:
+	for item in dropped_magazines:
+		if is_instance_valid(item.node):
+			item.node.queue_free()
+	dropped_magazines.clear()

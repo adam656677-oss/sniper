@@ -39,8 +39,12 @@ func run_tests() -> void:
 	check(viewmodel.magazine.position.y < -0.16, "Reload state animates the magazine and weapon position")
 	viewmodel.advance(0.016, false, viewmodel.reload_duration * 0.40, 0.0)
 	check(viewmodel.magazine.position.y < -0.45 and viewmodel.weapon_root.rotation.x < -0.05, "Mid-reload pose holds the magazine low and dips the weapon")
+	check(viewmodel.dropped_magazines.size() == 1 and not viewmodel.magazine.visible, "Reload ejects a separate magazine prop from the weapon")
 	viewmodel.advance(0.016, false, viewmodel.reload_duration * 0.03, 0.0)
 	check(absf(viewmodel.magazine.position.y + 0.16) < 0.01 and absf(viewmodel.weapon_root.rotation.x) < 0.01, "Late-reload pose seats the magazine and settles the weapon")
+	check(viewmodel.magazine.visible and viewmodel.dropped_magazines.size() == 1, "Fresh magazine returns while the dropped magazine remains visible")
+	viewmodel.advance(1.40, false, 0.0, 0.0)
+	check(viewmodel.dropped_magazines.is_empty(), "Dropped magazine effect cleans itself up after its short fall")
 	game.queue_free()
 	await process_frame
 	if failures == 0:
