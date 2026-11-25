@@ -16,10 +16,10 @@ func run_tests() -> void:
 	var game = load("res://compound_mission.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
-	var takedown: TakedownController = game.takedown
-	var player: Player = game.player
-	var level: LevelBase = game.level
-	var enemy: Enemy = level.enemies[0]
+	var takedown = game.takedown
+	var player = game.player
+	var level = game.level
+	var enemy = level.enemies[0]
 	enemy.global_position = Vector3(0, 1, 0)
 	enemy.look_at(Vector3(0, 1, -10), Vector3.UP)
 	player.global_position = Vector3(0, 1, 2)
@@ -34,7 +34,7 @@ func run_tests() -> void:
 	check(not takedown.active and game.camera.current and game.get_node("HUDLayer").visible, "Camera, HUD and simulation return after the cinematic")
 	check(player.is_physics_processing() and level.is_physics_processing(), "Player and level processing are restored")
 
-	var front_enemy: Enemy = level.enemies[0]
+	var front_enemy = level.enemies[0]
 	front_enemy.global_position = Vector3(0, 1, 0)
 	front_enemy.look_at(Vector3(0, 1, -10), Vector3.UP)
 	player.global_position = Vector3(0, 1, -2)
