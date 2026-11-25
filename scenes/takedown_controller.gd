@@ -11,13 +11,13 @@ const FINISH_SECONDS := 1.25
 const KILL_AT_SECONDS := 0.58
 
 var mission: Node
-var player: Player
-var level: LevelBase
+var player: Variant
+var level: Variant
 var return_camera: Camera3D
 var cinematic_camera: Camera3D
 var hud_layer: CanvasLayer
-var viewmodel: WeaponViewmodel
-var target: Enemy
+var viewmodel: Variant
+var target: Variant
 var active := false
 var elapsed := 0.0
 var kill_applied := false
@@ -41,14 +41,14 @@ func bind(owner: Node) -> void:
 	cinematic_camera.current = false
 	add_child(cinematic_camera)
 
-func candidate() -> Enemy:
+func candidate() -> Variant:
 	if not player or not level or player.carrying:
 		return null
-	var best: Enemy
+	var best: Variant = null
 	var best_distance := MAX_RANGE
 	for item in level.enemies:
-		var enemy := item as Enemy
-		if enemy == null or not enemy.is_alive() or enemy.state == Enemy.State.ALERT or enemy.state == Enemy.State.FLEE:
+		var enemy = item
+		if enemy == null or not enemy.is_alive() or enemy.state == 3 or enemy.state == 5:
 			continue
 		var distance := player.global_position.distance_to(enemy.global_position)
 		if distance > best_distance:
@@ -126,7 +126,7 @@ func finish() -> void:
 	if level and is_instance_valid(level):
 		level.set_physics_process(level_was_processing)
 	for entry in enemy_processing:
-		var enemy: Enemy = entry.enemy
+		var enemy = entry.enemy
 		if is_instance_valid(enemy):
 			enemy.set_physics_process(bool(entry.enabled))
 	enemy_processing.clear()
