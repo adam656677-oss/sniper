@@ -1,5 +1,7 @@
 extends Node3D
 
+const TakedownControllerScript = preload("res://scenes/takedown_controller.gd")
+
 # Mission root: wires the level, player, weapon rig and HUD together and
 # routes input to the right system. Simulation state lives in GameState.
 
@@ -19,6 +21,7 @@ var measured_range := -1.0
 var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
 var camera: Camera3D
+var takedown: Variant
 
 func _ready() -> void:
 	GameState.reset()
@@ -29,6 +32,10 @@ func _ready() -> void:
 	player.position = level.spawn_point
 	weapon.camera = camera
 	viewmodel.bind_weapon(weapon)
+	takedown = TakedownControllerScript.new()
+	takedown.name = "TakedownController"
+	add_child(takedown)
+	takedown.bind(self)
 	weapon.excluded = [player.get_rid()]
 	scope_view.source = camera
 	weapon.body_hit.connect(level.on_body_hit)
@@ -157,6 +164,10 @@ func check_outcome() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
 		return
+	if takedown and takedown.active:
+		if event.is_action_pressed("pause"):
+			takedown.cancel()
+		return
 	if event.is_action_pressed("restart"):
 		get_tree().reload_current_scene()
 		return
@@ -172,6 +183,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			GameState.set_paused(not GameState.paused)
 		return
 	if not GameState.simulation_active():
+		return
+	if event.is_action_pressed("takedown"):
+		takedown.start()
 		return
 	if event.is_action_pressed("reload"):
 		weapon.begin_reload()
@@ -223,7 +237,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				weapon.toggle_aim()
 
-const CONTROLS_HELP := "Left click fire | Right click aim | Wheel zoom | Shift hold breath | [ ] zero\nB binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact\n1 rifle | 2–4 handguns | F5 quick save | F9 quick load | Escape pause | N restart"
+const CONTROLS_HELP := "Left click fire | Right click aim | Wheel zoom | Shift hold breath | [ ] zero\nB binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact\n1 rifle | 2–4 handguns | F silent takedown (behind, close) | F5 quick save | F9 quick load | Escape pause | N restart"
 
 static func signed_text(value: float) -> String:
 	return "%.1f" % (0.0 if absf(value) < 0.05 else value)
@@ -299,6 +313,9 @@ func update_crosshair() -> void:
 		crosshair.modulate = Color(1, 1, 1)
 
 func _physics_process(delta: float) -> void:
+	if takedown and takedown.active:
+		takedown.advance(delta)
+		return
 	if GameState.simulation_active():
 		feedback.advance(delta, Vector2(player.velocity.x, player.velocity.z).length(), is_aiming(), Settings.reduced_motion())
 	feedback.draw_tracers(weapon.projectiles)
