@@ -3,6 +3,7 @@ extends SceneTree
 const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
 
 var failures := 0
+var state: Node
 
 func check(value: bool, label: String) -> void:
 	if value:
@@ -17,6 +18,7 @@ func _initialize() -> void:
 func run_tests() -> void:
 	var packed = load("res://kestrel_mission.tscn")
 	check(packed is PackedScene, "Kestrel Pass mission scene loads")
+	state = root.get_node("GameState")
 	var game = packed.instantiate()
 	root.add_child(game)
 	await process_frame
@@ -39,7 +41,7 @@ func run_tests() -> void:
 	level.exfil_zone.check(level.gate_point)
 	check(level.mission_log.status("exfil") == MissionLog.Status.COMPLETE, "Entering the north saddle completes the final objective")
 	game.check_outcome()
-	check(GameState.finished and not GameState.failed, "Completing the campaign objectives finishes the mission")
+	check(state.finished and not state.failed, "Completing the campaign objectives finishes the mission")
 	game.queue_free()
 	await process_frame
 	if failures == 0:
