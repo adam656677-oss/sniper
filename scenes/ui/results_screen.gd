@@ -6,15 +6,26 @@ extends Control
 var mission: Node
 var text: Label
 var panel: VBoxContainer
+const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
 
 func _ready() -> void:
 	mission = owner
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ThemeKit.apply(self)
+	var overlay := ColorRect.new()
+	overlay.color = Color(0.008, 0.014, 0.014, 0.84)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(overlay)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(560, 0)
+	center.add_child(card)
 	panel = VBoxContainer.new()
-	center.add_child(panel)
+	panel.add_theme_constant_override("separation", 14)
+	card.add_child(panel)
 	text = Label.new()
 	panel.add_child(text)
 	button("Retry", func(): get_tree().reload_current_scene())
@@ -24,6 +35,7 @@ func _ready() -> void:
 func button(label: String, callback: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
+	b.custom_minimum_size = Vector2(500, 42)
 	b.pressed.connect(callback)
 	panel.add_child(b)
 	return b

@@ -87,4 +87,4 @@ Runs the editor import and every headless suite in `tests/`. Set `GODOT` to the 
 
 ## Limitations
 
-This is a prototype, not a finished game. Hostiles are box figures without animation. There are no models, animations or sounds, and the menus are unstyled. See `docs/CHECKLIST.md` for the full plan.
+This is a prototype, not a finished game. Hostiles are box figures without animation. The title screen and mission shell now use a shared dark tactical theme and procedural shader backdrop, but the game still needs production character and weapon models, authored animations, sound, finished terrain and a full visual playtest. See `docs/CHECKLIST.md` for the full plan.

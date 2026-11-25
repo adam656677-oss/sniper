@@ -4,6 +4,8 @@ extends Control
 # scene_changer is swapped by tests so no scene change happens headlessly.
 
 const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
+const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
+const BackdropShader = preload("res://scenes/ui/menu_backdrop.gdshader")
 
 enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS }
 
@@ -22,16 +24,41 @@ func _ready() -> void:
 	scene_changer = func(path: String): get_tree().change_scene_to_file(path)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ThemeKit.apply(self)
+	var backdrop := ColorRect.new()
+	backdrop.name = "TacticalBackdrop"
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var backdrop_material := ShaderMaterial.new()
+	backdrop_material.shader = BackdropShader
+	backdrop.material = backdrop_material
+	add_child(backdrop)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(460, 0)
+	center.add_child(panel)
 	var column := VBoxContainer.new()
-	center.add_child(column)
+	column.add_theme_constant_override("separation", 12)
+	panel.add_child(column)
 	home = VBoxContainer.new()
+	home.alignment = BoxContainer.ALIGNMENT_CENTER
+	home.add_theme_constant_override("separation", 12)
 	column.add_child(home)
 	var title := Label.new()
 	title.text = "ECHO RIDGE"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 44)
+	title.add_theme_color_override("font_color", Color(0.93, 0.90, 0.82))
+	title.add_theme_constant_override("outline_size", 3)
 	home.add_child(title)
+	var subtitle := Label.new()
+	subtitle.text = tr("FIELD OPERATIONS  //  SINGLE-PLAYER CAMPAIGN")
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.add_theme_font_size_override("font_size", 11)
+	subtitle.add_theme_color_override("font_color", Color(0.72, 0.58, 0.37))
+	home.add_child(subtitle)
 	continue_button = button(home, "Continue", continue_checkpoint)
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
@@ -39,6 +66,8 @@ func _ready() -> void:
 	button(home, "Settings", func(): show_screen(Screen.SETTINGS))
 	button(home, "Quit", func(): get_tree().quit())
 	status = Label.new()
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status.add_theme_font_size_override("font_size", 12)
 	home.add_child(status)
 	var version := Label.new()
 	version.text = build_label()
@@ -54,6 +83,9 @@ func _ready() -> void:
 		button(missions, tr(String(mission.title)), func(): start_mission(i))
 		var brief := Label.new()
 		brief.text = tr(String(mission.brief))
+		brief.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		brief.custom_minimum_size = Vector2(340, 0)
+		brief.add_theme_font_size_override("font_size", 12)
 		missions.add_child(brief)
 	button(missions, "Back", func(): show_screen(Screen.HOME))
 	settings_screen = SettingsScreen.new()
@@ -80,6 +112,8 @@ static func build_label() -> String:
 func button(parent: Node, text: String, callback: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
+	b.custom_minimum_size = Vector2(340, 42)
+	b.focus_mode = Control.FOCUS_ALL
 	b.pressed.connect(callback)
 	parent.add_child(b)
 	return b
