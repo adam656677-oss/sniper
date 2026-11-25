@@ -22,7 +22,7 @@ The scene includes two raised approach areas with access ramps, a walled depot, 
 
 ## Current limitations
 
-This is a compact graybox/visual blockout, not the final 1 km² mountain environment. The ridge and pine shelf are raised simple meshes, not sculpted terrain; trees, buildings and tanks are procedural placeholders. The culvert route, detailed tower scans, truck animation, radio junction-box destruction, fully dressed office interior, authored cinematics, ambient/weapon audio and final landscape art remain outstanding. The radio mast is disabled through close interaction in this slice, not by shooting its junction box.
+This is a compact graybox/visual blockout, not the final 1 km² mountain environment. The ridge and pine shelf are raised simple meshes, not sculpted terrain; trees, buildings and tanks are procedural placeholders. The culvert route and abandoned north-gate truck are present as static blockout geometry. Detailed terrain, truck animation, radio junction-box destruction, a fully dressed office interior, authored cinematics, ambient/weapon audio and final landscape art remain outstanding. The radio mast is disabled through close interaction in this slice, not by shooting its junction box.
 
 The commander and guards use the procedural humanoid placeholder rig from the enemy-character pass.
 
