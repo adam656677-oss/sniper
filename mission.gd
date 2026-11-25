@@ -183,6 +183,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		weapon.select_weapon(1)
 	elif event.is_action_pressed("weapon_3"):
 		weapon.select_weapon(2)
+	elif event.is_action_pressed("weapon_4"):
+		weapon.select_weapon(3)
 	elif event.is_action_pressed("crouch"):
 		player.toggle_stance(Player.Stance.CROUCH)
 	elif event.is_action_pressed("prone"):
