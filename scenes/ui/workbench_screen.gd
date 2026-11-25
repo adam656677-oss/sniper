@@ -5,7 +5,7 @@ extends VBoxContainer
 
 signal closed
 
-const FAMILIES := [["recon", "Ridgeline recon rifle"], ["sidearm", "Whisper sidearm"]]
+const FAMILIES := [["recon", "Ridgeline recon rifle"], ["sidearm", "Handguns (all pistols)"]]
 
 var selectors: Dictionary = {} # family -> {slot: OptionButton}
 var summary: Label
