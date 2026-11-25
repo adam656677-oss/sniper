@@ -8,7 +8,9 @@ extends Node
 const Ballistics = preload("res://ballistics.gd")
 const DEFAULT_PROFILES := [
 	"res://scenes/weapons/profiles/ridgeline_recon.tres",
-	"res://scenes/weapons/profiles/whisper_sidearm.tres"
+	"res://scenes/weapons/profiles/whisper_sidearm.tres",
+	"res://scenes/weapons/profiles/sentinel_service.tres",
+	"res://scenes/weapons/profiles/ironclad_heavy.tres"
 ]
 const ZERO_STEP := 100.0
 const ZERO_MIN := 100.0
