@@ -1,0 +1,74 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/kestrel_pass.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="2"]
+
+[sub_resource type="BoxMesh" id="ground_mesh"]
+size = Vector3(400, 1, 400)
+
+[sub_resource type="BoxShape3D" id="ground_shape"]
+size = Vector3(400, 1, 400)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.22, 0.25, 0.20, 1)
+roughness = 0.98
+
+[node name="KestrelPass" type="Node3D"]
+script = ExtResource("1")
+spawn_point = Vector3(0, 1, 170)
+wind = Vector3(2.8, 0, 1.2)
+time_of_day = 0
+weather = 1
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-38, -28, 0)
+light_energy = 1.25
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("ground_mesh")
+material_override = SubResource("ground_mat")
+
+[node name="Collision" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("ground_shape")
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Guard1" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(-42, 1, -45)
+patrol_points = PackedVector3Array(-42, 1, -45, -42, 1, -92)
+
+[node name="Guard2" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(42, 1, -48)
+patrol_points = PackedVector3Array(42, 1, -48, 42, 1, -96)
+
+[node name="Guard3" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(-5, 1, -110)
+patrol_points = PackedVector3Array(-5, 1, -110, -35, 1, -112)
+
+[node name="Guard4" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(26, 1, -28)
+patrol_points = PackedVector3Array(26, 1, -28, 42, 1, -18)
+
+[node name="Guard5" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(-58, 1, -82)
+patrol_points = PackedVector3Array(-58, 1, -82, -42, 1, -112)
+
+[node name="Guard6" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(62, 1, -92)
+patrol_points = PackedVector3Array(62, 1, -92, 72, 1, -112)
+
+[node name="Guard7" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(-18, 1, -145)
+patrol_points = PackedVector3Array(-18, 1, -145, -42, 1, -158)
+
+[node name="Guard8" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(22, 1, -150)
+patrol_points = PackedVector3Array(22, 1, -150, 48, 1, -158)
+
+[node name="Commander" parent="Enemies" instance=ExtResource("2")]
+position = Vector3(0, 1, -64)
+patrol_points = PackedVector3Array(0, 1, -64, 25, 1, -84, -10, 1, -72)
