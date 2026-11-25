@@ -26,6 +26,7 @@ func run_tests() -> void:
 	enemy.change_state(3)
 	visual._process(0.2)
 	check(visual.held_weapon.visible and visual.left_arm.rotation.x < 0.0, "Alert state raises the weapon into a combat-ready pose")
+	visual.clock = 0.0 # Keep the procedural stride assertion deterministic across headless frame timing.
 	enemy.velocity = Vector3(1, 0, 0)
 	visual._process(0.1)
 	check(absf(visual.left_leg.rotation.x) > 0.1, "Movement drives a procedural walking cycle")
