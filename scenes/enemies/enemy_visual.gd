@@ -26,11 +26,29 @@ var left_calf: Node3D
 var right_calf: Node3D
 var held_weapon: Node3D
 var collapsed := false
+var hit_reaction_time := 0.0
+var hit_reaction_duration := 0.34
+var hit_reaction_strength := 0.0
+var hit_reaction_side := 1.0
 
 func _ready() -> void:
 	enemy = get_parent()
+	if enemy.has_signal("hit_received"):
+		enemy.hit_received.connect(_on_hit_received)
 	_hide_blockout_meshes()
 	_build_humanoid()
+
+
+func _on_hit_received(_source: Node, _shape_index: int, damage: float) -> void:
+	hit_reaction_time = hit_reaction_duration
+	hit_reaction_strength = clampf(damage / 60.0, 0.2, 1.0)
+	var target: Node3D = enemy.player() as Node3D
+	if target:
+		var incoming: Vector3 = enemy.global_position - target.global_position
+		incoming.y = 0.0
+		if incoming.length() > 0.01:
+			var local_direction: Vector3 = enemy.global_basis.inverse() * incoming.normalized()
+			hit_reaction_side = 1.0 if local_direction.x >= 0.0 else -1.0
 
 func _hide_blockout_meshes() -> void:
 	if not enemy:
@@ -159,6 +177,9 @@ func _process(delta: float) -> void:
 	if not enemy or not is_instance_valid(enemy):
 		return
 	clock += delta
+	hit_reaction_time = maxf(0.0, hit_reaction_time - delta)
+	var hit_blend := clampf(hit_reaction_time / hit_reaction_duration, 0.0, 1.0)
+	hit_blend = hit_blend * hit_blend * (3.0 - 2.0 * hit_blend)
 	var dead: bool = int(enemy.state) == 6
 	var moving: bool = Vector2(enemy.velocity.x, enemy.velocity.z).length() > 0.25 and not dead
 	var stride := sin(clock * 8.0) * (0.55 if moving else 0.025)
@@ -173,7 +194,12 @@ func _process(delta: float) -> void:
 	left_forearm.rotation.x = lerpf(left_forearm.rotation.x, -0.55 if aiming else 0.0, blend)
 	right_forearm.rotation.x = lerpf(right_forearm.rotation.x, -0.55 if aiming else 0.0, blend)
 	torso.position.y = lerpf(torso.position.y, 0.37 + (absf(sin(clock * 8.0)) * 0.025 if moving else sin(clock * 1.8) * 0.006), blend)
+	torso.rotation.x = -0.18 * hit_reaction_strength * hit_blend
+	torso.rotation.z = -0.13 * hit_reaction_side * hit_reaction_strength * hit_blend
 	head.rotation.y = lerpf(head.rotation.y, sin(clock * 0.75) * 0.035 if not aiming else 0.0, blend)
+	head.rotation.z = 0.08 * hit_reaction_side * hit_reaction_strength * hit_blend
+	left_arm.rotation.z = 0.12 * hit_reaction_side * hit_reaction_strength * hit_blend
+	right_arm.rotation.z = 0.12 * hit_reaction_side * hit_reaction_strength * hit_blend
 	held_weapon.visible = aiming or enemy.state == 4
 	if dead:
 		rotation.z = lerpf(rotation.z, 1.25, blend)
