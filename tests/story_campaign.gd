@@ -36,6 +36,7 @@ func run_tests() -> void:
 		await process_frame
 		check(home.player != null and home.camera != null, "Playable prologue creates a first-person player and camera")
 		check(home.interactables.size() == 4, "Playable prologue exposes three story discoveries and an exit")
+		check(home.attack_lights.size() == 2 and home.fade_rect != null, "Prologue builds exterior headlights and a cinematic fade")
 		check(home.interact_with("photo") and home.interact_with("lena") and home.interact_with("ledger"), "Player can inspect the photo, talk to Lena and recover her data key")
 		check(home.attack_started and story.has_evidence("black_ledger_fragment_00"), "Three discoveries trigger the home attack and recover ledger evidence")
 		story.set_flag("prologue_intro_seen", true)
