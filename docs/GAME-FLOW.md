@@ -2,7 +2,7 @@
 
 This document is the map of how the game is intended to work from launch to mission completion. The master production tracker is **[CHECKLIST.md](CHECKLIST.md)**; this file explains the systems and the paths between them.
 
-> **Status note (25 November 2026):** The diagrams describe the current architecture and intended finished-game flow. Some systems are already implemented, some are procedural foundations, and some remain roadmap work. A diagram is not proof that a feature is complete. Use the checklist's `[x]` / `[~]` / `[ ]` status and each item's verification requirement as the source of truth.
+> **Status note (26 November 2026):** The diagrams describe the current architecture and intended finished-game flow. Some systems are already implemented, some are procedural foundations, and some remain roadmap work. A diagram is not proof that a feature is complete. Use the checklist's `[x]` / `[~]` / `[ ]` status and each item's verification requirement as the source of truth.
 
 ## 1. Whole-game flow
 
@@ -49,6 +49,8 @@ flowchart TB
       LOADOUT["Loadout<br/>weapon parts and configurations"]
       PROG["Progression<br/>records, unlocks, achievements"]
       AUDIO["AudioDirector<br/>positional gameplay sound events"]
+      STORY["StoryCampaign<br/>chapter state, evidence, dialogue flags"]
+      DIALOGUE["StoryDialogue<br/>subtitles and radio overlay"]
     end
 
     subgraph MISSION["Mission scene — mission.gd"]
@@ -72,6 +74,9 @@ flowchart TB
     SAVE <--> MISSION
     LOADOUT --> WEAPON
     PROG <--> MISSION
+    STORY <--> MENU
+    STORY <--> MISSION
+    STORY --> DIALOGUE
     AUDIO <--> PLAYER
     AUDIO <--> WEAPON
     AUDIO <--> ENEMY
@@ -102,6 +107,8 @@ flowchart TB
 | `Loadout` | Installed weapon parts and per-weapon configurations |
 | `Progression` | Mission records, best score/time/shot distance, unlocks and achievements |
 | `AudioDirector` | Positional gameplay sound events and SFX preference handling |
+| `StoryCampaign` | Saved story chapter, unlocks, evidence, seen dialogue, flags and ending decision |
+| `StoryDialogue` | Shared subtitle/radio overlay that presents lines requested by the story campaign |
 
 ### Mission scene ownership
 
@@ -262,3 +269,41 @@ The authoritative task list is **[CHECKLIST.md](CHECKLIST.md)**.
 - Each phase has an exit gate. Do not call the game complete until the release exit gate in the master checklist is satisfied.
 
 For validation commands, test coverage and playtest recording, see [VALIDATION.md](VALIDATION.md). For the full production sequence and outstanding work, see [CHECKLIST.md](CHECKLIST.md).
+
+## 9. Story mode flow — prologue to campaign progression
+
+```mermaid
+flowchart TD
+    MENU[Main menu] --> NEW[New Story]
+    MENU --> CONTINUE[Continue Story]
+    NEW --> RESET[StoryCampaign creates a fresh campaign save]
+    RESET --> PROLOGUE[The Last Quiet Night prologue]
+    CONTINUE --> ROUTE[Resolve active chapter from campaign save]
+    ROUTE --> PROLOGUE
+    ROUTE --> KESTREL[Kestrel Pass]
+    ROUTE --> ECHO[Echo Ridge recon]
+    ROUTE --> COMPOUND[The Compound]
+    PROLOGUE --> BEATS[Skippable narrative beats and saved position]
+    BEATS --> COMPLETE_PROLOGUE[Complete prologue]
+    COMPLETE_PROLOGUE --> KESTREL
+    KESTREL --> RADIO[StoryDialogue radio/subtitle beats]
+    RADIO --> OBJECTIVES[Mission objectives and player choices]
+    OBJECTIVES --> EVIDENCE[Recover Black Ledger fragments]
+    EVIDENCE --> DOSSIER[Evidence dossier]
+    DOSSIER --> RESULT[Results screen records chapter completion]
+    RESULT --> UNLOCK[StoryCampaign unlocks next chapter]
+    UNLOCK --> CONTINUE_RESULT[Continue Story]
+    CONTINUE_RESULT --> ECHO
+    ECHO --> RESULT
+    COMPOUND --> RESULT
+    UNLOCK --> FUTURE[Later chapters remain locked / in development until playable]
+```
+
+### Story ownership and save boundaries
+
+- `StoryCampaign` owns narrative progress and saves to `user://campaign/story.json`. It is separate from `SaveSystem` mission checkpoints and `Progression` score records.
+- `StoryDialogue` is a presentation layer. It receives speaker/line events; it does not decide whether a chapter or evidence item is unlocked.
+- Mission objective events can request one-time dialogue and add evidence. Replayed scenes do not repeat already-seen one-time story lines.
+- The prologue stores its current beat so Continue Story resumes the sequence.
+- The current story path connects the prologue to Kestrel Pass, Echo Ridge recon and The Compound. Later campaign chapters are intentionally not selectable until their playable scenes exist.
+- The current prologue is a text-and-dialogue cinematic presentation. A fully playable 3D home/ambush sequence, authored cinematics, voice acting and the final boss/ending presentation remain production work.

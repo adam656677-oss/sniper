@@ -7,7 +7,7 @@ const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
 const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
 const BackdropShader = preload("res://scenes/ui/menu_backdrop.gdshader")
 
-enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS }
+enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS, EVIDENCE }
 
 var screen: int = Screen.HOME
 var scene_changer: Callable
@@ -17,7 +17,11 @@ var settings_screen: SettingsScreen
 var workbench: WorkbenchScreen
 var records: VBoxContainer
 var records_text: Label
+var evidence: VBoxContainer
+var evidence_text: Label
 var continue_button: Button
+var story_mode_button: Button
+var continue_story_button: Button
 var status: Label
 
 func _ready() -> void:
@@ -60,9 +64,12 @@ func _ready() -> void:
 	subtitle.add_theme_color_override("font_color", Color(0.72, 0.58, 0.37))
 	home.add_child(subtitle)
 	continue_button = button(home, "Continue", continue_checkpoint)
+	story_mode_button = button(home, tr("New Story"), start_story_mode)
+	continue_story_button = button(home, tr("Continue Story"), continue_story)
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
 	button(home, "Records", func(): show_screen(Screen.RECORDS))
+	button(home, tr("Evidence"), func(): show_screen(Screen.EVIDENCE))
 	button(home, "Settings", func(): show_screen(Screen.SETTINGS))
 	button(home, "Quit", func(): get_tree().quit())
 	status = Label.new()
@@ -99,6 +106,13 @@ func _ready() -> void:
 	records_text = Label.new()
 	records.add_child(records_text)
 	button(records, "Back", func(): show_screen(Screen.HOME))
+	evidence = VBoxContainer.new()
+	column.add_child(evidence)
+	evidence_text = Label.new()
+	evidence_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	evidence_text.custom_minimum_size = Vector2(360, 180)
+	evidence.add_child(evidence_text)
+	button(evidence, "Back", func(): show_screen(Screen.HOME))
 	show_screen(Screen.HOME)
 
 # "v0.4.0 (abc1234)" when CI stamped a build, "v0.4.0 (dev)" otherwise.
@@ -125,11 +139,15 @@ func show_screen(value: int) -> void:
 	settings_screen.visible = screen == Screen.SETTINGS
 	workbench.visible = screen == Screen.WORKBENCH
 	records.visible = screen == Screen.RECORDS
+	evidence.visible = screen == Screen.EVIDENCE
 	if screen == Screen.RECORDS:
 		records_text.text = "\n".join(Progression.summary_lines())
+	if screen == Screen.EVIDENCE:
+		evidence_text.text = "\n".join(StoryCampaign.evidence_lines())
 	if screen == Screen.WORKBENCH:
 		workbench.load_into_controls()
 	continue_button.disabled = not SaveSystem.has_save(SaveSystem.CHECKPOINT_SLOT)
+	continue_story_button.disabled = not StoryCampaign.can_continue()
 	status.text = tr("Checkpoint available") if not continue_button.disabled else tr("No checkpoint yet")
 	if screen == Screen.SETTINGS:
 		settings_screen.load_into_controls()
@@ -149,3 +167,19 @@ func continue_checkpoint() -> String:
 	var scene: String = String(SaveSystem.pending.scene)
 	scene_changer.call(scene)
 	return scene
+
+func start_story_mode() -> String:
+	StoryCampaign.start_new_campaign()
+	continue_story_button.disabled = not StoryCampaign.can_continue()
+	var path := "res://scenes/ui/story_prologue.tscn"
+	scene_changer.call(path)
+	return path
+
+func continue_story() -> String:
+	var path := StoryCampaign.continue_scene_path()
+	if path.is_empty():
+		return ""
+	if StoryCampaign.active_chapter != "prologue":
+		StoryCampaign.begin_chapter(StoryCampaign.active_chapter)
+	scene_changer.call(path)
+	return path

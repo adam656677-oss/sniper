@@ -13,6 +13,8 @@ Settings="*res://autoload/settings.gd"
 SaveSystem="*res://autoload/save_system.gd"
 Loadout="*res://autoload/loadout.gd"
 Progression="*res://autoload/progression.gd"
+StoryCampaign="*res://autoload/story_campaign.gd"
+StoryDialogue="*res://autoload/story_dialogue.gd"
 AudioDirector="*res://autoload/audio_director.gd"
 
 [debug]

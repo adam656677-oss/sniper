@@ -31,14 +31,14 @@ These results confirm automated checks and a Windows runtime smoke test on the l
 - Kestrel Pass terrain shader and procedural ridge dressing foundations; the full 1 km² production terrain and authored environment kit remain outstanding.
 - Positional audio event foundation with procedural cues; recorded weapon layers, foley, ambience, voice performance and final mix remain outstanding.
 
-## Narrative direction
+## Story mode implementation (2026-11-26)\n\nThe first playable story-mode foundation is now in the development branch: persistent campaign save state, a skippable multi-beat prologue sequence, New Story / Continue Story menu actions, a reusable subtitle/radio overlay, mission-specific radio beats, unique evidence collection, a Black Ledger dossier screen, results-screen chapter feedback and chapter progression through the currently existing Kestrel Pass, Echo Ridge recon and Compound scenes. The prologue is currently a text-and-dialogue cinematic presentation, not yet a playable 3D home/ambush scene. The later missions, final boss and ending presentation remain planned.\n\n## Narrative direction
 
 The new campaign direction is documented in:
 - `docs/design/story-bible.md`: protagonist, tragedy, corporation, cast, campaign arc, finale and story-system production plan.
 - `docs/design/campaign-outline.md`: prologue and eight-mission campaign map.
 - `docs/design/mission-01-kestrel-pass.md`: current Kestrel Pass mission design, to be revised for the new story.
 
-The story is a narrative blueprint only. The prologue, cinematic sequences, dialogue/subtitles, evidence viewer, story flags, boss fight and ending choice are not yet implemented.
+The story is no longer only a document: the first campaign state, prologue presentation, dialogue/radio overlay and progression hooks are implemented in the story-mode foundation branch. The prologue is not yet a playable 3D sequence; the evidence dossier, remaining missions, fully implemented boss fight and ending presentation are still outstanding.
 
 ## Major remaining production gates
 
