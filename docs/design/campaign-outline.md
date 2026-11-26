@@ -1,39 +1,56 @@
 # Campaign outline
 
-Status: draft for checklist item 5.1. Fictional factions, places and names throughout. Each mission adds one mechanic so the campaign keeps teaching.
+Status: narrative direction defined in `docs/design/story-bible.md`; story integration and cinematic implementation remain production work. Fictional factions, locations and names throughout.
 
 ## Premise
 
-A contract marksman known only by call sign Echo is hired by a regional monitoring mission to document and, when ordered, stop the Varn Accord, a private security force running arms through the border passes. Briefings and radio come from the handler, Mara Quill, a former range officer who trusts Echo's eye more than her own satellites. The story is told through mission briefings, radio chatter during play and the ledger pages recovered along the way.
+In 2041, former special reconnaissance marksman Elias Vance (callsign Echo) has left his old life behind. His wife, Lena Vale, discovers that Asterion Continuity—a private-security and infrastructure corporation—is using its surveillance platform NIGHTGLASS to erase people who threaten its contracts. When an Asterion field team, the Varn Accord, attacks their home, Lena is killed, Elias is left gravely wounded, and the corporation frames him for the attack.
 
-## Missions
+Elias survives with fragments of Lena's Black Ledger, evidence that can expose the conspiracy. Guided by former range officer Mara Quill and underground systems broker Imani Rook, he follows the chain of command toward Asterion's director, Silas Vey. The campaign is a personal revenge thriller that grows into a fight over who controls the truth.
 
-| # | Name | Conditions | New mechanic | Status |
+## Campaign format
+
+A cinematic playable prologue/tutorial followed by eight main missions. The player can approach supported encounters through stealth, long-range engagements or direct action. The story remains coherent while dialogue, alert states, routes and mission results acknowledge player choices.
+
+| # | Name | Conditions | Story purpose / mechanic | Status |
 |---|---|---|---|---|
-| 0 | The Range | Clear noon | Tutorial: scope, rangefinder, zero, breath, holdover | Built |
-| 1 | Kestrel Pass | Clear dawn into windy day | Gusting crosswind, overwatch, mast sabotage | Designed (mission-01-kestrel-pass.md) |
-| 2 | Echo Ridge | Clear dawn | Intel recovery and extraction under time pressure | Prototype built as the recon mission |
-| 3 | The Compound | Windy dusk | Close stealth, body hiding, silent objectives | Prototype built |
-| 4 | Lowwater Bridge | Rain, dusk | Moving vehicle target on a timed convoy | Not started |
-| 5 | Glass Hollow | Night | Thermal scope, enemies with torches | Not started |
-| 6 | Saltmarsh Station | Dust storm, noon | Counter-sniper duel; visibility under 400 m | Not started |
-| 7 | Overwatch | Clear, noon to dusk | Protect a moving ally team from range | Not started |
-| 8 | High Cairn | Windy dawn, 1200 m | Longest shots of the game; the Accord's founder | Not started |
+| 0 | The Last Quiet Night | Quiet evening into night | Establish Elias and Lena, tutorial, home attack, escape and framing | Narrative design |
+| 1 | Kestrel Pass | Clear dawn into windy day | Track the raid team; overwatch, gusting crosswind and outpost infiltration | Mission blockout exists; story integration pending |
+| 2 | Echo Ridge | Clear dawn | Recover a Black Ledger shard and extract under surveillance pressure | Recon prototype exists; story integration pending |
+| 3 | The Compound | Windy dusk | Identify Commander Rusk; close stealth, body hiding and silent objectives | Prototype exists; story integration pending |
+| 4 | Lowwater Bridge | Rain, dusk | Intercept convoy and rescue a witness; moving vehicle target and timed objective | Not started |
+| 5 | Glass Hollow | Night | Expose NIGHTGLASS research; thermal optics, power control and smart-optic enemies | Not started |
+| 6 | Saltmarsh Station | Dust storm, noon | Survive Asterion's counter-sniper; decoys and changing sightlines | Not started |
+| 7 | Overwatch | Clear, noon to dusk | Protect Imani and defectors transmitting the ledger; ally protection | Not started |
+| 8 | High Cairn — The Last Contract | Stormy night | Disable Asterion's uplink, defeat Rusk and confront Vey; multi-phase boss and ending choice | Not started |
 
-## Progression
+## Principal characters and factions
 
-- Rifles and parts unlock through mission completion and achievements, and the workbench applies them.
-- The handler's radio comments react to how the previous mission went: ghost, loud, or failed objectives.
-- Each mission keeps its records and can be replayed from mission select with any unlocked loadout.
+- **Elias Vance / Echo:** former special reconnaissance marksman and protagonist.
+- **Lena Vale:** Elias's wife, engineer and whistleblower whose evidence drives the story.
+- **Mara Quill:** former range officer and handler; ally with a difficult secret.
+- **Imani Rook:** underground systems broker and ally.
+- **Commander Rusk:** field commander who led the raid.
+- **Silas Vey:** Asterion's director and final antagonist.
+- **Asterion Continuity:** corporation behind NIGHTGLASS.
+- **Varn Accord:** Asterion's private military arm.
+
+## Progression and narrative reactivity
+
+- Rifles and parts unlock through mission completion and achievements; the workbench applies them.
+- Radio dialogue reacts to previous mission outcomes: ghost, loud, optional objective complete, evidence recovered or ally endangered.
+- Evidence fragments build the Black Ledger chronology. Core plot facts are never hidden behind optional collectibles.
+- Mission results preserve stealth, accuracy, alarms, evidence and rescue outcomes.
+- The final evidence decision changes the epilogue, not whether the player gets the earned confrontation with Vey.
 
 ## Tone checks
 
-- The player chooses when to fire; the game never forces a shot on a non-combatant.
-- No real-world conflicts, units, brands or politicians.
-- Violence is shown through the scope and kill cam without gore beyond the optional blood toggle.
+- Original story and characters; no copied scenes, dialogue, characters or settings from existing franchises.
+- Grounded near-future technology: smart optics, drones, surveillance overlays, biometric access, signal jammers and remote defenses.
+- Violence has consequences; civilians are not forced targets.
+- Keep quiet character moments between action sequences so the revenge has emotional weight.
+- The boss is defeated through readable mechanics and player skill, not an oversized health bar.
 
-## Open questions for the owner
+## Production status
 
-1. Is a light story wanted at all, or should missions stand alone as contracts?
-2. Should the campaign end with a choice, or a single ending?
-3. Eight missions is roughly 6 to 8 hours of play. Is that the target length?
+The story bible is the narrative blueprint, not a claim that the story is already playable. Existing mission blockouts and gameplay systems need story integration. Build the prologue/Kestrel Pass vertical slice first, then script and implement each chapter. See `docs/design/story-bible.md` for the cast, chapter beats, final boss structure and production order.
