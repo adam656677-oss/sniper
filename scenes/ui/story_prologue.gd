@@ -95,5 +95,5 @@ func _advance() -> void:
 	_render_beat()
 
 func _begin_mission() -> void:
-	StoryCampaign.complete_prologue()
-	get_tree().change_scene_to_file("res://kestrel_mission.tscn")
+	StoryCampaign.set_flag("prologue_intro_seen", true)
+	get_tree().change_scene_to_file("res://scenes/ui/prologue_home.tscn")
