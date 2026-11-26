@@ -145,3 +145,26 @@ longest,longest
 not completed,not completed
 rain,rain
 windy,windy
+New Story,New Story
+Continue Story,Continue Story
+Evidence,Evidence
+STORY UPDATED  //  NEXT: %s,STORY UPDATED  //  NEXT: %s
+NEXT CHAPTER IN DEVELOPMENT  //  %s,NEXT CHAPTER IN DEVELOPMENT  //  %s
+ECHO RIDGE  //  STORY MODE,ECHO RIDGE  //  STORY MODE
+THE LAST QUIET NIGHT,THE LAST QUIET NIGHT
+Skip intro,Skip intro
+PROLOGUE  //  %02d OF %02d,PROLOGUE  //  %02d OF %02d
+Begin Kestrel Pass,Begin Kestrel Pass
+The Last Quiet Night,The Last Quiet Night
+Echo Ridge,Echo Ridge
+The Compound,The Compound
+Lowwater Bridge,Lowwater Bridge
+Glass Hollow,Glass Hollow
+Saltmarsh Station,Saltmarsh Station
+Overwatch,Overwatch
+High Cairn — The Last Contract,High Cairn — The Last Contract
+BLACK LEDGER  //  RECOVERED EVIDENCE,BLACK LEDGER  //  RECOVERED EVIDENCE
+No evidence recovered yet. Complete story objectives to find fragments of Lena's archive.,No evidence recovered yet. Complete story objectives to find fragments of Lena's archive.
+FILE 01 — THE DEPOT LEDGER,FILE 01 — THE DEPOT LEDGER
+"A payment trail links the Varn Accord raid team to an Asterion shell account. The authorization mark is partially corrupted, but the NIGHTGLASS program tag is intact.","A payment trail links the Varn Accord raid team to an Asterion shell account. The authorization mark is partially corrupted, but the NIGHTGLASS program tag is intact."
+RECOVERED FILE: %s,RECOVERED FILE: %s
