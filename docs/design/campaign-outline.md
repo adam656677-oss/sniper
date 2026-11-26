@@ -1,6 +1,6 @@
 # Campaign outline
 
-Status: narrative direction defined in `docs/design/story-bible.md`; story integration and cinematic implementation remain production work. Fictional factions, locations and names throughout.
+Status: narrative direction is defined and the first story-mode foundation is integrated on `main`. The prologue currently plays as a text-and-dialogue sequence; the playable 3D home exploration, attack and escape remain production work. Fictional factions, locations and names throughout.
 
 ## Premise
 
@@ -14,10 +14,10 @@ A cinematic playable prologue/tutorial followed by eight main missions. The play
 
 | # | Name | Conditions | Story purpose / mechanic | Status |
 |---|---|---|---|---|
-| 0 | The Last Quiet Night | Quiet evening into night | Establish Elias and Lena, tutorial, home attack, escape and framing | Narrative design |
-| 1 | Kestrel Pass | Clear dawn into windy day | Track the raid team; overwatch, gusting crosswind and outpost infiltration | Mission blockout exists; story integration pending |
-| 2 | Echo Ridge | Clear dawn | Recover a Black Ledger shard and extract under surveillance pressure | Recon prototype exists; story integration pending |
-| 3 | The Compound | Windy dusk | Identify Commander Rusk; close stealth, body hiding and silent objectives | Prototype exists; story integration pending |
+| 0 | The Last Quiet Night | Quiet evening into night | Establish Elias and Lena, tutorial, home attack, escape and framing | Narrative sequence integrated; playable 3D set piece not started |
+| 1 | Kestrel Pass | Clear dawn into windy day | Track the raid team; overwatch, gusting crosswind and outpost infiltration | Existing mission scene wired to campaign progression and story radio; full playthrough pending |
+| 2 | Echo Ridge | Clear dawn | Recover a Black Ledger shard and extract under surveillance pressure | Existing recon scene wired to campaign progression and story radio; full playthrough pending |
+| 3 | The Compound | Windy dusk | Identify Commander Rusk; close stealth, body hiding and silent objectives | Existing scene wired to campaign progression and story radio; full playthrough pending |
 | 4 | Lowwater Bridge | Rain, dusk | Intercept convoy and rescue a witness; moving vehicle target and timed objective | Not started |
 | 5 | Glass Hollow | Night | Expose NIGHTGLASS research; thermal optics, power control and smart-optic enemies | Not started |
 | 6 | Saltmarsh Station | Dust storm, noon | Survive Asterion's counter-sniper; decoys and changing sightlines | Not started |
