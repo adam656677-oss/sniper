@@ -6,7 +6,8 @@ Planning and status live in `docs/`:
 
 - `docs/CHECKLIST.md`: the master start-to-finish production checklist, verification requirements and release exit gates.
 - `docs/GAME-FLOW.md`: architecture and gameplay flow diagrams showing how the systems work together.
-- `docs/STATUS.md`: audit of what works, what is broken and why.
+- `docs/STATUS.md`: current verified project status and remaining production gates.
+- `docs/design/story-bible.md`: protagonist, story premise, characters, campaign arc and final boss plan.
 - `docs/superpowers/specs/2026-11-15-echo-ridge-design.md`: design document and open questions.
 - `docs/TOOLING.md`: tools, asset sources, licences and what the owner needs to provide.
 - `docs/VALIDATION.md`: how to run the tests and builds.
