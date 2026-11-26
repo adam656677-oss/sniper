@@ -30,7 +30,7 @@ func _ready() -> void:
 	text = Label.new()
 	panel.add_child(text)
 	button("Retry", func(): get_tree().reload_current_scene())
-	continue_story_button = button("Continue Story", _continue_story)
+	continue_story_button = button(tr("Continue Story"), _continue_story)
 	button("Mission select", func(): mission.quit_to_menu())
 	visible = false
 
