@@ -1,24 +1,24 @@
 # Echo Ridge: project status
 
-Audited 2026-11-26 against main commit `06934a750b611322ebd7c01fcc1e7d1e9e9628a8`.
+Audited 2026-11-26 against main commit `40263797cb949a53caece57684a0747a49c083f2`.
 
 ## Headline
 
-Echo Ridge has moved beyond the original broken prototype. The main branch has a growing Godot 4.7 single-player foundation, mission and enemy systems, a 1000 m shooting range, a Kestrel Pass blockout, a shared UI shell, procedural visual/audio effects and automated Windows build/runtime validation.
+Echo Ridge has a green Godot 4.7 development build pipeline and a growing single-player foundation. The main branch now includes the first integrated story-mode layer: a persistent campaign, an opening narrative sequence, radio/subtitle dialogue, evidence collection and chapter progression through the three existing mission scenes.
 
-This is still an in-development prototype—not a finished game and not yet a complete cinematic story campaign. Production character/weapon art, authored animation, recorded audio, finished environments, full mission content and human Windows playtesting remain major work.
+This is still an in-development prototype—not a finished game or a complete cinematic campaign. The opening is currently a text-and-dialogue presentation, not a playable 3D home/ambush sequence. Production character/weapon art, authored animation, recorded audio, finished environments, later campaign missions, the final boss and human Windows playtesting remain major work.
 
 ## Latest verified main-branch automation
 
-For commit `06934a750b611322ebd7c01fcc1e7d1e9e9628a8`:
+For merge commit `40263797cb949a53caece57684a0747a49c083f2`:
 
 | Workflow | Run | Result |
 |---|---:|---|
-| Validate and build | 45738500837 | Success |
-| Projectile regression tests | 45738500832 | Success |
-| Windows runtime smoke test | 45738691418 | Success |
+| Validate and build | [45856882903](https://github.com/adam656677-oss/sniper/actions/runs/45856882903) | Success |
+| Projectile regression tests | [45856882935](https://github.com/adam656677-oss/sniper/actions/runs/45856882935) | Success |
+| Windows runtime smoke test | [45856885061](https://github.com/adam656677-oss/sniper/actions/runs/45856885061) | Success |
 
-These results confirm automated checks and a Windows runtime smoke test on the listed commit. They do not replace a human playing the game on a Windows PC.
+The validation workflow also exported a Windows development build and uploaded screenshots. These results confirm automated checks and a Windows runtime smoke test; they do not replace a human playing the game on a Windows PC.
 
 ## Implemented foundation
 
@@ -28,24 +28,27 @@ These results confirm automated checks and a Windows runtime smoke test on the l
 - Enemy perception, patrol/suspicious/investigate/alert/search/flee/dead state machine, squad alert coordination, return fire, body discovery, lockdown and reinforcement foundations.
 - Procedural enemy visual rig, directional hit stagger and death presentation foundations. These are not authored production animations or a final character rig.
 - Mission objectives, triggers, extraction, checkpoints, save/load, results, settings, gunsmith and mission selection foundations.
-- Kestrel Pass terrain shader and procedural ridge dressing foundations; the full 1 km² production terrain and authored environment kit remain outstanding.
-- Positional audio event foundation with procedural cues; recorded weapon layers, foley, ambience, voice performance and final mix remain outstanding.
+- Kestrel Pass terrain shader and procedural ridge dressing foundations; the full 1 km² production terrain and authored environment kit remain.
+- Positional audio event foundation with procedural cues; recorded weapon layers, foley, ambience, voice performance and final mix remain.
+- Story campaign save state, New Story / Continue Story, a skippable nine-beat prologue presentation, reusable subtitle/radio overlay, mission radio beats, Black Ledger evidence screen and chapter progression across the currently existing Kestrel Pass, Echo Ridge recon and Compound scenes.
 
-## Story mode implementation (2026-11-26)\n\nThe first playable story-mode foundation is now in the development branch: persistent campaign save state, a skippable multi-beat prologue sequence, New Story / Continue Story menu actions, a reusable subtitle/radio overlay, mission-specific radio beats, unique evidence collection, a Black Ledger dossier screen, results-screen chapter feedback and chapter progression through the currently existing Kestrel Pass, Echo Ridge recon and Compound scenes. The prologue is currently a text-and-dialogue cinematic presentation, not yet a playable 3D home/ambush scene. The later missions, final boss and ending presentation remain planned.\n\n## Narrative direction
+## Story direction and implementation
 
-The new campaign direction is documented in:
-- `docs/design/story-bible.md`: protagonist, tragedy, corporation, cast, campaign arc, finale and story-system production plan.
+The original revenge/corporate-noir story is documented in:
+- `docs/design/story-bible.md`: characters, factions, conspiracy, campaign arc, finale and production principles.
 - `docs/design/campaign-outline.md`: prologue and eight-mission campaign map.
-- `docs/design/mission-01-kestrel-pass.md`: current Kestrel Pass mission design, to be revised for the new story.
+- `docs/design/mission-01-kestrel-pass.md`: Kestrel Pass mission design.
 
-The story is no longer only a document: the first campaign state, prologue presentation, dialogue/radio overlay and progression hooks are implemented in the story-mode foundation branch. The prologue is not yet a playable 3D sequence; the evidence dossier, remaining missions, fully implemented boss fight and ending presentation are still outstanding.
+The story follows Elias Vance after Asterion Continuity's Varn Accord strike team attacks his home, kills his wife Lena Vale and frames him. Lena's Black Ledger evidence points to the NIGHTGLASS program and ultimately to Asterion director Silas Vey. The final confrontation is intended to be earned through the campaign, with the player deciding what happens to the evidence afterward.
+
+The current prologue is a text-and-dialogue cinematic presentation. It does not yet contain the playable domestic exploration, tutorial, 3D home attack or escape sequence. Later missions, the complete Rusk/Vey boss encounters and ending presentation are not implemented yet.
 
 ## Major remaining production gates
 
 1. **Human Windows playtest:** download and launch the CI build; record controls, stability and playability in `docs/VALIDATION.md`.
-2. **Core sniper feel:** visual/audio review of scope, impacts, weapon handling, camera and enemy reactions.
-3. **World and art:** production terrain, environment kit, player/weapon models, character variants, authored animations, VFX and recorded audio.
-4. **Story vertical slice:** playable prologue and Kestrel Pass with character introduction, attack, briefing, reactive radio and evidence progression.
+2. **Playable story vertical slice:** build the 3D prologue home, character interaction, attack/escape sequence and story handoff into Kestrel Pass.
+3. **Core sniper feel:** visual/audio review of scope, impacts, weapon handling, camera and enemy reactions.
+4. **World and art:** production terrain, environment kit, player/weapon models, character variants, authored animations, VFX and recorded audio.
 5. **Campaign content:** build and playtest the remaining missions, including the final High Cairn boss encounter.
 6. **Release readiness:** performance, accessibility, licensing, external QA, signing and release packaging.
 
