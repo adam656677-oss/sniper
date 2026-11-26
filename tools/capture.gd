@@ -30,6 +30,11 @@ func run() -> void:
 	await shot("09_settings_keys")
 	menu.queue_free()
 	await process_frame
+	var prologue = load("res://scenes/ui/prologue_home.tscn").instantiate()
+	root.add_child(prologue)
+	await shot("12_playable_prologue_home")
+	prologue.queue_free()
+	await process_frame
 	var game = load("res://compound_mission.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
