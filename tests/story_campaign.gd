@@ -44,7 +44,8 @@ func run_tests() -> void:
 	var advance_event := InputEventAction.new()
 	advance_event.action = "ui_accept"
 	advance_event.pressed = true
-	dialogue._unhandled_input(advance_event)
+	Input.parse_input_event(advance_event)
+	await process_frame
 	check(not dialogue.panel.visible, "Keyboard input advances and dismisses radio dialogue")
 	check(story.add_evidence("ledger_01") and not story.add_evidence("ledger_01"), "Evidence is unique")
 	check(story.has_evidence("ledger_01"), "Collected evidence is queryable")
