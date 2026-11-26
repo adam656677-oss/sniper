@@ -19,7 +19,12 @@ func run_tests() -> void:
 	check(story.active and story.active_chapter == "prologue", "New campaign begins at the prologue")
 	check(story.can_continue() and story.continue_scene_path() == "res://scenes/ui/story_prologue.tscn", "New campaign can resume the prologue")
 	check(story.PROLOGUE_BEATS.size() >= 8, "Prologue has a multi-beat narrative sequence")
-	var prologue = load("res://scenes/ui/story_prologue.tscn").instantiate()
+	var prologue_scene: PackedScene = load("res://scenes/ui/story_prologue.tscn")
+	check(prologue_scene != null, "Prologue scene resource loads")
+	if prologue_scene == null:
+		quit(1)
+		return
+	var prologue = prologue_scene.instantiate()
 	root.add_child(prologue)
 	await process_frame
 	check(prologue.body_label.text.contains("MERIDIAN CORRIDOR") and prologue.next_button.text == "Continue", "Prologue scene renders its opening story beat")
