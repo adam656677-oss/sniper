@@ -6,6 +6,7 @@ extends Control
 var mission: Node
 var text: Label
 var panel: VBoxContainer
+var continue_story_button: Button
 const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
 
 func _ready() -> void:
@@ -29,6 +30,7 @@ func _ready() -> void:
 	text = Label.new()
 	panel.add_child(text)
 	button("Retry", func(): get_tree().reload_current_scene())
+	continue_story_button = button("Continue Story", _continue_story)
 	button("Mission select", func(): mission.quit_to_menu())
 	visible = false
 
@@ -70,6 +72,15 @@ func show_results(progress: Dictionary = {}) -> void:
 	lines.append(tr("Shots: %d | Hits: %d | Accuracy: %d%%") % [stats.shots, stats.hits, int(round(mission.accuracy() * 100.0))])
 	lines.append(tr("Kills: %d | Longest shot: %.0f m") % [stats.kills, stats.longest_kill])
 	lines.append(tr("Stealth: %s (%d detections)") % [stealth_rating(stats, objectives), stats.detections])
+	if StoryCampaign.active:
+		if StoryCampaign.can_continue():
+			lines.append(tr("STORY UPDATED  //  NEXT: %s") % StoryCampaign.chapter_title())
+		else:
+			lines.append(tr("NEXT CHAPTER IN DEVELOPMENT  //  %s") % StoryCampaign.chapter_title())
+		continue_story_button.visible = true
+		continue_story_button.disabled = not StoryCampaign.can_continue()
+	else:
+		continue_story_button.visible = false
 	if progress.get("new_best", false):
 		lines.append(tr("New best score"))
 	for id in progress.get("unlocked", []):
@@ -78,3 +89,8 @@ func show_results(progress: Dictionary = {}) -> void:
 		lines.append(line)
 	text.text = "\n".join(lines)
 	visible = true
+
+func _continue_story() -> void:
+	var path := StoryCampaign.continue_scene_path()
+	if not path.is_empty():
+		get_tree().change_scene_to_file(path)
