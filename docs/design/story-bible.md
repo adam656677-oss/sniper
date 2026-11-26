@@ -1,6 +1,6 @@
 # Echo Ridge — story bible
 
-**Status:** Narrative direction approved for development planning; story implementation is not yet built.
+**Status:** Narrative direction approved. The first story-mode foundation is integrated on main: persistent campaign progression, a skippable nine-beat prologue presentation, radio/subtitle dialogue, evidence collection and progression through the three existing mission scenes. The prologue is not yet a playable 3D sequence; later missions, the full boss encounters and ending presentation remain unbuilt.
 **Genre:** Cinematic tactical action thriller / near-future corporate noir.
 **Setting:** 2041, in the fictional Meridian Corridor. Rural mountain passes, industrial towns and a neon-lit corporate city sit beneath a dense private surveillance network.
 **Design promise:** A personal revenge story with the escalating scale, hard-edged action and memorable set pieces of a modern action film, combined with original cyberpunk worldbuilding. This is an original story; it does not use John Wick or Cyberpunk characters, plots, dialogue or settings.
