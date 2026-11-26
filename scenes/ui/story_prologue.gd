@@ -84,7 +84,7 @@ func _render_beat() -> void:
 	speaker_label.text = tr(String(beat.speaker))
 	body_label.text = tr(String(beat.text))
 	progress_label.text = tr("PROLOGUE  //  %02d OF %02d") % [beat_index + 1, StoryCampaign.PROLOGUE_BEATS.size()]
-	next_button.text = tr("Begin Kestrel Pass") if beat_index == StoryCampaign.PROLOGUE_BEATS.size() - 1 else tr("Continue")
+	next_button.text = tr("Enter the House") if beat_index == StoryCampaign.PROLOGUE_BEATS.size() - 1 else tr("Continue")
 
 func _advance() -> void:
 	if beat_index >= StoryCampaign.PROLOGUE_BEATS.size() - 1:
