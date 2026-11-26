@@ -4,6 +4,7 @@ var failures := 0
 var state: Node
 var saves: Node
 var settings: Node
+var story: Node
 var requested: Array = []
 
 func check(condition: bool, label: String) -> void:
@@ -23,8 +24,9 @@ func run_tests() -> void:
 	state = root.get_node("GameState")
 	saves = root.get_node("SaveSystem")
 	settings = root.get_node("Settings")
+	story = root.get_node("StoryCampaign")
 	settings.reset()
-	StoryCampaign.active = false
+	story.active = false
 	StoryCampaign.active_chapter = ""
 	StoryCampaign.save_campaign()
 	saves.delete_save(saves.CHECKPOINT_SLOT)
