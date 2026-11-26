@@ -42,15 +42,27 @@ func _build_environment() -> void:
 	sky.sky_material = sky_mat
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.42, 0.36, 0.29)
-	env.ambient_light_energy = 0.5
+	env.ambient_light_color = Color(0.72, 0.68, 0.62)
+	env.ambient_light_energy = 0.95
 	world.environment = env
 	add_child(world)
 	key_light = DirectionalLight3D.new()
 	key_light.rotation_degrees = Vector3(-35, -25, 0)
-	key_light.light_energy = 0.8
+	key_light.light_energy = 1.15
 	key_light.shadow_enabled = true
 	add_child(key_light)
+	var living_light := OmniLight3D.new()
+	living_light.light_color = Color(1.0, 0.78, 0.56)
+	living_light.light_energy = 3.2
+	living_light.omni_range = 16.0
+	living_light.position = Vector3(1.0, 3.0, -1.0)
+	add_child(living_light)
+	var kitchen_light := OmniLight3D.new()
+	kitchen_light.light_color = Color(1.0, 0.86, 0.68)
+	kitchen_light.light_energy = 2.4
+	kitchen_light.omni_range = 9.0
+	kitchen_light.position = Vector3(-3.5, 2.8, -1.8)
+	add_child(kitchen_light)
 
 func _build_house() -> void:
 	_box("Floor", Vector3(0, -0.15, 0), Vector3(14, 0.3, 18), Color(0.19, 0.17, 0.14), true)
