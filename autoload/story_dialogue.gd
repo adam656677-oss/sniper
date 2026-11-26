@@ -10,6 +10,7 @@ var continue_button: Button
 
 func _ready() -> void:
 	layer = 20
+	StoryCampaign.dialogue_requested.connect(enqueue)
 	var shade := ColorRect.new()
 	shade.color = Color(0.0, 0.0, 0.0, 0.18)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
