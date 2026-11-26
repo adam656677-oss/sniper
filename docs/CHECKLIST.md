@@ -104,7 +104,8 @@ Game flow and architecture diagrams: `docs/GAME-FLOW.md`. Design reference: `doc
 
 ## Phase 5: Content scale-up
 
-- [x] 5.1 Campaign outline (docs/design/campaign-outline.md; owner questions at the end): six to eight missions, narrative through briefings and radio, fictional factions. Verify: review.
+- [~] 5.1 Campaign outline and story bible (docs/design/campaign-outline.md and docs/design/story-bible.md): original revenge/corporate-noir premise, protagonist, tragedy, principal cast, eight-mission arc and final boss/ending structure are defined. Verify: narrative review; story implementation is tracked separately.
+- [ ] 5.7 Story systems: cinematic prologue and transitions, dialogue/subtitles, reactive radio, Black Ledger evidence viewer, saved story flags and ending choice. Verify: automated story-state/save tests plus a complete Windows playthrough.
 - [ ] 5.2 Missions 2 through N, each with a distinct biome or time of day and one new mechanic (night with thermal scope, moving vehicle target, protect an ally, timed extraction, sandstorm). One pull request per mission, each with a playtest. Verify: playtest each.
 - [ ] 5.3 Additional rifles and scopes through the gunsmith (fictional names). Verify: gunsmith tests extended.
 - [ ] 5.4 Enemy variety: snipers that counter the player, dogs, vehicles, drones. Verify: tests for each perception type.
