@@ -44,7 +44,7 @@ func run_tests() -> void:
 		await process_frame
 		story.start_new_campaign()
 		story.save_campaign()
-		dialogue.clear_queue()
+		root.get_node("StoryDialogue").clear_queue()
 	prologue._advance()
 	check(prologue.beat_index == 1 and story.prologue_beat == 1, "Prologue advances and persists the current beat")
 	prologue.queue_free()
