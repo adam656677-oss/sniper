@@ -56,6 +56,7 @@ func _ready() -> void:
 	GameState.mission_finished.connect(on_mission_over)
 	GameState.mission_failed.connect(on_mission_over)
 	SaveSystem.apply_pending(self)
+	StoryCampaign.on_mission_started(scene_file_path)
 	update_hud()
 
 func on_mission_over() -> void:
@@ -64,6 +65,8 @@ func on_mission_over() -> void:
 			if objective.status == MissionLog.Status.ACTIVE and objective.kind != MissionLog.Kind.PRIMARY:
 				level.mission_log.complete(objective.id)
 	SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
+	if not GameState.failed:
+		StoryCampaign.record_mission_completed(scene_file_path)
 	var progress := Progression.record(Progression.mission_id_for(scene_file_path), stats, level.mission_log, GameState.failed)
 	results.show_results(progress)
 
@@ -72,6 +75,8 @@ func quit_to_menu() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
 
 func on_objective_changed(_id: String, status: int) -> void:
+	if status == MissionLog.Status.COMPLETE:
+		StoryCampaign.on_objective_completed(scene_file_path, _id)
 	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete():
 		SaveSystem.save_game(SaveSystem.CHECKPOINT_SLOT, self)
 
