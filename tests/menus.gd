@@ -24,6 +24,9 @@ func run_tests() -> void:
 	saves = root.get_node("SaveSystem")
 	settings = root.get_node("Settings")
 	settings.reset()
+	StoryCampaign.active = false
+	StoryCampaign.active_chapter = ""
+	StoryCampaign.save_campaign()
 	saves.delete_save(saves.CHECKPOINT_SLOT)
 	var menu = load("res://scenes/ui/main_menu.tscn").instantiate()
 	root.add_child(menu)
@@ -34,6 +37,13 @@ func run_tests() -> void:
 	check(menu.continue_button.disabled, "Continue is disabled without a checkpoint")
 	check(menu.build_label().begins_with("v0.4.0 ("), "The menu shows the version and build")
 	check(menu.continue_checkpoint() == "" and requested.is_empty(), "Continue without a checkpoint changes nothing")
+	check(menu.continue_story_button.disabled, "Continue Story is disabled without a campaign")
+	press(menu.story_mode_button)
+	check(requested == ["res://scenes/ui/story_prologue.tscn"] and StoryCampaign.active, "New Story starts a saved campaign and opens the prologue")
+	requested.clear()
+	check(not menu.continue_story_button.disabled, "Continue Story enables after a campaign starts")
+	check(menu.continue_story() == "res://scenes/ui/story_prologue.tscn" and requested == ["res://scenes/ui/story_prologue.tscn"], "Continue Story resumes the current chapter")
+	requested.clear()
 	menu.show_screen(menu.Screen.MISSIONS)
 	var buttons: Array = []
 	for child in menu.missions.get_children():
@@ -112,6 +122,9 @@ func run_tests() -> void:
 	game.queue_free()
 	menu.queue_free()
 	await process_frame
+	StoryCampaign.active = false
+	StoryCampaign.active_chapter = ""
+	StoryCampaign.save_campaign()
 	if failures == 0:
 		print("MENU TESTS PASSED")
 	quit(0 if failures == 0 else 1)
