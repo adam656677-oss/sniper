@@ -147,6 +147,20 @@ func add_evidence(evidence_id: String) -> bool:
 func has_evidence(evidence_id: String) -> bool:
 	return evidence.has(evidence_id)
 
+func evidence_lines() -> Array[String]:
+	var lines: Array[String] = [tr("BLACK LEDGER  //  RECOVERED EVIDENCE")]
+	if evidence.is_empty():
+		lines.append(tr("No evidence recovered yet. Complete story objectives to find fragments of Lena's archive."))
+		return lines
+	for evidence_id in evidence:
+		match evidence_id:
+			"black_ledger_fragment_01":
+				lines.append(tr("FILE 01 — THE DEPOT LEDGER"))
+				lines.append(tr("A payment trail links the Varn Accord raid team to an Asterion shell account. The authorization mark is partially corrupted, but the NIGHTGLASS program tag is intact."))
+			_:
+				lines.append(tr("RECOVERED FILE: %s") % evidence_id)
+	return lines
+
 func radio_once(dialogue_id: String, speaker: String, line: String) -> bool:
 	if not active or dialogue_id.is_empty() or seen_dialogue.has(dialogue_id):
 		return false
