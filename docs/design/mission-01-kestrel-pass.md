@@ -10,6 +10,24 @@ A lone marksman overwatches a mountain pass at dawn, picks apart a supply outpos
 
 Fictional border region, late autumn, clear dawn turning windy by mid-mission. Fictional faction: the Varn Accord, a private security force guarding a fuel and arms depot at the head of the pass. No real units, places or brands.
 
+## Story context
+
+This is the first full mission after the playable prologue, **The Last Quiet Night**. Elias Vance (Echo) has survived the attack on his home and learned that the Varn Accord carried it out. He follows a trace from the damaged Black Ledger to this depot, believing the unit's records will identify who authorized the strike.
+
+The depot commander is a local Accord officer, not Commander Rusk, who led the raid on Elias's home. Rusk is not killed in this mission; his authorization signature and a short encrypted command recording are among the evidence recovered from the office. This preserves Rusk as a recurring field antagonist and makes the mission's discovery more important than a simple revenge kill.
+
+Mara Quill provides the briefing and radio support. Her dialogue should be restrained: she knows this is personal, but insists that Elias bring back proof. After the ledger is recovered, Imani Rook can decode the first fragment and identify the name **NIGHTGLASS**. Silas Vey should be foreshadowed through a corporate authorization mark or clipped broadcast, not introduced in a long exposition dump.
+
+## Narrative beats
+
+1. **Briefing:** Mara explains that the depot supplied the team that hit Elias's home. The target is the records office, not indiscriminate revenge.
+2. **Approach:** Environmental details—fresh vehicle tracks, a damaged Accord transport and a hurriedly cleared office—show the site was used recently.
+3. **Discovery:** The ledger fragment links the raid to a larger operation and carries Rusk's authorization signature.
+4. **Complication:** If the radio mast remains active, the Accord attempts to lock down the pass and destroy the remaining records. Disabling it buys time and changes the extraction pressure.
+5. **Extraction:** Mara confirms that the recovered evidence is authentic. Imani identifies NIGHTGLASS, setting up Echo Ridge.
+
+Dialogue should react to the player's approach (undetected, alarm raised, mast disabled) without changing the core discovery. Keep the mission's quiet moments short and let the environment carry part of the story.
+
 ## Map (about 1 km²)
 
 | Area | Purpose |
