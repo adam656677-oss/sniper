@@ -72,3 +72,10 @@ func clear_queue() -> void:
 	if is_instance_valid(panel):
 		panel.visible = false
 		shade.visible = false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not panel.visible:
+		return
+	if event.is_action_pressed("ui_accept") or event.is_action_pressed("interact"):
+		advance()
+		get_viewport().set_input_as_handled()
