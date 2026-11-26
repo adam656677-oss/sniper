@@ -170,6 +170,7 @@ func continue_checkpoint() -> String:
 
 func start_story_mode() -> String:
 	StoryCampaign.start_new_campaign()
+	continue_story_button.disabled = not StoryCampaign.can_continue()
 	var path := "res://scenes/ui/story_prologue.tscn"
 	scene_changer.call(path)
 	return path
