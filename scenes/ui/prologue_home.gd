@@ -189,7 +189,7 @@ func _process(_delta: float) -> void:
 	if escaped:
 		return
 	var target := _nearest_interactable()
-	prompt.text = "[E] " + String(interactables[target].label) if not target.is_empty() else ""
+	prompt.text = tr("[E] %s") % String(interactables[target].label) if not target.is_empty() else ""
 	if Input.is_action_just_pressed("interact") and not target.is_empty():
 		interact_with(target)
 
