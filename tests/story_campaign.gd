@@ -47,7 +47,7 @@ func run_tests() -> void:
 	check(story.record_mission_completed("res://main.tscn") and story.active_chapter == "compound", "Echo Ridge completion advances to the compound")
 	check(story.choose_ending("release") and story.ending == "release", "Ending decision is stored")
 	check(story.save_campaign(), "Campaign state saves to disk")
-	var saved_chapter := story.active_chapter
+	var saved_chapter: String = story.active_chapter
 	story.active_chapter = "prologue"
 	check(story.load_campaign() and story.active_chapter == saved_chapter, "Campaign state reloads from disk")
 	story.start_new_campaign()
