@@ -33,6 +33,9 @@ func run() -> void:
 	var prologue = load("res://scenes/ui/prologue_home.tscn").instantiate()
 	root.add_child(prologue)
 	await shot("12_playable_prologue_home")
+	prologue.player.global_position = Vector3(0, 1, 10.2)
+	prologue.player.rotation.y = PI
+	await shot("13_prologue_escape_yard")
 	prologue.queue_free()
 	await process_frame
 	var game = load("res://compound_mission.tscn").instantiate()
