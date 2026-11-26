@@ -7,7 +7,7 @@ const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
 const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
 const BackdropShader = preload("res://scenes/ui/menu_backdrop.gdshader")
 
-enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS }
+enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS, EVIDENCE }
 
 var screen: int = Screen.HOME
 var scene_changer: Callable
@@ -17,6 +17,8 @@ var settings_screen: SettingsScreen
 var workbench: WorkbenchScreen
 var records: VBoxContainer
 var records_text: Label
+var evidence: VBoxContainer
+var evidence_text: Label
 var continue_button: Button
 var story_mode_button: Button
 var continue_story_button: Button
@@ -67,6 +69,7 @@ func _ready() -> void:
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
 	button(home, "Records", func(): show_screen(Screen.RECORDS))
+	button(home, "Evidence", func(): show_screen(Screen.EVIDENCE))
 	button(home, "Settings", func(): show_screen(Screen.SETTINGS))
 	button(home, "Quit", func(): get_tree().quit())
 	status = Label.new()
@@ -103,6 +106,13 @@ func _ready() -> void:
 	records_text = Label.new()
 	records.add_child(records_text)
 	button(records, "Back", func(): show_screen(Screen.HOME))
+	evidence = VBoxContainer.new()
+	column.add_child(evidence)
+	evidence_text = Label.new()
+	evidence_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	evidence_text.custom_minimum_size = Vector2(360, 180)
+	evidence.add_child(evidence_text)
+	button(evidence, "Back", func(): show_screen(Screen.HOME))
 	show_screen(Screen.HOME)
 
 # "v0.4.0 (abc1234)" when CI stamped a build, "v0.4.0 (dev)" otherwise.
@@ -129,8 +139,11 @@ func show_screen(value: int) -> void:
 	settings_screen.visible = screen == Screen.SETTINGS
 	workbench.visible = screen == Screen.WORKBENCH
 	records.visible = screen == Screen.RECORDS
+	evidence.visible = screen == Screen.EVIDENCE
 	if screen == Screen.RECORDS:
 		records_text.text = "\n".join(Progression.summary_lines())
+	if screen == Screen.EVIDENCE:
+		evidence_text.text = "\n".join(StoryCampaign.evidence_lines())
 	if screen == Screen.WORKBENCH:
 		workbench.load_into_controls()
 	continue_button.disabled = not SaveSystem.has_save(SaveSystem.CHECKPOINT_SLOT)
