@@ -69,7 +69,7 @@ func _ready() -> void:
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
 	button(home, "Records", func(): show_screen(Screen.RECORDS))
-	button(home, "Evidence", func(): show_screen(Screen.EVIDENCE))
+	button(home, tr("Evidence"), func(): show_screen(Screen.EVIDENCE))
 	button(home, "Settings", func(): show_screen(Screen.SETTINGS))
 	button(home, "Quit", func(): get_tree().quit())
 	status = Label.new()
