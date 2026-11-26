@@ -59,7 +59,7 @@ func advance() -> void:
 func _show_next() -> void:
 	if queue.is_empty():
 		panel.visible = false
-		get_child(0).visible = false
+		shade.visible = false
 		return
 	var entry: Dictionary = queue.pop_front()
 	speaker_label.text = String(entry.get("speaker", ""))
@@ -71,4 +71,4 @@ func clear_queue() -> void:
 	queue.clear()
 	if is_instance_valid(panel):
 		panel.visible = false
-		get_child(0).visible = false
+		shade.visible = false
