@@ -7,11 +7,12 @@ var panel: PanelContainer
 var speaker_label: Label
 var line_label: Label
 var continue_button: Button
+var shade: ColorRect
 
 func _ready() -> void:
 	layer = 20
 	StoryCampaign.dialogue_requested.connect(enqueue)
-	var shade := ColorRect.new()
+	shade = ColorRect.new()
 	shade.color = Color(0.0, 0.0, 0.0, 0.18)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -51,7 +52,7 @@ func enqueue(speaker: String, line: String) -> void:
 func advance() -> void:
 	if queue.is_empty():
 		panel.visible = false
-		get_child(0).visible = false
+		shade.visible = false
 		return
 	_show_next()
 
@@ -64,7 +65,7 @@ func _show_next() -> void:
 	speaker_label.text = String(entry.get("speaker", ""))
 	line_label.text = String(entry.get("line", ""))
 	panel.visible = true
-	get_child(0).visible = true
+	shade.visible = true
 
 func clear_queue() -> void:
 	queue.clear()
