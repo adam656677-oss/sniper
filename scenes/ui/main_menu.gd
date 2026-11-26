@@ -65,7 +65,7 @@ func _ready() -> void:
 	home.add_child(subtitle)
 	continue_button = button(home, "Continue", continue_checkpoint)
 	story_mode_button = button(home, tr("New Story"), start_story_mode)
-	continue_story_button = button(home, "Continue Story", continue_story)
+	continue_story_button = button(home, tr("Continue Story"), continue_story)
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
 	button(home, "Records", func(): show_screen(Screen.RECORDS))
