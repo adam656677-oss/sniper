@@ -70,7 +70,11 @@ func can_continue() -> bool:
 	return active and not active_chapter.is_empty() and CHAPTERS.has(active_chapter) and not String(CHAPTERS[active_chapter].scene).is_empty()
 
 func continue_scene_path() -> String:
-	return String(CHAPTERS.get(active_chapter, {}).get("scene", "")) if can_continue() else ""
+	if not can_continue():
+		return ""
+	if active_chapter == "prologue" and bool(get_flag("prologue_intro_seen", false)):
+		return "res://scenes/ui/prologue_home.tscn"
+	return String(CHAPTERS.get(active_chapter, {}).get("scene", ""))
 
 func chapter_title(chapter_id: String = "") -> String:
 	var key := active_chapter if chapter_id.is_empty() else chapter_id

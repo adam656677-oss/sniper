@@ -28,6 +28,23 @@ func run_tests() -> void:
 	root.add_child(prologue)
 	await process_frame
 	check(prologue.body_label.text.contains("MERIDIAN CORRIDOR") and prologue.next_button.text == "Continue", "Prologue scene renders its opening story beat")
+	var home_scene: PackedScene = load("res://scenes/ui/prologue_home.tscn")
+	check(home_scene != null, "Playable home prologue scene resource loads")
+	if home_scene != null:
+		var home = home_scene.instantiate()
+		root.add_child(home)
+		await process_frame
+		check(home.player != null and home.camera != null, "Playable prologue creates a first-person player and camera")
+		check(home.interactables.size() == 4, "Playable prologue exposes three story discoveries and an exit")
+		check(home.interact_with("photo") and home.interact_with("lena") and home.interact_with("ledger"), "Player can inspect the photo, talk to Lena and recover her data key")
+		check(home.attack_started and story.has_evidence("black_ledger_fragment_00"), "Three discoveries trigger the home attack and recover ledger evidence")
+		story.set_flag("prologue_intro_seen", true)
+		check(story.continue_scene_path() == "res://scenes/ui/prologue_home.tscn", "Continue Story resumes the playable home sequence after the intro")
+		home.queue_free()
+		await process_frame
+		story.start_new_campaign()
+		story.save_campaign()
+		root.get_node("StoryDialogue").clear_queue()
 	prologue._advance()
 	check(prologue.beat_index == 1 and story.prologue_beat == 1, "Prologue advances and persists the current beat")
 	prologue.queue_free()
