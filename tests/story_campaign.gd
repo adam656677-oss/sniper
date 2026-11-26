@@ -39,7 +39,7 @@ func run_tests() -> void:
 	dialogue.advance()
 	check(story.add_evidence("ledger_01") and not story.add_evidence("ledger_01"), "Evidence is unique")
 	check(story.has_evidence("ledger_01"), "Collected evidence is queryable")
-	check(story.evidence_lines().any(func(line: String): return line.contains("ledger_01")), "Evidence dossier includes recovered entries")
+	check(story.evidence_lines().back().contains("ledger_01"), "Evidence dossier includes recovered entries")
 	check(story.record_mission_completed("res://kestrel_mission.tscn"), "Completing active Kestrel chapter advances story")
 	check(story.is_chapter_complete("kestrel_pass") and story.active_chapter == "echo_ridge", "Kestrel completion unlocks Echo Ridge")
 	check(story.continue_scene_path() == "res://main.tscn", "Echo Ridge chapter maps to its existing playable scene")
