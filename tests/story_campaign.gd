@@ -36,7 +36,11 @@ func run_tests() -> void:
 	check(not story.radio_once("test_radio", "MARA", "Radio check."), "Radio beat does not replay after it has been seen")
 	var dialogue = root.get_node("StoryDialogue")
 	check(dialogue.panel.visible and dialogue.line_label.text == "Radio check.", "Radio event appears in the shared dialogue overlay")
-	dialogue.advance()
+	var advance_event := InputEventAction.new()
+	advance_event.action = "ui_accept"
+	advance_event.pressed = true
+	dialogue._unhandled_input(advance_event)
+	check(not dialogue.panel.visible, "Keyboard input advances and dismisses radio dialogue")
 	check(story.add_evidence("ledger_01") and not story.add_evidence("ledger_01"), "Evidence is unique")
 	check(story.has_evidence("ledger_01"), "Collected evidence is queryable")
 	check(story.evidence_lines().back().contains("ledger_01"), "Evidence dossier includes recovered entries")
