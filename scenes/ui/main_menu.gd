@@ -18,6 +18,8 @@ var workbench: WorkbenchScreen
 var records: VBoxContainer
 var records_text: Label
 var continue_button: Button
+var story_mode_button: Button
+var continue_story_button: Button
 var status: Label
 
 func _ready() -> void:
@@ -60,6 +62,8 @@ func _ready() -> void:
 	subtitle.add_theme_color_override("font_color", Color(0.72, 0.58, 0.37))
 	home.add_child(subtitle)
 	continue_button = button(home, "Continue", continue_checkpoint)
+	story_mode_button = button(home, "New Story", start_story_mode)
+	continue_story_button = button(home, "Continue Story", continue_story)
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
 	button(home, "Records", func(): show_screen(Screen.RECORDS))
@@ -130,6 +134,7 @@ func show_screen(value: int) -> void:
 	if screen == Screen.WORKBENCH:
 		workbench.load_into_controls()
 	continue_button.disabled = not SaveSystem.has_save(SaveSystem.CHECKPOINT_SLOT)
+	continue_story_button.disabled = not StoryCampaign.can_continue()
 	status.text = tr("Checkpoint available") if not continue_button.disabled else tr("No checkpoint yet")
 	if screen == Screen.SETTINGS:
 		settings_screen.load_into_controls()
@@ -149,3 +154,18 @@ func continue_checkpoint() -> String:
 	var scene: String = String(SaveSystem.pending.scene)
 	scene_changer.call(scene)
 	return scene
+
+func start_story_mode() -> String:
+	StoryCampaign.start_new_campaign()
+	var path := "res://scenes/ui/story_prologue.tscn"
+	scene_changer.call(path)
+	return path
+
+func continue_story() -> String:
+	var path := StoryCampaign.continue_scene_path()
+	if path.is_empty():
+		return ""
+	if StoryCampaign.active_chapter != "prologue":
+		StoryCampaign.begin_chapter(StoryCampaign.active_chapter)
+	scene_changer.call(path)
+	return path
