@@ -1,1 +1,6 @@
-[gd_scene load_steps=2 format=3]\n\n[ext_resource type="Script" path="res://scenes/ui/story_prologue.gd" id="1"]\n\n[node name="StoryPrologue" type="Control"]\nscript = ExtResource("1")\n
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/story_prologue.gd" id="1"]
+
+[node name="StoryPrologue" type="Control"]
+script = ExtResource("1")
