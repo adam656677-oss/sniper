@@ -64,7 +64,7 @@ func _ready() -> void:
 	subtitle.add_theme_color_override("font_color", Color(0.72, 0.58, 0.37))
 	home.add_child(subtitle)
 	continue_button = button(home, "Continue", continue_checkpoint)
-	story_mode_button = button(home, "New Story", start_story_mode)
+	story_mode_button = button(home, tr("New Story"), start_story_mode)
 	continue_story_button = button(home, "Continue Story", continue_story)
 	button(home, "Missions", func(): show_screen(Screen.MISSIONS))
 	button(home, "Workbench", func(): show_screen(Screen.WORKBENCH))
