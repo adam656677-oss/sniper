@@ -8,6 +8,9 @@ extends SubViewport
 const ZOOM_MIN := 4.0
 const ZOOM_MAX := 12.0
 const ZOOM_STEP := 2.0
+# Nothing within arm's length belongs in a riflescope picture: clipping it keeps
+# the first-person viewmodel (about 1.7 m deep at most) out of the magnified view.
+const NEAR_CLIP := 2.5
 
 var source: Camera3D
 var weapon: WeaponRig
@@ -21,6 +24,7 @@ var configured: WeaponProfile
 func _ready() -> void:
 	own_world_3d = false
 	render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	camera.near = NEAR_CLIP
 
 static func fov_for_zoom(magnification: float, hip_fov: float) -> float:
 	return rad_to_deg(2.0 * atan(tan(deg_to_rad(hip_fov) * 0.5) / maxf(magnification, 1.0)))
