@@ -18,8 +18,25 @@ PATTERNS = [
     r'\["t_\w+", "([^"]+)"\]',
     r'"(?:title|brief)": "([^"]+)"',
     r'tr\("([^"]+)"\)',
+    # Story text. These accept escaped quotes inside the literal. Dialogue ids
+    # (the first radio_once argument) are never displayed and are not captured.
+    r'"(?:speaker|text)": "((?:[^"\\]|\\.)+)"',
+    r'radio_once\(\s*"[^"]*"\s*,\s*"((?:[^"\\]|\\.)+)"',
+    r'radio_once\(\s*"[^"]*"\s*,\s*"(?:[^"\\]|\\.)*"\s*,\s*"((?:[^"\\]|\\.)+)"',
+    r'\.get\("(?:title|brief)", "((?:[^"\\]|\\.)+)"\)',
 ]
 SOURCES = ["mission.gd", "scope_overlay.gd", "scenes", "autoload"]
+# Matches are source text. Undo GDScript escapes the way Godot's String.c_unescape()
+# does (tests/localisation.gd uses it), so a key holds the string tr() receives at
+# runtime: "2041.\nA quiet home" becomes a key with a real line break.
+C_ESCAPES = [("\\a", "\a"), ("\\b", "\b"), ("\\f", "\f"), ("\\n", "\n"), ("\\r", "\r"),
+             ("\\t", "\t"), ("\\v", "\v"), ("\\'", "'"), ('\\"', '"'), ("\\?", "?"),
+             ("\\\\", "\\")]
+
+def c_unescape(text: str) -> str:
+    for escaped, char in C_ESCAPES:
+        text = text.replace(escaped, char)
+    return text
 
 def collect(root: pathlib.Path) -> list[str]:
     found = []
@@ -31,6 +48,7 @@ def collect(root: pathlib.Path) -> list[str]:
         text = path.read_text()
         for pattern in PATTERNS:
             for match in re.findall(pattern, text):
+                match = c_unescape(match)
                 if match.strip() and match not in found:
                     found.append(match)
     return found
