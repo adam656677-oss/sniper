@@ -14,7 +14,7 @@ Pushing a tag such as `v0.4.0` runs `release.yml`: it validates, stamps the tag 
 
 ## Screenshots
 
-`tools/capture.gd` renders the main menu, mission select, the compound at the hip, through the scope and through binoculars, and the range at the hip and at 12x. CI runs it under a virtual display after validation and uploads `EchoRidge-screenshots`. Locally:
+`tools/capture.gd` renders the main menu, mission select, the playable prologue home, the prologue yard escape from the doorway and from behind the woodpile, the compound at the hip, through the scope and through binoculars, and the range at the hip and at 12x. CI runs it under a virtual display after validation and uploads `EchoRidge-screenshots`. Locally:
 
 ```bash
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --script res://tools/capture.gd -- /tmp/shots
@@ -57,6 +57,7 @@ Add `--export` to also produce `builds/windows/EchoRidge.exe` (requires the 4.7 
 | Saves | `tests/saves.gd` | Checkpoint on objective completion, quick save, full round trip of player, weapons, stealth kit, hostiles, objectives, statistics and difficulty, staged loads applied only by the matching scene, corrupt, wrong-version and incomplete saves rejected |
 | Scope | `tests/scope.gd` | Zero turret steps and clamps, holdover, launch elevation, scope view following the camera, magnification range and clamps, reticle marks scaling with zoom, rangefinder, wind readout, kill-cam trigger and time scale |
 | Stealth | `tests/stealth.gd` | Noise by stance and motion, footsteps making a patrol suspicious, binoculars, tagging, tag list pruning, stones drawing a guard, stone count, pause gating |
+| Prologue escape | `tests/prologue_escape.gd` | Closed doorway and front wall before the attack, operatives and exposure meter appearing on the breach, leaving through the breached door, crouch exposure and camera height, flashlight cone and range, the van and woodpile blocking sight (crouched only for the woodpile), getting spotted and reset to the doorway, the house as a safe zone, yard boundary, tree-line escape and the unseen-escape story flag |
 | Targets | `tests/targets.gd` | Hit zones (head, torso, limb), damage multipliers, death removal, live projectile headshot |
 
 Not covered: visual appearance, audio, aim feel, Windows launch beyond a headless 120-frame run, performance, enemy behaviour (none exists).
