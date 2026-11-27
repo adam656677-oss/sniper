@@ -41,7 +41,7 @@ Planning and status live in `docs/`:
 
 ## Implemented
 
-Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Binoculars with target tagging, a stance-based noise meter and throwable stones. Three difficulty levels. Dawn, noon, dusk and night lighting with clear, windy, rain and dust weather that changes the wind, haze, and how far guards see and hear. Primary, secondary and optional objectives per mission with trigger zones and kill, accuracy and detection statistics. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Sprint while standing and moving forward at the hip, with an eased field-of-view kick, louder footsteps and a brief sway penalty afterwards; a short camera dip on hard landings. Both camera effects are off with reduced motion. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Binoculars with target tagging, a stance-based noise meter and throwable stones. Three difficulty levels. Dawn, noon, dusk and night lighting with clear, windy, rain and dust weather that changes the wind, haze, and how far guards see and hear. Primary, secondary and optional objectives per mission with trigger zones and kill, accuracy and detection statistics. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Scenes
 
@@ -64,7 +64,8 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | 1, 2 | Rifle, sidearm |
 | B | Toggle binoculars (left click or T tags the hostile under the crosshair) |
 | G | Throw a stone to draw a guard |
-| Shift (hold) | Hold breath while aiming |
+| Shift (hold) | Sprint while standing and moving forward; footsteps carry further |
+| Shift (hold, while aiming) | Hold breath. A Shift still held from sprinting must be pressed again |
 | [ and ] | Zero turret down and up (100 m steps) |
 | Space | Skip long-shot slow motion |
 | C | Toggle crouch |
@@ -77,7 +78,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 
 ### Controller
 
-Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click holds breath, right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses.
+Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click sprints while moving forward at the hip (until you stop, aim, crouch or click again) and holds breath while aiming; right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses.
 
 ## Validation
 
