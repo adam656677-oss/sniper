@@ -13,6 +13,8 @@ const BODY_VIEW_DISTANCE := 40.0
 const EYE_HEIGHT := 0.85
 
 var awareness := 0.0
+# Per-instance cone width, for narrower sensors such as a flashlight beam.
+var fov_degrees := FOV_DEGREES
 
 func body() -> Node3D:
 	return get_parent() as Node3D
@@ -32,7 +34,7 @@ func visibility_of(point: Vector3, exposure: float, max_distance: float = VIEW_D
 		return 0.0
 	var direction := (point - eye) / distance
 	var cosine := clampf(forward().dot(direction), -1.0, 1.0)
-	if acos(cosine) > deg_to_rad(FOV_DEGREES * 0.5):
+	if acos(cosine) > deg_to_rad(fov_degrees * 0.5):
 		return 0.0
 	var world := body().get_world_3d()
 	if world:
