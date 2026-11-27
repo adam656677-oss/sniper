@@ -18,11 +18,12 @@ Planning and status live in `docs/`:
 |---|---|
 | `main.tscn`, `mission.gd` | Mission root: wires level, player, weapon rig and HUD; routes input actions |
 | `autoload/game_state.gd` | `GameState` autoload: paused, finished, failed, intel, difficulty |
-| `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, difficulty, kill cam |
+| `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, aim assist, difficulty, kill cam |
+| `autoload/input_glyphs.gd` | `InputGlyphs` autoload: last input device and device-aware prompt text for each action's binding |
 | `autoload/loadout.gd` | `Loadout` autoload: installed gunsmith parts per weapon family |
 | `autoload/progression.gd` | `Progression` autoload: per-mission records and eight achievements |
 | `autoload/save_system.gd` | `SaveSystem` autoload: versioned JSON saves, checkpoints, quick save and load |
-| `scenes/player/` | First-person body and camera |
+| `scenes/player/` | First-person body and camera; `aim_assist.gd` is the controller aim friction |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
 | `scenes/levels/level_base.gd` | Level contract: spawn, wind, targets, interact, objective, completion |
 | `scenes/levels/test_range.tscn` | The intel mission level; targets are children of `Targets` |
@@ -61,7 +62,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | Left click | Fire (also resumes from pause) |
 | Right click | Aim through the scope |
 | Mouse wheel | Scope magnification 4x to 12x while aiming |
-| 1, 2 | Rifle, sidearm |
+| 1 to 4 | Rifle, then the three handguns |
 | B | Toggle binoculars (left click or T tags the hostile under the crosshair) |
 | G | Throw a stone to draw a guard |
 | Shift (hold) | Sprint while standing and moving forward; footsteps carry further |
@@ -78,7 +79,11 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 
 ### Controller
 
-Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click sprints while moving forward at the hip (until you stop, aim, crouch or click again) and holds breath while aiming; right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses.
+Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click sprints while moving forward at the hip (until you stop, aim, crouch or click again) and holds breath while aiming; right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses. Takedowns, skipping slow motion, zooming out, quick save and load and restart have no controller binding yet.
+
+On-screen prompts (tutorial steps, objectives, HUD lines and the pause menu controls help) name the controls of the device you used last, with Xbox-style button names, and switch as soon as you press a key, click or move the mouse, or press a button or push a stick or trigger. They read the current bindings, so a remapped key shows its new key, and remapping a key keeps its controller button.
+
+Aim assist (Settings, Controls, "Controller aim assist", on by default) slows the right stick while the crosshair or scope centre is on or just beside a live hostile in clear sight: 40% slower at Normal, 67% on Easy and 27% on Hard, fading out between 0.3 m and 0.9 m from the body's centre line. It never moves or snaps the aim and does nothing with the mouse or when switched off.
 
 ## Validation
 

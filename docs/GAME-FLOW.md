@@ -103,6 +103,7 @@ flowchart TB
 |---|---|
 | `GameState` | Shared mission state: pause, completion/failure, difficulty and mission-level flags |
 | `Settings` | Saved user preferences, controls, sensitivity, video/audio and accessibility options |
+| `InputGlyphs` | Last input device (keyboard and mouse or controller) and device-aware prompt text for each action's current binding |
 | `SaveSystem` | Versioned save data, checkpoints, quick save/load and validation of corrupt or incompatible files |
 | `Loadout` | Installed weapon parts and per-weapon configurations |
 | `Progression` | Mission records, best score/time/shot distance, unlocks and achievements |
