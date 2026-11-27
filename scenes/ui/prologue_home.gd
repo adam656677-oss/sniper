@@ -46,6 +46,7 @@ var exposure_label: Label
 var exposure_bar: ProgressBar
 var key_light: DirectionalLight3D
 var front_door: Node3D
+var lena: MeshInstance3D
 var door_collision: CollisionShape3D
 var fade_rect: ColorRect
 var alarm_rect: ColorRect
@@ -123,7 +124,7 @@ func _build_house() -> void:
 	_box("Kitchen island", Vector3(-3.6, 0.55, -1.8), Vector3(2.2, 1.1, 1.2), Color(0.3, 0.25, 0.19), false)
 	_box("Window", Vector3(0, 2, -8.62), Vector3(3, 1.6, 0.08), Color(0.08, 0.13, 0.18), false)
 	_box("Photo frame", Vector3(2, 1.65, -3.65), Vector3(0.9, 0.7, 0.08), Color(0.65, 0.43, 0.23), false)
-	_capsule("Lena silhouette", Vector3(-2.2, 0.9, -1.4), Color(0.48, 0.3, 0.25))
+	lena = _capsule("Lena silhouette", Vector3(-2.2, 0.9, -1.4), Color(0.48, 0.3, 0.25))
 	_box("Data key", Vector3(-1.1, 1, -1.4), Vector3(0.22, 0.08, 0.38), Color(0.18, 0.65, 0.72), false)
 	_build_front_door()
 	_build_exterior()
@@ -176,8 +177,13 @@ func _build_player() -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
+	# The fade sits above the HUD and below the subtitle overlay (layer 20), so a
+	# fade to black hides the objective panel while story lines stay readable.
+	var fade_layer := CanvasLayer.new()
+	fade_layer.layer = 10
+	add_child(fade_layer)
 	fade_rect = _overlay(Color.BLACK)
-	layer.add_child(fade_rect)
+	fade_layer.add_child(fade_rect)
 	alarm_rect = _overlay(Color(0.55, 0.04, 0.02))
 	layer.add_child(alarm_rect)
 	var panel := PanelContainer.new()
@@ -278,7 +284,7 @@ func _boundary(label: String, at: Vector3, size: Vector3) -> void:
 	body.add_child(collision)
 	add_child(body)
 
-func _capsule(label: String, at: Vector3, tint: Color) -> void:
+func _capsule(label: String, at: Vector3, tint: Color) -> MeshInstance3D:
 	var mesh := MeshInstance3D.new()
 	var shape := CapsuleMesh.new()
 	shape.radius = 0.28
@@ -288,6 +294,7 @@ func _capsule(label: String, at: Vector3, tint: Color) -> void:
 	mesh.position = at
 	mesh.name = label
 	add_child(mesh)
+	return mesh
 
 func _build_exterior() -> void:
 	_box("Yard ground", Vector3(0, -0.32, 27), Vector3(46, 0.35, 40), Color(0.12, 0.14, 0.12), true)
@@ -530,9 +537,16 @@ func _begin_attack() -> void:
 	door_tween.tween_property(front_door, "rotation:y", deg_to_rad(72), 0.8).set_delay(0.5)
 	for operative in operatives:
 		operative.visible = true
+	for id in interactables:
+		interactables[id].node.visible = false
 	exposure_label.visible = true
 	exposure_bar.visible = true
 	StoryCampaign.dialogue_requested.emit(tr("NARRATOR"), tr("The front door buckles inward. The house is no longer safe."))
+	StoryCampaign.dialogue_requested.emit(tr("LENA VALE"), tr("They're here for the key. Take it and go, Elias. I'll be right behind you!"))
+	# Lena runs for the back of the house; the aftermath reveals she never got out.
+	var lena_exit := create_tween()
+	lena_exit.tween_property(lena, "position", Vector3(-5.4, 0.9, -7.6), 1.4).set_delay(0.4)
+	lena_exit.tween_callback(lena.hide)
 	StoryCampaign.dialogue_requested.emit(tr("MARA QUILL — RADIO"), tr("Two of them are sweeping the yard with lights. Stay out of the beams and make for the trees."))
 	_update_objective()
 
@@ -603,27 +617,37 @@ func _escape_home() -> void:
 		StoryCampaign.dialogue_requested.emit(tr("MARA QUILL — RADIO"), tr("They never saw you. Keep moving, Echo."))
 	else:
 		StoryCampaign.dialogue_requested.emit(tr("MARA QUILL — RADIO"), tr("You're clear. Barely. Keep moving."))
-	StoryCampaign.dialogue_requested.emit(tr("NARRATOR"), tr("Elias disappears into the tree line with Lena's data key. By sunrise, Asterion will call him the attacker."))
 	objective.text = tr("PROLOGUE COMPLETE  //  KESTREL PASS UNLOCKED")
 	prompt.text = tr("Moving to Kestrel Pass...")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if auto_transition:
-		_finish_escape_transition()
+	_finish_escape_transition()
 
+# Outro: finish the escape lines, fade to black, narrate the aftermath over the
+# black screen, then complete the chapter. auto_transition only gates the final
+# scene change so tests and captures can stay in this scene.
 func _finish_escape_transition() -> void:
-	# Let every queued line finish so the final story beat is never cut off.
-	while StoryDialogue.panel.visible or not StoryDialogue.queue.is_empty():
-		await get_tree().process_frame
-		if not is_inside_tree():
-			return
+	if not await _dialogue_finished():
+		return
 	await get_tree().create_timer(0.35).timeout
 	if not is_inside_tree():
 		return
 	var fade := create_tween()
 	fade.tween_property(fade_rect, "modulate:a", 1.0, 1.0)
 	await fade.finished
+	prompt.text = ""
+	for beat in StoryCampaign.AFTERMATH_BEATS:
+		StoryCampaign.dialogue_requested.emit(tr(String(beat.speaker)), tr(String(beat.text)))
+	if not await _dialogue_finished():
+		return
 	StoryCampaign.complete_prologue()
-	get_tree().change_scene_to_file(KESTREL_SCENE)
+	if auto_transition:
+		get_tree().change_scene_to_file(KESTREL_SCENE)
+
+# Waits until every queued line has been read. False if this scene left the tree.
+func _dialogue_finished() -> bool:
+	while is_inside_tree() and (StoryDialogue.panel.visible or not StoryDialogue.queue.is_empty()):
+		await get_tree().process_frame
+	return is_inside_tree()
 
 func _update_objective() -> void:
 	if attack_started:
