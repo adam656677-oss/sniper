@@ -22,6 +22,8 @@ var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
 var camera: Camera3D
 var takedown: Variant
+var breath_latched := false # Shift held from a sprint when the scope came up
+var was_aiming := false
 
 func _ready() -> void:
 	GameState.reset()
@@ -45,6 +47,7 @@ func _ready() -> void:
 	stealth.camera = camera
 	stealth.player = player
 	stealth.level = level
+	player.sprint_gate = sprint_allowed
 	level.target_killed.connect(on_target_killed)
 	killcam.camera = $KillCamCamera
 	killcam.return_camera = camera
@@ -244,11 +247,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		if is_aiming():
 			scope_view.zoom_out()
 	elif event.is_action_pressed("binoculars"):
+		if weapon.aiming and not stealth.binoculars:
+			weapon.toggle_aim() # the binoculars replace the scope rather than hiding it
 		stealth.toggle_binoculars()
 	elif event.is_action_pressed("tag"):
 		stealth.tag()
 	elif event.is_action_pressed("throw"):
 		stealth.throw_stone()
+	elif event.is_action_pressed("sprint") and event is InputEventJoypadButton:
+		player.toggle_sprint()
 	elif event.is_action_released("aim") and weapon.aiming and (bool(Settings.get_value("controls", "hold_to_aim")) or event is InputEventJoypadMotion):
 		weapon.toggle_aim()
 	elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or event is InputEventJoypadButton or event is InputEventJoypadMotion:
@@ -318,10 +325,24 @@ func hip_fov() -> float:
 func is_aiming() -> bool:
 	return camera.fov < 70.0 and not stealth.binoculars
 
+# The player may sprint only at the hip: not scoped, not on the binoculars, not mid-takedown.
+func sprint_allowed() -> bool:
+	return not weapon.aiming and not stealth.binoculars and not (takedown and takedown.active)
+
+# Shift is both sprint and hold breath. Breath is held only through a raised
+# sight (a narrow hip field of view alone does not count), and a press held from
+# a sprint when the scope comes up is ignored until the player presses it again.
 func advance_sway(delta: float) -> void:
 	sway.stance_multiplier = player.sway_multiplier()
 	if GameState.simulation_active():
-		sway.set_holding(is_aiming() and Input.is_action_pressed("hold_breath"))
+		var aiming := is_aiming() and weapon.aiming
+		var breath_held := Input.is_action_pressed("hold_breath")
+		if not breath_held:
+			breath_latched = false
+		elif aiming and not was_aiming and Input.is_action_pressed("sprint"):
+			breath_latched = true
+		was_aiming = aiming
+		sway.set_holding(aiming and breath_held and not breath_latched)
 		sway.advance(delta)
 	var offset := sway.offset_degrees() if is_aiming() and GameState.simulation_active() else Vector2.ZERO
 	camera.rotation_degrees = Vector3(offset.y + feedback.recoil_degrees, offset.x, 0.0)
