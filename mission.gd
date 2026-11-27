@@ -22,6 +22,7 @@ var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
 var camera: Camera3D
 var takedown: Variant
+var applied_fov_kick := 0.0
 var breath_latched := false # Shift held from a sprint when the scope came up
 var was_aiming := false
 
@@ -48,6 +49,7 @@ func _ready() -> void:
 	stealth.player = player
 	stealth.level = level
 	player.sprint_gate = sprint_allowed
+	player.landed.connect(on_player_landed)
 	level.target_killed.connect(on_target_killed)
 	killcam.camera = $KillCamCamera
 	killcam.return_camera = camera
@@ -329,6 +331,9 @@ func is_aiming() -> bool:
 func sprint_allowed() -> bool:
 	return not weapon.aiming and not stealth.binoculars and not (takedown and takedown.active)
 
+func on_player_landed(fall_speed: float) -> void:
+	feedback.land(fall_speed, weapon.aiming, Settings.reduced_motion())
+
 # Shift is both sprint and hold breath. Breath is held only through a raised
 # sight (a narrow hip field of view alone does not count), and a press held from
 # a sprint when the scope comes up is ignored until the player presses it again.
@@ -346,7 +351,19 @@ func advance_sway(delta: float) -> void:
 		sway.advance(delta)
 	var offset := sway.offset_degrees() if is_aiming() and GameState.simulation_active() else Vector2.ZERO
 	camera.rotation_degrees = Vector3(offset.y + feedback.recoil_degrees, offset.x, 0.0)
-	camera.position.y = feedback.bob_offset()
+	camera.position.y = feedback.bob_offset() + feedback.dip_offset()
+
+# The sprint kick widens the hip view only. The scope and binoculars own the
+# field of view while they are up, and the kick has eased away by the time
+# sprinting can resume.
+func advance_camera_fov() -> void:
+	if weapon.aiming or stealth.binoculars:
+		applied_fov_kick = 0.0
+		return
+	var kick: float = feedback.sprint_fov_offset()
+	if kick > 0.0 or applied_fov_kick > 0.0:
+		camera.fov = hip_fov() + kick
+	applied_fov_kick = kick
 
 const CROSSHAIR := "+"
 const HIT_MARKER := "X"
@@ -365,6 +382,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if GameState.simulation_active():
 		feedback.advance(delta, Vector2(player.velocity.x, player.velocity.z).length(), is_aiming(), Settings.reduced_motion())
+		feedback.advance_motion(delta, player.sprinting, Settings.reduced_motion())
 	feedback.draw_tracers(weapon.projectiles)
 	update_crosshair()
 	$HUDLayer.visible = not killcam.following
@@ -373,6 +391,7 @@ func _physics_process(delta: float) -> void:
 	viewmodel.advance(delta, weapon.aiming, weapon.reload_remaining, Vector2(player.velocity.x, player.velocity.z).length())
 	weapon.advance_projectiles(delta)
 	advance_sway(delta)
+	advance_camera_fov()
 	killcam.advance(delta)
 	killcam.advance_follow(delta, killcam.following and weapon.projectiles.has(killcam.followed))
 	stealth.advance(delta)

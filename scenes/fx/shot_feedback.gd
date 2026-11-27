@@ -2,17 +2,31 @@ class_name ShotFeedback
 extends Node3D
 
 # Visual feedback for shots: tracer lines for rounds in flight, dust puffs and
-# bullet holes where rounds land, and recoil/head-bob camera offsets.
-# Lives under the mission; tracers and impacts are drawn in world space.
+# bullet holes where rounds land, and the camera offsets: recoil, head bob, the
+# sprint field-of-view kick and the landing dip. Bob, kick and dip are off while
+# aiming and with reduced motion. Lives under the mission; tracers and impacts
+# are drawn in world space.
 
 const MAX_HOLES := 64
 const TRACER_MIN_DISTANCE := 60.0
 const RECOIL_RECOVERY := 8.0 # per second, exponential
 const BOB_AMPLITUDE := 0.035
 const BOB_FREQUENCY := 9.0
+const SPRINT_FOV_KICK := 5.0 # degrees added to the hip field of view at full sprint
+const SPRINT_FOV_IN := 0.35 # seconds to ease the kick in
+const SPRINT_FOV_OUT := 0.3 # seconds to ease it back out
+const LANDING_DIP_MIN_SPEED := 5.0 # m/s at touch-down, about a 0.6 m drop; slower is a step, not a fall
+const LANDING_DIP_FULL_SPEED := 12.0 # m/s for the deepest dip, about a 3.6 m drop
+const LANDING_DIP_MIN := 0.05 # metres
+const LANDING_DIP_MAX := 0.14
+const LANDING_DIP_TIME := 0.4 # seconds down and back up
+const LANDING_DIP_ATTACK := 0.25 # share of the dip spent going down
 
 var recoil_degrees := 0.0
 var bob_time := 0.0
+var sprint_blend := 0.0
+var dip_depth := 0.0
+var dip_time := 0.0
 var holes: Array[Node3D] = []
 var tracer_mesh := ImmediateMesh.new()
 var tracer_instance: MeshInstance3D
@@ -51,6 +65,43 @@ func advance(delta: float, moving_speed: float, aiming: bool, reduced_motion: bo
 
 func bob_offset() -> float:
 	return sin(bob_time) * BOB_AMPLITUDE if bob_time > 0.0 else 0.0
+
+# Sprint kick and landing dip. Reduced motion clears both at once.
+func advance_motion(delta: float, sprinting: bool, reduced_motion: bool) -> void:
+	var dt := maxf(delta, 0.0)
+	if reduced_motion:
+		sprint_blend = 0.0
+		dip_depth = 0.0
+		dip_time = 0.0
+		return
+	var ease_time := SPRINT_FOV_IN if sprinting else SPRINT_FOV_OUT
+	sprint_blend = move_toward(sprint_blend, 1.0 if sprinting else 0.0, dt / ease_time)
+	if dip_depth > 0.0:
+		dip_time += dt
+		if dip_time >= LANDING_DIP_TIME:
+			dip_depth = 0.0
+			dip_time = 0.0
+
+# Degrees to add to the hip field of view; eased in and out.
+func sprint_fov_offset() -> float:
+	return SPRINT_FOV_KICK * smoothstep(0.0, 1.0, sprint_blend)
+
+# Starts a dip for a touch-down at fall_speed m/s. Steps, scoped landings and reduced motion get none.
+func land(fall_speed: float, aiming: bool, reduced_motion: bool) -> bool:
+	if reduced_motion or aiming or fall_speed < LANDING_DIP_MIN_SPEED:
+		return false
+	var weight := clampf((fall_speed - LANDING_DIP_MIN_SPEED) / (LANDING_DIP_FULL_SPEED - LANDING_DIP_MIN_SPEED), 0.0, 1.0)
+	dip_depth = lerpf(LANDING_DIP_MIN, LANDING_DIP_MAX, weight)
+	dip_time = 0.0
+	return true
+
+# Camera height offset in metres: a quick drop, then an eased recovery.
+func dip_offset() -> float:
+	if dip_depth <= 0.0:
+		return 0.0
+	var phase := dip_time / LANDING_DIP_TIME
+	var envelope := sin(phase / LANDING_DIP_ATTACK * PI * 0.5) if phase < LANDING_DIP_ATTACK else 1.0 - smoothstep(LANDING_DIP_ATTACK, 1.0, phase)
+	return -dip_depth * envelope
 
 # Lines from each round's launch point to its current position, once it is far enough out to read.
 func draw_tracers(projectiles: Array[Dictionary]) -> void:
