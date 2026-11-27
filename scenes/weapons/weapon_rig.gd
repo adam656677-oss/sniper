@@ -6,6 +6,7 @@ extends Node
 # Needs `camera` and `excluded` set by the mission before firing.
 
 const Ballistics = preload("res://ballistics.gd")
+# The first entry is the default rifle; the workbench's chosen rifle replaces it.
 const DEFAULT_PROFILES := [
 	"res://scenes/weapons/profiles/ridgeline_recon.tres",
 	"res://scenes/weapons/profiles/whisper_sidearm.tres",
@@ -40,13 +41,19 @@ var excluded: Array[RID] = []
 func _ready() -> void:
 	spread_rng.randomize()
 	if profiles.is_empty():
-		for path in DEFAULT_PROFILES:
+		for path in profile_paths():
 			profiles.append(Loadout.apply_to(load(path) as WeaponProfile))
 	for profile in profiles:
 		stored.append({"ammo": profile.capacity, "reserve": profile.reserve, "cooldown": 0.0})
 		zero_ranges.append(profile.zero_range)
 	ammo = profiles[active].capacity
 	reserve_ammo = profiles[active].reserve
+
+# The default loadout with the rifle chosen at the workbench in the primary slot.
+static func profile_paths() -> Array:
+	var paths: Array = DEFAULT_PROFILES.duplicate()
+	paths[0] = Loadout.rifle_path()
+	return paths
 
 func hip_fov() -> float:
 	return clampf(float(Settings.get_value("video", "fov")), 60.0, 110.0)
