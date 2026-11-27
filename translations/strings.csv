@@ -200,3 +200,6 @@ RECOVERED FILE: %s,RECOVERED FILE: %s
 "WASD Move  •  Mouse Look  •  E Interact  •  C Crouch  •  Esc Release Mouse","WASD Move  •  Mouse Look  •  E Interact  •  C Crouch  •  Esc Release Mouse"
 "They're here for the key. Take it and go, Elias. I'll be right behind you!","They're here for the key. Take it and go, Elias. I'll be right behind you!"
 "Sprint","Sprint"
+"Left click fire | Right click aim | Wheel zoom | Shift sprint, or hold breath while aiming | [ ] zero","Left click fire | Right click aim | Wheel zoom | Shift sprint, or hold breath while aiming | [ ] zero"
+"B binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact","B binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact"
+"1 rifle | 2–4 handguns | F silent takedown (behind, close) | F5 quick save | F9 quick load | Escape pause | N restart","1 rifle | 2–4 handguns | F silent takedown (behind, close) | F5 quick save | F9 quick load | Escape pause | N restart"
