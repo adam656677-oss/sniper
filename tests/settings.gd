@@ -82,6 +82,7 @@ func run_tests() -> void:
 	for section in settings.DEFAULTS:
 		total += settings.DEFAULTS[section].size()
 	check(bound == total, "Every setting has a control (%d of %d)" % [bound, total])
+	check(settings.get_value("controls", "aim_assist") == true and screen.checks.has("controls/aim_assist") and screen.checks["controls/aim_assist"].button_pressed, "Aim assist defaults on and has a check box")
 	check(screen.remap_buttons.size() == settings.REMAPPABLE.size() and screen.remap_buttons["reload"].text == "R", "Every remappable action shows its key")
 	screen.start_listening("reload")
 	check(screen.remap_buttons["reload"].text == "Press a key...", "Choosing an action waits for a key")
