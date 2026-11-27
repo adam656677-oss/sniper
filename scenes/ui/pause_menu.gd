@@ -40,7 +40,7 @@ func _ready() -> void:
 	button("Restart mission", func(): get_tree().reload_current_scene())
 	button("Quit to menu", func(): mission.quit_to_menu())
 	var help := Label.new()
-	help.text = mission.CONTROLS_HELP if mission and mission.get("CONTROLS_HELP") else ""
+	help.text = mission.controls_help() if mission and mission.has_method("controls_help") else ""
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	help.add_theme_font_size_override("font_size", 12)
 	panel.add_child(help)
