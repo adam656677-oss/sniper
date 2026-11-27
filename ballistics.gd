@@ -81,6 +81,45 @@ static func holdover(muzzle_velocity: float, target_range: float, zero_range: fl
 	var elevation := zero_angle(muzzle_velocity, zero_range, params)
 	return -float(simulate_flat(muzzle_velocity, elevation, target_range, params).height)
 
+# Ricochet off hard surfaces. A round that meets metal or stone at RICOCHET_MAX_ANGLE
+# degrees or less (measured between its path and the surface) skips off along the
+# mirror reflection about the surface normal, turned by up to RICOCHET_SCATTER_DEGREES,
+# and keeps RICOCHET_SPEED_RETENTION of its speed (36% of its energy). Steeper strikes
+# and soft surfaces stop it. Fictional tuning.
+const RICOCHET_MAX_ANGLE := 15.0
+const RICOCHET_SPEED_RETENTION := 0.6
+const RICOCHET_SCATTER_DEGREES := 4.0
+const RICOCHET_MIN_EXIT_ANGLE := 1.0 # scatter never turns a round back into the surface
+
+# Degrees between a path and the surface it meets: 0 grazing, 90 head-on.
+static func incidence_angle(direction: Vector3, normal: Vector3) -> float:
+	if direction.length_squared() == 0.0 or normal.length_squared() == 0.0:
+		return 90.0
+	return rad_to_deg(asin(clampf(-direction.normalized().dot(normal.normalized()), -1.0, 1.0)))
+
+# Velocity leaving a surface. {} when the round stops there, otherwise
+# {"velocity", "angle"} with the strike angle in degrees. The scatter is drawn from
+# rng; with no rng or zero degrees the round leaves along the exact reflection.
+static func ricochet(velocity: Vector3, normal: Vector3, hard: bool, rng: RandomNumberGenerator = null, scatter_degrees: float = RICOCHET_SCATTER_DEGREES) -> Dictionary:
+	if not hard or velocity.length_squared() == 0.0 or normal.length_squared() == 0.0:
+		return {}
+	var n := normal.normalized()
+	var angle := incidence_angle(velocity, n)
+	if angle <= 0.0 or angle > RICOCHET_MAX_ANGLE:
+		return {}
+	var direction := velocity.normalized()
+	var leaving := direction - 2.0 * direction.dot(n) * n
+	if rng != null and scatter_degrees > 0.0:
+		var axis := leaving.cross(n)
+		if axis.length_squared() < 0.000001:
+			axis = leaving.cross(Vector3.UP if absf(leaving.y) < 0.9 else Vector3.RIGHT)
+		axis = axis.normalized().rotated(leaving, rng.randf_range(0.0, TAU))
+		leaving = leaving.rotated(axis, deg_to_rad(scatter_degrees) * sqrt(rng.randf())).normalized()
+		var min_exit := sin(deg_to_rad(RICOCHET_MIN_EXIT_ANGLE))
+		if leaving.dot(n) < min_exit:
+			leaving = (leaving + n * (min_exit - leaving.dot(n))).normalized()
+	return {"velocity": leaving * velocity.length() * RICOCHET_SPEED_RETENTION, "angle": angle}
+
 # Trace each old-to-new position segment during integration to avoid tunnelling.
 static func trace_segment(space: PhysicsDirectSpaceState3D, start: Vector3, finish: Vector3, excluded: Array[RID], collision_mask: int = 1) -> Dictionary:
 	if start.is_equal_approx(finish):

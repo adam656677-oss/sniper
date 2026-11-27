@@ -127,6 +127,10 @@ func run_tests() -> void:
 	level.weather = 0
 	level.wind = Vector3.ZERO
 	weapon.wind = Vector3.ZERO
+	var straight_round := {"position": Vector3(0, 0, -100), "velocity": Vector3(0, 0, -800)}
+	var skipped_round := {"position": Vector3(-3, 0, -104), "velocity": Vector3(-480, 0, -640), "bounce_point": Vector3(0, 0, -100)}
+	check(fx.tracer_tail(straight_round).is_equal_approx(Vector3(0, 0, -75)), "A straight round's tracer trails 25 m behind it")
+	check(fx.tracer_tail(skipped_round).is_equal_approx(Vector3(0, 0, -100)), "A ricochet's tracer starts at the strike, not back through the surface")
 	weapon.ricochet_scatter = 0.0
 	weapon.ricochet.connect(func(position, normal, incoming, outgoing, body): ricochets.append({"position": position, "normal": normal, "incoming": incoming, "outgoing": outgoing, "body": body}))
 	weapon.impact.connect(func(position, normal, body): impacts.append({"position": position, "normal": normal, "body": body}))

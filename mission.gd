@@ -1,6 +1,7 @@
 extends Node3D
 
 const TakedownControllerScript = preload("res://scenes/takedown_controller.gd")
+const ImpactSurfaces = preload("res://scenes/fx/impact_surfaces.gd")
 
 # Mission root: wires the level, player, weapon rig and HUD together and
 # routes input to the right system. Simulation state lives in GameState.
@@ -56,6 +57,7 @@ func _ready() -> void:
 	killcam.return_camera = camera
 	weapon.fired.connect(on_weapon_fired)
 	weapon.impact.connect(on_impact)
+	weapon.ricochet.connect(on_ricochet)
 	weapon.body_hit.connect(on_body_hit)
 	level.coordinator.level_changed.connect(on_alert_changed)
 	level.mission_log.objective_changed.connect(on_objective_changed)
@@ -101,26 +103,14 @@ func on_impact(position: Vector3, normal: Vector3, body: Node3D) -> void:
 	var living := body != null and body.has_method("take_hit")
 	feedback.impact(position, normal, not living, impact_surface_for(body))
 
-
 func impact_surface_for(body: Node3D) -> String:
-	if body == null:
-		return "earth"
-	if body.has_meta("impact_surface"):
-		return String(body.get_meta("impact_surface"))
-	if body.is_in_group("surface_metal"):
-		return "metal"
-	if body.is_in_group("surface_wood"):
-		return "wood"
-	if body.is_in_group("surface_earth"):
-		return "earth"
-	var label := String(body.name).to_lower()
-	if label.contains("fuel") or label.contains("truck") or label.contains("metal"):
-		return "metal"
-	if label.contains("wood") or label.contains("crate") or label.contains("door"):
-		return "wood"
-	if label.contains("ground") or label.contains("terrain") or label.contains("road"):
-		return "earth"
-	return "stone"
+	return ImpactSurfaces.surface_for(body)
+
+# A round skipping off a hard surface: sparks along its new path, and the whine is
+# a noise for guards near the strike (loud enough to alarm the closest ones).
+func on_ricochet(position: Vector3, _normal: Vector3, _incoming: Vector3, outgoing: Vector3, _body: Node3D) -> void:
+	feedback.ricochet(position, outgoing)
+	level.report_noise(position, WeaponRig.RICOCHET_NOISE_RADIUS, 1.0)
 
 func on_weapon_fired(profile: WeaponProfile) -> void:
 	if profile.simulated_projectile and not weapon.projectiles.is_empty():
