@@ -4,7 +4,7 @@ This pass adds a short first-person brass casing animation to the existing proce
 
 ## Limits
 
-The casing is a camera-local presentation effect, not a world-physics rigid body. It does not collide with floors, bounce, emit its own sound, or persist in the level. The weapon and arm geometry remain procedural placeholders rather than authored production models. Smoke, surface-specific impact materials, optional blood effects, footstep dust and distant explosions are still outstanding.
+The casing is a camera-local presentation effect, not a world-physics rigid body. It does not collide with floors, bounce, emit its own sound, or persist in the level. The weapon and arm geometry remain procedural placeholders rather than authored production models. Surface-specific impacts, ricochets and the optional blood mist are covered in `docs/Surface-Specific-Impacts.md`. Footstep dust and distant explosions are still outstanding.
 
 ## Validation
 

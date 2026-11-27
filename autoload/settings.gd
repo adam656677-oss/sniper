@@ -8,7 +8,7 @@ const DEFAULTS := {
 	"video": {"fullscreen": false, "vsync": true, "fov": 75.0, "resolution_scale": 1.0},
 	"audio": {"master": 1.0, "music": 0.8, "sfx": 1.0},
 	"controls": {"sensitivity": 1.0, "invert_y": false, "hold_to_aim": false, "aim_assist": true},
-	"gameplay": {"difficulty": 1, "killcam": true, "realism_ranging": false, "hud_assists": true},
+	"gameplay": {"difficulty": 1, "killcam": true, "realism_ranging": false, "hud_assists": true, "blood_effects": true},
 	"accessibility": {"reduced_motion": false, "colorblind_reticle": false, "subtitles": true},
 }
 const REMAPPABLE := ["move_forward", "move_back", "move_left", "move_right", "sprint", "fire", "aim", "reload", "interact",
@@ -141,6 +141,10 @@ func high_contrast_reticle() -> bool:
 
 func realism_ranging() -> bool:
 	return bool(get_value("gameplay", "realism_ranging"))
+
+# A small dark-red mist on body hits; off shows the neutral dust puff. The hit marker is the same either way.
+func blood_effects() -> bool:
+	return bool(get_value("gameplay", "blood_effects"))
 
 func invert_y() -> bool:
 	return bool(get_value("controls", "invert_y"))

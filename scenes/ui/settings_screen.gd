@@ -47,6 +47,7 @@ func _ready() -> void:
 	add_check_to(gameplay, "Long-shot slow motion", "gameplay", "killcam")
 	add_check_to(gameplay, "HUD assists", "gameplay", "hud_assists")
 	add_check_to(gameplay, "Realistic ranging (binoculars only)", "gameplay", "realism_ranging")
+	add_check_to(gameplay, tr("Blood effects"), "gameplay", "blood_effects")
 	var access := page("Accessibility")
 	add_check_to(access, "Reduced motion", "accessibility", "reduced_motion")
 	add_check_to(access, "High-contrast reticle", "accessibility", "colorblind_reticle")

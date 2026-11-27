@@ -33,10 +33,12 @@ func run_tests() -> void:
 	settings.clear_bindings()
 	check(settings.get_value("controls", "sensitivity") == 1.0 and settings.get_value("gameplay", "difficulty") == 1, "Defaults are in place")
 	check(settings.get_value("nope", "x") == null, "Unknown settings read as null")
+	check(settings.get_value("gameplay", "blood_effects") == true, "Blood effects are on by default")
 	settings.set_value("controls", "sensitivity", 2.5)
 	settings.set_value("controls", "invert_y", true)
 	settings.set_value("gameplay", "difficulty", 2)
 	settings.set_value("gameplay", "killcam", false)
+	settings.set_value("gameplay", "blood_effects", false)
 	settings.set_value("nope", "x", 1)
 	check(settings.values.has("nope") == false, "Unknown settings are ignored")
 	check(settings.remap("reload", key_event(KEY_K)), "Reload can be remapped")
@@ -49,6 +51,7 @@ func run_tests() -> void:
 	check(settings.load_settings(), "Settings load from disk")
 	settings.apply()
 	check(settings.get_value("controls", "sensitivity") == 2.5 and settings.invert_y() and settings.get_value("gameplay", "killcam") == false, "Values round-trip")
+	check(settings.get_value("gameplay", "blood_effects") == false, "Turning blood effects off round-trips")
 	check(state.difficulty == state.Difficulty.HARD, "Applying settings sets the difficulty")
 	check(InputMap.event_is_action(key_event(KEY_K), "reload"), "Bindings round-trip and apply")
 	var game = load("res://main.tscn").instantiate()
@@ -95,7 +98,14 @@ func run_tests() -> void:
 	screen.checks["accessibility/colorblind_reticle"].button_pressed = true
 	screen.checks["gameplay/realism_ranging"].button_pressed = true
 	screen.sliders["video/resolution_scale"].value = 0.75
+	var blood_box: CheckBox = screen.checks.get("gameplay/blood_effects")
+	check(blood_box != null and blood_box.text == "Blood effects" and blood_box.get_parent().get_parent() == screen.tabs.get_node("Gameplay"), "Blood effects is a checkbox on the gameplay tab")
+	check(blood_box != null and blood_box.button_pressed, "The blood effects box shows the default")
+	if blood_box:
+		blood_box.button_pressed = false
 	screen.apply_from_controls()
+	var saved := ConfigFile.new()
+	check(settings.get_value("gameplay", "blood_effects") == false and saved.load(settings.PATH) == OK and saved.get_value("gameplay", "blood_effects", true) == false, "Unticking blood effects applies and saves it")
 	var music := AudioServer.get_bus_index("Music")
 	check(AudioServer.bus_count == 3 and music > 0 and absf(AudioServer.get_bus_volume_db(music) - linear_to_db(0.25)) < 0.01, "Music volume reaches its audio bus")
 	check(is_equal_approx(root.scaling_3d_scale, 0.75), "Render scale reaches the viewport")
