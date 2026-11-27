@@ -41,7 +41,7 @@ The original revenge/corporate-noir story is documented in:
 
 The story follows Elias Vance after Asterion Continuity's Varn Accord strike team attacks his home, kills his wife Lena Vale and frames him. Lena's Black Ledger evidence points to the NIGHTGLASS program and ultimately to Asterion director Silas Vey. The final confrontation is intended to be earned through the campaign, with the player deciding what happens to the evidence afterward.
 
-The prologue opens with a text-and-dialogue presentation, then hands off to a playable blockout: the home with three story discoveries, the front-door breach, and a stealth escape across the yard past two flashlight-sweeping Accord operatives (cover, crouch, an exposure meter, spotted-and-reset). It uses primitive geometry; the on-screen raid, authored characters, animation, voice and a human difficulty playtest remain. Later missions, the complete Rusk/Vey boss encounters and ending presentation are not implemented yet.
+The prologue opens with a short text presentation that sets up the evening, then hands off to a playable blockout: the home with three story discoveries, the front-door breach, and a stealth escape across the yard past two flashlight-sweeping Accord operatives (cover, crouch, an exposure meter, spotted-and-reset). Lena's loss and the framing are narrated over black after the escape, and the Kestrel Pass briefing acknowledges whether Elias was seen. It uses primitive geometry; the on-screen raid, authored characters, animation, voice and a human difficulty playtest remain. Later missions, the complete Rusk/Vey boss encounters and ending presentation are not implemented yet.
 
 ## Major remaining production gates
 

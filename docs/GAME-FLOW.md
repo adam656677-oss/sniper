@@ -283,13 +283,14 @@ flowchart TD
     ROUTE --> KESTREL[Kestrel Pass]
     ROUTE --> ECHO[Echo Ridge recon]
     ROUTE --> COMPOUND[The Compound]
-    PROLOGUE --> BEATS[Skippable narrative beats and saved position]
+    PROLOGUE --> BEATS[Skippable intro: the evening and Lena's discovery, saved position]
     BEATS --> HOME[Playable home: three discoveries and Lena's data key]
-    HOME --> BREACH[Attack: front door breached, Accord team sweeps the yard]
+    HOME --> BREACH[Attack: front door breached, Lena sends Elias out with the key, Accord team sweeps the yard]
     BREACH --> SWEEP{Exposure meter full?}
     SWEEP -->|yes: spotted| DOORWAY[Reset to the doorway, Mara radio hint]
     DOORWAY --> BREACH
-    SWEEP -->|no: reach the tree line| COMPLETE_PROLOGUE[Complete prologue and record unseen or seen escape]
+    SWEEP -->|no: reach the tree line| AFTERMATH[Fade to black: aftermath narration, Lena's loss and the framing]
+    AFTERMATH --> COMPLETE_PROLOGUE[Complete prologue and record unseen or seen escape]
     COMPLETE_PROLOGUE --> KESTREL
     KESTREL --> RADIO[StoryDialogue radio/subtitle beats]
     RADIO --> OBJECTIVES[Mission objectives and player choices]
@@ -311,4 +312,4 @@ flowchart TD
 - Mission objective events can request one-time dialogue and add evidence. Replayed scenes do not repeat already-seen one-time story lines.
 - The prologue stores its current beat so Continue Story resumes the sequence.
 - The current story path connects the prologue to Kestrel Pass, Echo Ridge recon and The Compound. Later campaign chapters are intentionally not selectable until their playable scenes exist.
-- The prologue is a skippable text-and-dialogue opening followed by a playable blockout: the home (three discoveries), the breach, and a stealth escape across the yard past two flashlight-sweeping Accord operatives. Operatives use the shared `Perception` component narrowed to the beam; the van and low cover block sight, crouching lowers exposure, the house is a safe zone, and being spotted resets Elias to the doorway. The `prologue_escape_unseen` story flag records how he got out. Authored cinematics, an on-screen raid, character art and animation, voice acting and the final boss/ending presentation remain production work.
+- The prologue is a skippable text-and-dialogue opening followed by a playable blockout: the home (three discoveries), the breach, and a stealth escape across the yard past two flashlight-sweeping Accord operatives. Operatives use the shared `Perception` component narrowed to the beam; the van and low cover block sight, crouching lowers exposure, the house is a safe zone, and being spotted resets Elias to the doorway. The `prologue_escape_unseen` story flag records how he got out, and Mara's Kestrel Pass briefing changes to match. The text intro stops before the attack; Lena's loss, the framing and the VARN ACCORD lead are narrated over black after the escape (`StoryCampaign.AFTERMATH_BEATS`). Authored cinematics, an on-screen raid, character art and animation, voice acting and the final boss/ending presentation remain production work.
