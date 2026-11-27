@@ -64,12 +64,20 @@ func run_tests() -> void:
 	var level = game.level
 	var log = level.mission_log
 	check(log.status("t_aim") == log.Status.ACTIVE and log.status("t_ring_100") == log.Status.HIDDEN, "The tutorial starts with aiming")
+	var glyphs = root.get_node_or_null("InputGlyphs")
+	check(glyphs != null, "Tutorial prompts come from the InputGlyphs device tracker")
+	if glyphs:
+		glyphs.set_gamepad(false)
+		check(log.lines().has("[ ] Aim down the scope (Right click) (optional)"), "The aim step names the mouse button on keyboard and mouse")
+		glyphs.set_gamepad(true)
+		check(log.lines().has("[ ] Aim down the scope (LT) (optional)"), "The aim step names the left trigger on a controller")
+		glyphs.set_gamepad(false)
 	level.advance_tutorial()
 	check(level.tutorial_step == 0, "Steps wait for their condition")
 	game.weapon.toggle_aim()
 	level.advance_tutorial()
 	check(log.status("t_aim") == log.Status.COMPLETE and log.status("t_ring_100") == log.Status.ACTIVE, "Aiming completes the first step and reveals the next")
-	check(not log.lines().has("[x] Aim down the scope (right click or left trigger) (optional)"), "Finished tutorial steps leave the HUD list")
+	check(not log.lines().any(func(line): return line.contains("Aim down the scope")), "Finished tutorial steps leave the HUD list")
 	level.plate_at(100.0).take_hit(-1, 0.0)
 	level.advance_tutorial()
 	check(level.tutorial_step == 2, "Ringing the 100 m plate advances")

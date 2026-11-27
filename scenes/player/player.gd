@@ -47,6 +47,7 @@ var sprinting := false
 var sprint_toggled := false # controller click-to-sprint, cleared when the sprint ends
 var sprint_latched := false
 var sprint_gate := Callable()
+var look_friction := Callable() # returns the stick look speed multiplier from aim assist, 0..1
 var exertion := 0.0
 var fall_speed := 0.0 # fastest downward speed in the current fall
 var last_landing_speed := 0.0
@@ -58,14 +59,19 @@ func look(relative: Vector2) -> void:
 	head.rotation.x = clampf(head.rotation.x - vertical * sensitivity, -PITCH_LIMIT, PITCH_LIMIT)
 
 # Right-stick look, applied per physics step. Scoped aim is slower, as with the mouse.
+# Aim assist (look_friction, set by the mission) can only lower the speed, on both
+# axes alike; with the stick at rest nothing turns.
 func stick_look(delta: float) -> void:
 	var stick := Input.get_vector("look_left", "look_right", "look_up", "look_down")
 	if stick == Vector2.ZERO:
 		return
-	var scale := STICK_LOOK_SPEED * Settings.sensitivity() * (0.35 if camera.fov < 30.0 else 1.0) * delta
+	var scale := STICK_LOOK_SPEED * Settings.sensitivity() * (0.35 if camera.fov < 30.0 else 1.0) * delta * look_friction_scale()
 	var vertical := -stick.y if Settings.invert_y() else stick.y
 	rotate_y(-stick.x * scale)
 	head.rotation.x = clampf(head.rotation.x - vertical * scale, -PITCH_LIMIT, PITCH_LIMIT)
+
+func look_friction_scale() -> float:
+	return clampf(float(look_friction.call()), 0.0, 1.0) if look_friction.is_valid() else 1.0
 
 func set_stance(value: Stance) -> bool:
 	if not GameState.simulation_active() or not STANCE_HEIGHT.has(value):

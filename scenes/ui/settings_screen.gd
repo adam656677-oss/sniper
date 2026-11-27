@@ -37,6 +37,7 @@ func _ready() -> void:
 	add_slider_to(controls, "Mouse sensitivity", "controls", "sensitivity", 0.1, 5.0, 0.1)
 	add_check_to(controls, "Invert vertical look", "controls", "invert_y")
 	add_check_to(controls, "Hold to aim", "controls", "hold_to_aim")
+	add_check_to(controls, tr("Controller aim assist"), "controls", "aim_assist")
 	var gameplay := page("Gameplay")
 	difficulty = OptionButton.new()
 	for name in ["Easy", "Normal", "Hard"]:
@@ -106,11 +107,10 @@ func add_check_to(parent: Node, text: String, section: String, key: String) -> C
 	checks[section + "/" + key] = box
 	return box
 
+# Key and mouse button names match the in-game prompts (InputGlyphs).
 func binding_text(action: String) -> String:
-	for event in InputMap.action_get_events(action):
-		if event is InputEventKey or event is InputEventMouseButton:
-			return event.as_text().replace(" (Physical)", "")
-	return "Unbound"
+	var event: InputEvent = InputGlyphs.binding(action, false)
+	return InputGlyphs.event_text(event) if event else tr("Unbound")
 
 func load_into_controls() -> void:
 	for path in sliders:

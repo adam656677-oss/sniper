@@ -6,6 +6,7 @@ extends Control
 var mission: Node
 var panel: VBoxContainer
 var settings_screen: SettingsScreen
+var help_label: Label
 const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
 
 func _ready() -> void:
@@ -39,16 +40,24 @@ func _ready() -> void:
 	button("Settings", func(): settings_screen.visible = true; panel.visible = false)
 	button("Restart mission", func(): get_tree().reload_current_scene())
 	button("Quit to menu", func(): mission.quit_to_menu())
-	var help := Label.new()
-	help.text = mission.controls_help() if mission and mission.has_method("controls_help") else ""
-	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	help.add_theme_font_size_override("font_size", 12)
-	panel.add_child(help)
+	help_label = Label.new()
+	help_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help_label.add_theme_font_size_override("font_size", 12)
+	panel.add_child(help_label)
+	refresh_help()
+	InputGlyphs.device_changed.connect(on_device_changed)
 	settings_screen = SettingsScreen.new()
 	settings_screen.visible = false
 	settings_screen.closed.connect(func(): settings_screen.visible = false; panel.visible = true)
 	column.add_child(settings_screen)
 	visible = false
+
+# The controls help names the keys or the controller buttons, whichever was used last.
+func refresh_help() -> void:
+	help_label.text = mission.controls_help() if mission and mission.has_method("controls_help") else ""
+
+func on_device_changed(_gamepad: bool) -> void:
+	refresh_help()
 
 func button(text: String, callback: Callable) -> Button:
 	var b := Button.new()
@@ -64,3 +73,5 @@ func _physics_process(_delta: float) -> void:
 		visible = show
 		panel.visible = true
 		settings_screen.visible = false
+		if show:
+			refresh_help()

@@ -2,7 +2,8 @@ class_name MissionLog
 extends Node
 
 # Ordered objective list for a mission. Objectives are dictionaries so they
-# serialise directly for saves and HUD rendering.
+# serialise directly for saves and HUD rendering. Titles may name controls as
+# {action} tokens, shown as the binding on the device in use (InputGlyphs).
 
 enum Kind { PRIMARY, SECONDARY, OPTIONAL }
 enum Status { HIDDEN, ACTIVE, COMPLETE, FAILED }
@@ -89,7 +90,7 @@ func line(objective: Dictionary) -> String:
 			mark = "[x]"
 		Status.FAILED:
 			mark = "[!]"
-	var text := "%s %s" % [mark, tr(String(objective.title))]
+	var text := "%s %s" % [mark, title_text(objective)]
 	if objective.goal > 1 and objective.status == Status.ACTIVE:
 		text += " (%d/%d)" % [objective.progress, objective.goal]
 	if objective.kind == Kind.SECONDARY:
@@ -99,6 +100,15 @@ func line(objective: Dictionary) -> String:
 	if objective.status == Status.FAILED:
 		text += " " + tr("FAILED")
 	return text
+
+# The translated title with {action} tokens filled in by the InputGlyphs autoload.
+# Looked up at run time: test scripts that name MissionLog compile it before the
+# autoloads exist, so the global identifier is not available here.
+func title_text(objective: Dictionary) -> String:
+	var title := tr(String(objective.title))
+	var tree := Engine.get_main_loop() as SceneTree
+	var glyphs: Node = tree.root.get_node_or_null("InputGlyphs") if tree else null
+	return glyphs.fill(title) if glyphs else title
 
 # Completed optional objectives are dropped from the HUD list to keep it short.
 func lines() -> Array[String]:

@@ -50,6 +50,7 @@ func _ready() -> void:
 	stealth.player = player
 	stealth.level = level
 	player.sprint_gate = sprint_allowed
+	player.look_friction = aim_friction
 	player.landed.connect(on_player_landed)
 	level.target_killed.connect(on_target_killed)
 	killcam.camera = $KillCamCamera
@@ -274,12 +275,37 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				weapon.toggle_aim()
 
+# Pause menu help for the device in use (InputGlyphs). Each entry names its
+# actions as tokens; an entry with an action the device cannot reach is left out
+# (the controller has no takedown, quick save or weapon slots, the keyboard no weapon cycle).
 func controls_help() -> String:
-	return "\n".join([
-		tr("Left click fire | Right click aim | Wheel zoom | Shift sprint, or hold breath while aiming | [ ] zero"),
-		tr("B binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact"),
-		tr("1 rifle | 2–4 handguns | F silent takedown (behind, close) | F5 quick save | F9 quick load | Escape pause | N restart"),
-	])
+	var breath: Array[String] = [tr("{sprint} sprint, or hold breath while aiming")]
+	if InputGlyphs.glyph("sprint") != InputGlyphs.glyph("hold_breath"):
+		breath = [tr("{sprint} sprint"), tr("{hold_breath} hold breath while aiming")]
+	var rows: Array = [
+		[tr("{fire} fire"), tr("{aim} aim"), tr("{zoom_in} zoom in"), tr("{zoom_out} zoom out")] + breath + [tr("{zero_up} zero up"), tr("{zero_down} zero down")],
+		[tr("{binoculars} binoculars ({fire} or {tag} tags)"), tr("{throw} throw stone"), tr("{crouch} crouch"), tr("{prone} prone"), tr("{reload} reload"), tr("{interact} interact")],
+		[tr("{weapon_1} rifle"), tr("{weapon_2}–{weapon_4} handguns"), tr("{next_weapon} next weapon"), tr("{takedown} silent takedown (behind, close)"),
+			tr("{quick_save} quick save"), tr("{quick_load} quick load"), tr("{pause} pause"), tr("{restart} restart")],
+	]
+	var lines: Array[String] = []
+	for row in rows:
+		var entries: Array[String] = []
+		for entry in row:
+			var text := InputGlyphs.fill_bound(entry)
+			if not text.is_empty():
+				entries.append(text)
+		lines.append(" | ".join(entries))
+	return "\n".join(lines)
+
+# Right-stick aim friction over a live hostile in sight (see AimAssist), scaled
+# by difficulty. Only the stick look asks for it, so the mouse never feels it.
+func aim_friction() -> float:
+	if not Settings.aim_assist() or level == null or camera == null:
+		return 1.0
+	var exclude: Array[RID] = [player.get_rid()]
+	var strength := AimAssist.strength_for(GameState.perception_multiplier())
+	return AimAssist.look_scale(camera.global_position, -camera.global_basis.z, level.enemies, strength, get_world_3d().direct_space_state, exclude)
 
 static func signed_text(value: float) -> String:
 	return "%.1f" % (0.0 if absf(value) < 0.05 else value)
@@ -287,9 +313,9 @@ static func signed_text(value: float) -> String:
 func update_hud() -> void:
 	var lines: Array[String] = []
 	if GameState.failed:
-		lines.append(tr("MISSION FAILED - N to restart"))
+		lines.append(InputGlyphs.fill(tr("MISSION FAILED - {restart} to restart")))
 	elif GameState.finished:
-		lines.append(tr("MISSION COMPLETE - N to restart"))
+		lines.append(InputGlyphs.fill(tr("MISSION COMPLETE - {restart} to restart")))
 	elif GameState.paused:
 		lines.append(tr("PAUSED"))
 	lines.append_array(level.mission_log.lines())
@@ -320,12 +346,12 @@ func update_hud() -> void:
 	if stealth.binoculars:
 		extras += "  |  " + tr("BINOCULARS")
 	if stealth.is_carrying():
-		extras += "  |  " + tr("CARRYING BODY (E to drop)")
+		extras += "  |  " + InputGlyphs.fill(tr("CARRYING BODY ({interact} to drop)"))
 	if player.suppression > 0.3:
 		extras += "  |  " + tr("SUPPRESSED")
 	lines.append(tr("Stones %d%s") % [stealth.stones, extras])
 	if killcam.active() or killcam.following:
-		lines.append(tr("LONG SHOT %.0f m  (Space to skip)") % last_long_shot)
+		lines.append(InputGlyphs.fill(tr("LONG SHOT %.0f m  ({skip_killcam} to skip)")) % last_long_shot)
 	hud.text = "\n".join(lines)
 
 func hip_fov() -> float:
