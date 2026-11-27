@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Collect player-facing strings into translations/strings.csv (keys are the English text).
 
-Run from the project root. Existing translations in other columns are kept.
-The same patterns are checked by tests/localisation.gd, so CI fails when a new
-UI string is not in the table.
+Run from the project root. New keys are appended to the end of the table with
+every field quoted and LF line endings; existing rows, their order and any
+translations in other columns are left byte for byte as they are, so a run only
+adds lines to the diff. The same patterns are checked by tests/localisation.gd,
+so CI fails when a new UI string is not in the table.
 """
 import csv, re, pathlib
 
@@ -45,7 +47,7 @@ def collect(root: pathlib.Path) -> list[str]:
         path = root / source
         files += [path] if path.is_file() else sorted(path.rglob("*.gd"))
     for path in files:
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         for pattern in PATTERNS:
             for match in re.findall(pattern, text):
                 match = c_unescape(match)
@@ -53,27 +55,27 @@ def collect(root: pathlib.Path) -> list[str]:
                     found.append(match)
     return found
 
-def main() -> None:
-    root = pathlib.Path(".")
+def main(root: pathlib.Path = pathlib.Path(".")) -> None:
     target = root / "translations" / "strings.csv"
     target.parent.mkdir(exist_ok=True)
-    rows = {}
     header = ["keys", "en"]
-    if target.exists():
-        with target.open(newline="") as f:
+    existing = set()
+    original = target.read_bytes() if target.exists() else b""
+    if original:
+        with target.open(newline="", encoding="utf-8") as f:
             reader = csv.reader(f)
-            header = next(reader)
-            for row in reader:
-                rows[row[0]] = row
-    for key in collect(root):
-        if key not in rows:
-            rows[key] = [key, key] + [""] * (len(header) - 2)
-    with target.open("w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(header)
-        for key in sorted(rows):
-            writer.writerow(rows[key])
-    print(f"{len(rows)} strings in {target}")
+            header = next(reader, header)
+            existing = {row[0] for row in reader if row}
+    added = [key for key in collect(root) if key not in existing]
+    with target.open("a", newline="", encoding="utf-8") as f:
+        if not original:
+            f.write(",".join(header) + "\n")
+        elif not original.endswith(b"\n"):
+            f.write("\n")
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
+        for key in added:
+            writer.writerow([key, key] + [""] * (len(header) - 2))
+    print(f"{len(existing) + len(added)} strings in {target} ({len(added)} added)")
 
 if __name__ == "__main__":
     main()
