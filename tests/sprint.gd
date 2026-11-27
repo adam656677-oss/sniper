@@ -119,6 +119,7 @@ func run_tests() -> void:
 	var hip: float = game.hip_fov()
 	rest_y = player.global_position.y
 	check(player.is_on_floor() and not player.sprinting and is_equal_approx(game.camera.fov, hip), "The player starts on the ground at the hip field of view")
+	check(game.controls_help().contains("Shift sprint, or hold breath while aiming"), "The pause menu controls help lists sprint")
 	Input.action_press("move_forward")
 	await frames(8)
 	check(not player.sprinting and absf(horizontal_speed(player) - 5.0) < 0.1, "Walking forward stays at walking speed")
