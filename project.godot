@@ -10,6 +10,7 @@ config/features=PackedStringArray("4.7")
 
 GameState="*res://autoload/game_state.gd"
 Settings="*res://autoload/settings.gd"
+InputGlyphs="*res://autoload/input_glyphs.gd"
 SaveSystem="*res://autoload/save_system.gd"
 Loadout="*res://autoload/loadout.gd"
 Progression="*res://autoload/progression.gd"
