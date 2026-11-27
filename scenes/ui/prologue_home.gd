@@ -13,6 +13,8 @@ var prompt: Label
 var objective: Label
 var key_light: DirectionalLight3D
 var front_door: Node3D
+var fade_rect: ColorRect
+var attack_lights: Array[SpotLight3D] = []
 var interactables: Dictionary = {}
 var discoveries: Array[String] = []
 var attack_started := false
@@ -80,6 +82,7 @@ func _build_house() -> void:
 	_capsule("Lena silhouette", Vector3(-2.2, 0.9, -1.4), Color(0.48, 0.3, 0.25))
 	_box("Data key", Vector3(-1.1, 1, -1.4), Vector3(0.22, 0.08, 0.38), Color(0.18, 0.65, 0.72), false)
 	front_door = _box("Front door", Vector3(0, 1.5, 8.68), Vector3(2.8, 3, 0.16), Color(0.18, 0.13, 0.1), false)
+	_build_exterior()
 
 func _build_player() -> void:
 	player = CharacterBody3D.new()
@@ -103,6 +106,12 @@ func _build_player() -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
+	fade_rect = ColorRect.new()
+	fade_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	fade_rect.color = Color.BLACK
+	fade_rect.modulate.a = 0.0
+	fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(fade_rect)
 	var panel := PanelContainer.new()
 	panel.anchor_left = 0.025
 	panel.anchor_top = 0.025
@@ -172,6 +181,43 @@ func _capsule(label: String, at: Vector3, tint: Color) -> void:
 	mesh.name = label
 	add_child(mesh)
 
+func _build_exterior() -> void:
+	_box("Yard ground", Vector3(0, -0.32, 27), Vector3(46, 0.35, 40), Color(0.12, 0.14, 0.12), true)
+	_box("Gravel drive", Vector3(0, -0.1, 23), Vector3(5.2, 0.06, 28), Color(0.25, 0.23, 0.19), false)
+	_box("Accord response vehicle", Vector3(0, 0.62, 24), Vector3(4.2, 1.25, 6.2), Color(0.055, 0.065, 0.07), false)
+	for x in [-13.0, -9.0, 9.0, 13.0]:
+		for z in [13.0, 21.0, 30.0, 38.0]:
+			_tree(Vector3(x, 0, z))
+	for x in [-1.15, 1.15]:
+		var headlight := SpotLight3D.new()
+		headlight.light_color = Color(0.78, 0.86, 1.0)
+		headlight.light_energy = 0.0
+		headlight.spot_range = 25.0
+		headlight.spot_angle = 28.0
+		headlight.position = Vector3(x, 0.9, 21.0)
+		add_child(headlight)
+		attack_lights.append(headlight)
+
+func _tree(at: Vector3) -> void:
+	var trunk := MeshInstance3D.new()
+	var trunk_mesh := CylinderMesh.new()
+	trunk_mesh.top_radius = 0.16
+	trunk_mesh.bottom_radius = 0.25
+	trunk_mesh.height = 2.8
+	trunk.mesh = trunk_mesh
+	trunk.material_override = _mat(Color(0.18, 0.13, 0.09))
+	trunk.position = at + Vector3(0, 1.4, 0)
+	add_child(trunk)
+	var crown := MeshInstance3D.new()
+	var crown_mesh := CylinderMesh.new()
+	crown_mesh.top_radius = 0.0
+	crown_mesh.bottom_radius = 1.5
+	crown_mesh.height = 4.2
+	crown.mesh = crown_mesh
+	crown.material_override = _mat(Color(0.055, 0.11, 0.075))
+	crown.position = at + Vector3(0, 3.8, 0)
+	add_child(crown)
+
 func _add_interactable(id: String, label: String, at: Vector3, tint: Color) -> void:
 	var marker := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
@@ -235,6 +281,8 @@ func _begin_attack() -> void:
 	if attack_started:
 		return
 	attack_started = true
+	for headlight in attack_lights:
+		headlight.light_energy = 7.5
 	key_light.light_energy = 0.12
 	key_light.light_color = Color(0.45, 0.16, 0.12)
 	StoryCampaign.set_flag("home_attack_survived", false)
@@ -261,8 +309,18 @@ func _escape_home() -> void:
 	objective.text = tr("PROLOGUE COMPLETE  //  KESTREL PASS UNLOCKED")
 	prompt.text = tr("Moving to Kestrel Pass...")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_finish_escape_transition()
+
+func _finish_escape_transition() -> void:
+	# Let every queued line finish so the final story beat is never cut off.
+	while StoryDialogue.panel.visible or not StoryDialogue.queue.is_empty():
+		await get_tree().process_frame
+	await get_tree().create_timer(0.35).timeout
+	var fade := create_tween()
+	fade.tween_property(fade_rect, "modulate:a", 1.0, 1.0)
+	await fade.finished
 	StoryCampaign.complete_prologue()
-	get_tree().create_timer(1.6).timeout.connect(func(): get_tree().change_scene_to_file(KESTREL_SCENE))
+	get_tree().change_scene_to_file(KESTREL_SCENE)
 
 func _update_objective() -> void:
 	if attack_started:
