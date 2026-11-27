@@ -28,6 +28,9 @@ const PATTERNS := [
 	r'radio_once\(\s*"[^"]*"\s*,\s*"((?:[^"\\]|\\.)+)"',
 	r'radio_once\(\s*"[^"]*"\s*,\s*"(?:[^"\\]|\\.)*"\s*,\s*"((?:[^"\\]|\\.)+)"',
 	r'\.get\("(?:title|brief)", "((?:[^"\\]|\\.)+)"\)',
+	r'add_(?:check|slider)_to\([^,\n]+, "([^"]+)"',
+	r'"detail": "((?:[^"\\]|\\.)+)"',
+	r'"name": "((?:[^"\\]|\\.)+)", "slot"',
 ]
 var failures := 0
 
@@ -78,7 +81,7 @@ func _initialize() -> void:
 	var keys := csv_keys()
 	check(keys.size() > 50, "Translation table loads with %d strings" % keys.size())
 	check(python_patterns() == PATTERNS, "tools/extract_strings.py uses the same patterns as this suite")
-	var files: Array[String] = ["res://mission.gd", "res://scope_overlay.gd"]
+	var files: Array[String] = ["res://mission.gd", "res://scope_overlay.gd", "res://gunsmith.gd"]
 	gd_files("res://scenes", files)
 	gd_files("res://autoload", files)
 	var missing: Array[String] = []
