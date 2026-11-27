@@ -88,6 +88,24 @@ func run_tests() -> void:
 	check(state.difficulty == state.Difficulty.HARD, "Difficulty restores")
 	game.queue_free()
 	await process_frame
+	# A save made with the recon rifle loads safely after the workbench swaps in
+	# a rifle with a smaller magazine and reserve.
+	var loadout = root.get_node("Loadout")
+	var chosen_rifle: String = loadout.rifle
+	var full_rifle: Dictionary = data.duplicate(true)
+	full_rifle.weapon.active = 0
+	full_rifle.weapon.stored[0] = {"ammo": 5, "reserve": 20, "cooldown": 0.0}
+	check(loadout.select_rifle("heavy_rifle"), "The workbench can switch the primary rifle")
+	game = fresh("res://compound_mission.tscn")
+	await physics_frame
+	for enemy in game.level.enemies:
+		enemy.set_physics_process(false)
+	saves.apply(game, full_rifle)
+	var heavy: WeaponProfile = game.weapon.profiles[0]
+	check(heavy.capacity < 5 and game.weapon.ammo == heavy.capacity and game.weapon.reserve_ammo <= heavy.reserve, "A checkpoint from another rifle never overfills the magazine or reserve")
+	loadout.select_rifle(chosen_rifle)
+	game.queue_free()
+	await process_frame
 	# Pending load applies on the next mission for the matching scene only.
 	check(saves.request_load("test") and not saves.pending.is_empty(), "Requesting a load stages the data")
 	game = fresh("res://main.tscn")

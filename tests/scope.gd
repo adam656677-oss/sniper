@@ -53,6 +53,7 @@ func run_tests() -> void:
 	game.camera.global_rotation = Vector3(0.1, 0.4, 0)
 	scope.follow()
 	check(scope.camera.global_transform.is_equal_approx(game.camera.global_transform), "Scope camera copies the player camera transform")
+	check(scope.camera.near >= 2.0 and game.viewmodel.position.length() < 1.0, "Scope camera clips the first-person viewmodel out of the picture")
 	var fov_4x: float = scope.current_fov()
 	check(fov_4x < 25.0 and fov_4x > 15.0, "4x magnification narrows the scope view")
 	check(scope.zoom_in() and scope.zoom == 6.0 and scope.current_fov() < fov_4x, "Wheel up magnifies")
@@ -61,6 +62,24 @@ func run_tests() -> void:
 	scope.set_zoom(1.0)
 	check(scope.zoom == 4.0 and not scope.zoom_out(), "Magnification clamps at 4x")
 	check(absf(scope.fov_for_zoom(1.0, 75.0) - 75.0) < 0.001, "1x magnification is the hip field of view")
+	# The installed optic sets the magnification range (checklist 5.3).
+	check(scope.zoom_min == 4.0 and scope.zoom_max == 12.0 and scope.zoom_step == 2.0, "The stock rifle optic magnifies 4x to 12x")
+	var high_power := WeaponProfile.new()
+	high_power.simulated_projectile = true
+	high_power.zoom_min = 6.0
+	high_power.zoom_max = 24.0
+	high_power.zoom_step = 3.0
+	scope.configure(high_power)
+	check(scope.zoom == 6.0 and scope.zoom_min == 6.0 and scope.zoom_max == 24.0, "An optic with a higher minimum pulls the zoom up to it")
+	check(scope.zoom_in() and scope.zoom == 9.0, "Zoom steps follow the optic")
+	scope.set_zoom(12.0)
+	var fov_12x: float = scope.current_fov()
+	scope.set_zoom(100.0)
+	check(scope.zoom == 24.0 and not scope.zoom_in(), "Magnification clamps at the optic's maximum")
+	check(scope.current_fov() < fov_12x * 0.6, "24x narrows the scope picture well beyond 12x")
+	scope.configure(weapon.profile())
+	check(scope.zoom == 12.0 and scope.zoom_max == 12.0, "Returning to the stock optic clamps the zoom back into range")
+	scope.set_zoom(4.0)
 	game.camera.global_position = Vector3(30, 2, 0)
 	game.camera.global_rotation = Vector3.ZERO
 	# Reticle marks.
@@ -76,6 +95,16 @@ func run_tests() -> void:
 	scope.set_zoom(12.0)
 	check(overlay.holdover_marks()[0].pixels > marks[0].pixels * 2.0, "Marks spread out at higher magnification")
 	scope.set_zoom(4.0)
+	var rifle: WeaponProfile = weapon.profile()
+	rifle.reticle_step = 50.0
+	rifle.reticle_max = 600.0
+	var fine: Array = overlay.holdover_marks()
+	check(fine.size() == 10 and fine[0].range == 150.0 and fine[-1].range == 600.0, "Reticle marks follow the optic's spacing and reach")
+	rifle.reticle_step = 100.0
+	rifle.reticle_max = 1500.0
+	var far: Array = overlay.holdover_marks()
+	check(far.size() == 11 and far[-1].range == 1200.0, "Reticle marks stop at the rifle's maximum range")
+	rifle.reticle_max = 1000.0
 	# Rangefinder.
 	var wall: StaticBody3D = game.level.spawn_box(Vector3(30, 2, -40), Vector3(4, 4, 1), Color.GRAY)
 	await physics_frame

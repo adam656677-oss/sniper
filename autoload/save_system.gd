@@ -149,7 +149,12 @@ func apply(mission: Node, data: Dictionary) -> void:
 	var w: Dictionary = data.weapon
 	for index in range(mini(weapon.stored.size(), w.get("stored", []).size())):
 		var entry: Dictionary = w.stored[index]
-		weapon.stored[index] = {"ammo": int(entry.get("ammo", 0)), "reserve": int(entry.get("reserve", 0)), "cooldown": float(entry.get("cooldown", 0.0))}
+		# The workbench can swap the rifle in a slot between saving and loading,
+		# so clamp to the weapon that is in the slot now.
+		var slot_profile: WeaponProfile = weapon.profiles[index]
+		var ammo := clampi(int(entry.get("ammo", 0)), 0, slot_profile.capacity)
+		var reserve := clampi(int(entry.get("reserve", 0)), 0, slot_profile.reserve)
+		weapon.stored[index] = {"ammo": ammo, "reserve": reserve, "cooldown": float(entry.get("cooldown", 0.0))}
 	for index in range(mini(weapon.zero_ranges.size(), w.get("zero_ranges", []).size())):
 		weapon.zero_ranges[index] = float(w.zero_ranges[index])
 	weapon.active = clampi(int(w.get("active", 0)), 0, weapon.profiles.size() - 1)
