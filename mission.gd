@@ -70,10 +70,11 @@ func on_mission_over() -> void:
 		for objective in level.mission_log.objectives:
 			if objective.status == MissionLog.Status.ACTIVE and objective.kind != MissionLog.Kind.PRIMARY:
 				level.mission_log.complete(objective.id)
-	SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
+	if level.allows_saves():
+		SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
 	if not GameState.failed:
 		StoryCampaign.record_mission_completed(scene_file_path)
-	var progress := Progression.record(Progression.mission_id_for(scene_file_path), stats, level.mission_log, GameState.failed)
+	var progress := level.record_progress(Progression.mission_id_for(scene_file_path), stats)
 	results.show_results(progress)
 
 func quit_to_menu() -> void:
@@ -83,16 +84,16 @@ func quit_to_menu() -> void:
 func on_objective_changed(_id: String, status: int) -> void:
 	if status == MissionLog.Status.COMPLETE:
 		StoryCampaign.on_objective_completed(scene_file_path, _id)
-	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete():
+	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete() and level.allows_saves():
 		SaveSystem.save_game(SaveSystem.CHECKPOINT_SLOT, self)
 
 func quick_save() -> bool:
-	if not GameState.simulation_active():
+	if not GameState.simulation_active() or not level.allows_saves():
 		return false
 	return SaveSystem.save_game(SaveSystem.QUICK_SLOT, self)
 
 func load_slot(slot: String) -> bool:
-	if not SaveSystem.request_load(slot):
+	if not level.allows_saves() or not SaveSystem.request_load(slot):
 		return false
 	get_tree().reload_current_scene()
 	return true
