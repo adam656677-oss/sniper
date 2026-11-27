@@ -38,6 +38,7 @@ func _ready() -> void:
 	takedown.bind(self)
 	weapon.excluded = [player.get_rid()]
 	scope_view.source = camera
+	scope_view.bind_weapon(weapon)
 	weapon.body_hit.connect(level.on_body_hit)
 	weapon.wind = level.wind
 	level.player = player
@@ -278,7 +279,7 @@ func update_hud() -> void:
 		lines.append(tr("PAUSED"))
 	lines.append_array(level.mission_log.lines())
 	lines.append(level.conditions_text())
-	var weapon_line := "%s  %d / %d  %s" % [weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
+	var weapon_line := "%s  %d / %d  %s" % [tr(weapon.profile().display_name), weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
 	if not weapon.projectiles.is_empty():
 		weapon_line += "  (%d in flight)" % weapon.projectiles.size()
 	lines.append(weapon_line)

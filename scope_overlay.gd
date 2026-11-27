@@ -23,7 +23,8 @@ func _physics_process(_delta: float) -> void:
 	range_text = "RANGE --" if measured < 0.0 else "RANGE %.0f m" % measured
 	queue_redraw()
 
-# Reticle marks: screen offset below centre for each 100 m beyond the zero.
+# Reticle marks: screen offset below centre for each reticle step beyond the zero,
+# out to the optic's reticle reach or the rifle's maximum range.
 func holdover_marks() -> Array[Dictionary]:
 	var marks: Array[Dictionary] = []
 	var game := mission()
@@ -36,12 +37,15 @@ func holdover_marks() -> Array[Dictionary]:
 	var scope_fov: float = game.scope_view.current_fov() if game.get("scope_view") else game.camera.fov
 	var radius := minf(viewport_size.x, viewport_size.y) * 0.38
 	var pixels_per_radian: float = radius / tan(deg_to_rad(scope_fov) * 0.5)
+	var optic: WeaponProfile = weapon.profile()
+	var step := maxf(optic.reticle_step, 10.0)
+	var reach := minf(optic.reticle_max, optic.max_range)
 	var zero: float = weapon.zero_range()
-	var distance := zero + 100.0
-	while distance <= 1000.0:
+	var distance := zero + step
+	while distance <= reach + 0.001:
 		var hold: float = weapon.holdover_at(distance)
 		marks.append({"range": distance, "pixels": atan2(hold, distance) * pixels_per_radian})
-		distance += 100.0
+		distance += step
 	return marks
 
 # The magnified picture from the scope viewport, as a textured disc.
@@ -94,11 +98,12 @@ func _draw() -> void:
 	var game := mission()
 	draw_string(font, center + Vector2(radius * 0.45, -radius * 0.75), "ZERO %.0f m | %.0fx" % [game.weapon.zero_range(), game.scope_view.zoom], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
 	var last_label_y := -1000.0
+	var label_every := int(maxf(game.weapon.profile().reticle_step, 10.0) * 2.0)
 	for mark in holdover_marks():
 		var y: float = center.y + mark.pixels
 		if y < center.y + radius:
 			draw_line(Vector2(center.x - 12, y), Vector2(center.x + 12, y), ink, 1.0)
-			if int(mark.range) % 200 == 0 and mark.pixels - last_label_y >= 12.0:
+			if int(mark.range) % label_every == 0 and mark.pixels - last_label_y >= 12.0:
 				draw_string(font, Vector2(center.x + 16, y + 4), "%d" % int(mark.range), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
 				last_label_y = mark.pixels
 	draw_string(font, center + Vector2(-150, radius * 0.78), game.wind_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
