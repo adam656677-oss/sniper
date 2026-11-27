@@ -112,12 +112,19 @@ func remap(action: String, event: InputEvent) -> bool:
 	changed.emit("bindings", action, text)
 	return true
 
+# A binding replaces the action's events on its own device only: a new key or
+# mouse button keeps the controller binding, and a new controller button keeps the key.
 func apply_binding(action: String, text: String) -> void:
 	var event := deserialize_event(text)
 	if event == null or not InputMap.has_action(action):
 		return
-	InputMap.action_erase_events(action)
+	for existing in InputMap.action_get_events(action):
+		if is_pad_event(existing) == is_pad_event(event):
+			InputMap.action_erase_event(action, existing)
 	InputMap.action_add_event(action, event)
+
+static func is_pad_event(event: InputEvent) -> bool:
+	return event is InputEventJoypadButton or event is InputEventJoypadMotion
 
 func clear_bindings() -> void:
 	bindings = {}
