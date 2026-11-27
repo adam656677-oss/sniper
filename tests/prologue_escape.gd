@@ -21,6 +21,13 @@ func check(condition: bool, label: String) -> void:
 func _initialize() -> void:
 	call_deferred("run_tests")
 
+# True when the shared subtitle overlay is showing or holding a line containing text.
+func dialogue_has(text: String) -> bool:
+	var dialogue = root.get_node("StoryDialogue")
+	if dialogue.panel.visible and dialogue.line_label.text.contains(text):
+		return true
+	return dialogue.queue.any(func(entry): return String(entry.line).contains(text))
+
 func physics_frames(count: int) -> void:
 	for i in count:
 		await physics_frame
@@ -67,6 +74,7 @@ func run_tests() -> void:
 	home.interact_with("photo")
 	home.interact_with("lena")
 	home.interact_with("ledger")
+	check(dialogue_has("Take it and go"), "Lena tells Elias to take the key and run when the door is breached")
 	root.get_node("StoryDialogue").clear_queue()
 	check(home.attack_started and home.doorway_open(), "The attack breaches the front doorway")
 	check(home.operatives.all(func(op): return op.visible), "Operatives appear when the attack begins")
@@ -76,6 +84,8 @@ func run_tests() -> void:
 	await place_player(Vector3(0, HOUSE, 7.6))
 	await push_player("move_back", 45)
 	check(home.player.global_position.z > 8.8, "Player can leave through the breached doorway")
+	await physics_frames(150)
+	check(not home.lena.visible, "Lena leaves the room after the breach")
 
 	# Crouching makes Elias harder to see.
 	home.set_crouched(false)
@@ -139,6 +149,23 @@ func run_tests() -> void:
 	await physics_frames(3)
 	check(home.escaped and story.get_flag("home_attack_survived"), "Reaching the tree line completes the escape")
 	check(story.get_flag("prologue_escape_unseen", true) == false, "Story records that Elias was seen during the escape")
+
+	# The outro fades to black, narrates the aftermath, then completes the chapter.
+	var dialogue = root.get_node("StoryDialogue")
+	var heard := ""
+	for i in 900:
+		if story.is_chapter_complete("prologue"):
+			break
+		if dialogue.panel.visible:
+			heard += dialogue.line_label.text + "\n"
+			dialogue.advance()
+		await process_frame
+	check(heard.contains("never made it out") and heard.contains("VARN ACCORD"), "The aftermath is narrated after the escape")
+	check(home.fade_rect.modulate.a >= 0.99, "The aftermath plays over a black screen")
+	var fade_layer: CanvasLayer = home.fade_rect.get_parent()
+	var hud_layer: CanvasLayer = home.objective.get_parent().get_parent().get_parent()
+	check(fade_layer.layer > hud_layer.layer and fade_layer.layer < dialogue.layer, "The black screen covers the HUD but not the subtitles")
+	check(story.is_chapter_complete("prologue") and story.is_chapter_unlocked("kestrel_pass"), "The prologue completes once the aftermath has played")
 
 	home.queue_free()
 	await process_frame

@@ -10,6 +10,12 @@ func check(condition: bool, label: String) -> void:
 		failures += 1
 		push_error("FAIL: " + label)
 
+func beats_text(beats: Array) -> String:
+	var text := ""
+	for beat in beats:
+		text += String(beat.text) + "\n"
+	return text
+
 func _initialize() -> void:
 	call_deferred("run_tests")
 
@@ -18,7 +24,9 @@ func run_tests() -> void:
 	story.start_new_campaign()
 	check(story.active and story.active_chapter == "prologue", "New campaign begins at the prologue")
 	check(story.can_continue() and story.continue_scene_path() == "res://scenes/ui/story_prologue.tscn", "New campaign can resume the prologue")
-	check(story.PROLOGUE_BEATS.size() >= 8, "Prologue has a multi-beat narrative sequence")
+	check(story.PROLOGUE_BEATS.size() >= 3, "Prologue intro sets up the evening over several beats")
+	check(not beats_text(story.PROLOGUE_BEATS).contains("VARN ACCORD") and not beats_text(story.PROLOGUE_BEATS).contains("terrorist"), "Prologue intro stops before the attack the player is about to play")
+	check(story.AFTERMATH_BEATS.size() >= 3 and beats_text(story.AFTERMATH_BEATS).contains("VARN ACCORD") and beats_text(story.AFTERMATH_BEATS).contains("Lena"), "Prologue aftermath carries Lena's loss, the framing and the first lead")
 	var prologue_scene: PackedScene = load("res://scenes/ui/story_prologue.tscn")
 	check(prologue_scene != null, "Prologue scene resource loads")
 	if prologue_scene == null:
@@ -56,6 +64,17 @@ func run_tests() -> void:
 	check(story.complete_prologue(), "Prologue completion advances campaign")
 	check(story.is_chapter_complete("prologue") and story.is_chapter_unlocked("kestrel_pass"), "Completing prologue unlocks Kestrel Pass")
 	check(story.active_chapter == "kestrel_pass" and story.continue_scene_path() == "res://kestrel_mission.tscn", "Continue Story launches the next playable chapter")
+	var briefing_dialogue = root.get_node("StoryDialogue")
+	briefing_dialogue.clear_queue()
+	story.set_flag("prologue_escape_unseen", true)
+	story.on_mission_started("res://kestrel_mission.tscn")
+	check(briefing_dialogue.line_label.text.contains("died in that fire"), "Kestrel briefing acknowledges an unseen prologue escape")
+	briefing_dialogue.clear_queue()
+	story.seen_dialogue.erase("kestrel_briefing")
+	story.set_flag("prologue_escape_unseen", false)
+	story.on_mission_started("res://kestrel_mission.tscn")
+	check(briefing_dialogue.line_label.text.contains("know you got out"), "Kestrel briefing acknowledges that Elias was seen escaping")
+	briefing_dialogue.clear_queue()
 	check(story.radio_once("test_radio", "MARA", "Radio check."), "First radio beat is accepted")
 	check(not story.radio_once("test_radio", "MARA", "Radio check."), "Radio beat does not replay after it has been seen")
 	var dialogue = root.get_node("StoryDialogue")
