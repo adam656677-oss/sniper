@@ -3,6 +3,7 @@ extends SceneTree
 const Ballistics = preload("res://ballistics.gd")
 var failures := 0
 var state: Node
+var progression: Node
 
 func check(condition: bool, label: String) -> void:
 	if condition:
@@ -38,6 +39,9 @@ func shoot_plate(game: Node, plate: Node, correct_wind: bool) -> void:
 
 func run_tests() -> void:
 	state = root.get_node("GameState")
+	progression = root.get_node("Progression")
+	progression.reset()
+	progression.save_progress()
 	var game = load("res://range_mission.tscn").instantiate()
 	root.add_child(game)
 	game.set_physics_process(false)
@@ -82,8 +86,12 @@ func run_tests() -> void:
 	await physics_frame
 	await physics_frame
 	check(state.finished and game.hud.text.contains("MISSION COMPLETE"), "Mission finishes when the range is complete")
+	check(level.allows_saves() and level.get("challenge_id") == null and level.TUTORIAL.size() == 7, "The plain range keeps saves, its tutorial and no challenge")
+	check(progression.records.has("range") and progression.challenge_records.is_empty(), "Finishing the plain range writes a mission record, not a challenge record")
 	game.queue_free()
 	await process_frame
+	progression.reset()
+	progression.save_progress()
 	if failures == 0:
 		print("RANGE TESTS PASSED")
 	quit(0 if failures == 0 else 1)
