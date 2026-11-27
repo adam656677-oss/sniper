@@ -37,6 +37,7 @@ func _ready() -> void:
 	add_slider_to(controls, "Mouse sensitivity", "controls", "sensitivity", 0.1, 5.0, 0.1)
 	add_check_to(controls, "Invert vertical look", "controls", "invert_y")
 	add_check_to(controls, "Hold to aim", "controls", "hold_to_aim")
+	add_check_to(controls, tr("Controller aim assist"), "controls", "aim_assist")
 	var gameplay := page("Gameplay")
 	difficulty = OptionButton.new()
 	for name in ["Easy", "Normal", "Hard"]:

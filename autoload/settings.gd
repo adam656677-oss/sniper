@@ -7,7 +7,7 @@ const PATH := "user://settings.cfg"
 const DEFAULTS := {
 	"video": {"fullscreen": false, "vsync": true, "fov": 75.0, "resolution_scale": 1.0},
 	"audio": {"master": 1.0, "music": 0.8, "sfx": 1.0},
-	"controls": {"sensitivity": 1.0, "invert_y": false, "hold_to_aim": false},
+	"controls": {"sensitivity": 1.0, "invert_y": false, "hold_to_aim": false, "aim_assist": true},
 	"gameplay": {"difficulty": 1, "killcam": true, "realism_ranging": false, "hud_assists": true},
 	"accessibility": {"reduced_motion": false, "colorblind_reticle": false, "subtitles": true},
 }
@@ -144,6 +144,10 @@ func realism_ranging() -> bool:
 
 func invert_y() -> bool:
 	return bool(get_value("controls", "invert_y"))
+
+# Right-stick friction over hostiles; never affects the mouse.
+func aim_assist() -> bool:
+	return bool(get_value("controls", "aim_assist"))
 
 func apply() -> void:
 	GameState.difficulty = clampi(int(get_value("gameplay", "difficulty")), 0, 2)

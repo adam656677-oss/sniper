@@ -50,6 +50,7 @@ func _ready() -> void:
 	stealth.player = player
 	stealth.level = level
 	player.sprint_gate = sprint_allowed
+	player.look_friction = aim_friction
 	player.landed.connect(on_player_landed)
 	level.target_killed.connect(on_target_killed)
 	killcam.camera = $KillCamCamera
@@ -295,6 +296,15 @@ func controls_help() -> String:
 				entries.append(text)
 		lines.append(" | ".join(entries))
 	return "\n".join(lines)
+
+# Right-stick aim friction over a live hostile in sight (see AimAssist), scaled
+# by difficulty. Only the stick look asks for it, so the mouse never feels it.
+func aim_friction() -> float:
+	if not Settings.aim_assist() or level == null or camera == null:
+		return 1.0
+	var exclude: Array[RID] = [player.get_rid()]
+	var strength := AimAssist.strength_for(GameState.perception_multiplier())
+	return AimAssist.look_scale(camera.global_position, -camera.global_basis.z, level.enemies, strength, get_world_3d().direct_space_state, exclude)
 
 static func signed_text(value: float) -> String:
 	return "%.1f" % (0.0 if absf(value) < 0.05 else value)
