@@ -6,7 +6,7 @@ extends VBoxContainer
 signal closed
 
 const REMAP_LABELS := {
-	"move_forward": "Move forward", "move_back": "Move back", "move_left": "Move left", "move_right": "Move right",
+	"move_forward": "Move forward", "move_back": "Move back", "move_left": "Move left", "move_right": "Move right", "sprint": "Sprint",
 	"fire": "Fire", "aim": "Aim", "reload": "Reload", "interact": "Interact", "crouch": "Crouch", "prone": "Prone",
 	"hold_breath": "Hold breath", "binoculars": "Binoculars", "tag": "Tag target", "throw": "Throw stone",
 	"zero_up": "Zero up", "zero_down": "Zero down", "quick_save": "Quick save", "quick_load": "Quick load",

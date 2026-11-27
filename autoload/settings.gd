@@ -11,7 +11,7 @@ const DEFAULTS := {
 	"gameplay": {"difficulty": 1, "killcam": true, "realism_ranging": false, "hud_assists": true},
 	"accessibility": {"reduced_motion": false, "colorblind_reticle": false, "subtitles": true},
 }
-const REMAPPABLE := ["move_forward", "move_back", "move_left", "move_right", "fire", "aim", "reload", "interact",
+const REMAPPABLE := ["move_forward", "move_back", "move_left", "move_right", "sprint", "fire", "aim", "reload", "interact",
 	"crouch", "prone", "hold_breath", "binoculars", "tag", "throw", "zero_up", "zero_down", "quick_save", "quick_load"]
 
 signal changed(section: String, key: String, value: Variant)
