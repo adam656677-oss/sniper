@@ -489,7 +489,7 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("crouch"):
 		set_crouched(not crouched)
 	var target := _nearest_interactable()
-	prompt.text = tr("[E] %s") % String(interactables[target].label) if not target.is_empty() else ""
+	prompt.text = tr("[%s] %s") % [InputGlyphs.glyph("interact"), String(interactables[target].label)] if not target.is_empty() else ""
 	if Input.is_action_just_pressed("interact") and not target.is_empty():
 		interact_with(target)
 

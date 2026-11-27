@@ -14,14 +14,15 @@ func _ready() -> void:
 	plates.sort_custom(func(a, b): return a.range_metres < b.range_metres)
 	super._ready()
 
-# Guided first steps, revealed one at a time as optional objectives.
+# Guided first steps, revealed one at a time as optional objectives. Controls
+# are {action} tokens, shown as the binding on the device in use.
 const TUTORIAL := [
-	["t_aim", "Aim down the scope (right click or left trigger)"],
+	["t_aim", "Aim down the scope ({aim})"],
 	["t_ring_100", "Ring the 100 m plate"],
 	["t_range", "Read a range of 300 m or more off the rangefinder"],
-	["t_zero", "Raise your zero to 300 m with ] (d-pad up)"],
+	["t_zero", "Raise your zero to 300 m with {zero_up}"],
 	["t_ring_300", "Ring the 300 m plate"],
-	["t_breath", "Hold your breath (Shift or left stick) while scoped"],
+	["t_breath", "Hold your breath ({hold_breath}) while scoped"],
 	["t_holdover", "Ring a plate at 600 m or beyond using the reticle marks"],
 ]
 var tutorial_step := 0

@@ -2,7 +2,8 @@ class_name MissionLog
 extends Node
 
 # Ordered objective list for a mission. Objectives are dictionaries so they
-# serialise directly for saves and HUD rendering.
+# serialise directly for saves and HUD rendering. Titles may name controls as
+# {action} tokens, shown as the binding on the device in use (InputGlyphs).
 
 enum Kind { PRIMARY, SECONDARY, OPTIONAL }
 enum Status { HIDDEN, ACTIVE, COMPLETE, FAILED }
@@ -89,7 +90,7 @@ func line(objective: Dictionary) -> String:
 			mark = "[x]"
 		Status.FAILED:
 			mark = "[!]"
-	var text := "%s %s" % [mark, tr(String(objective.title))]
+	var text := "%s %s" % [mark, InputGlyphs.fill(tr(String(objective.title)))]
 	if objective.goal > 1 and objective.status == Status.ACTIVE:
 		text += " (%d/%d)" % [objective.progress, objective.goal]
 	if objective.kind == Kind.SECONDARY:

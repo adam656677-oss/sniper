@@ -12,8 +12,8 @@ func near_extraction(point: Vector3) -> bool:
 	return point.distance_to(extraction_point) < INTERACT_DISTANCE
 
 func setup_objectives() -> void:
-	mission_log.add("intel", "Reach the gold terminal ahead and press E")
-	mission_log.add("extract", "Return to the green extraction marker and press E", MissionLog.Kind.PRIMARY, 1, true)
+	mission_log.add("intel", "Reach the gold terminal ahead and press {interact}")
+	mission_log.add("extract", "Return to the green extraction marker and press {interact}", MissionLog.Kind.PRIMARY, 1, true)
 	mission_log.add("targets", "Drop the three practice targets", MissionLog.Kind.OPTIONAL, 3)
 
 func on_target_died(body: Node3D) -> void:
