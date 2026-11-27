@@ -4,10 +4,12 @@ extends Control
 # scene_changer is swapped by tests so no scene change happens headlessly.
 
 const MissionCatalog = preload("res://scenes/ui/mission_catalog.gd")
+const ChallengeCatalog = preload("res://scenes/challenges/challenge_catalog.gd")
+const Atmosphere = preload("res://scenes/levels/atmosphere.gd")
 const ThemeKit = preload("res://scenes/ui/ui_theme.gd")
 const BackdropShader = preload("res://scenes/ui/menu_backdrop.gdshader")
 
-enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS, EVIDENCE }
+enum Screen { HOME, MISSIONS, SETTINGS, WORKBENCH, RECORDS, EVIDENCE, CHALLENGE }
 
 var screen: int = Screen.HOME
 var scene_changer: Callable
@@ -19,6 +21,14 @@ var records: VBoxContainer
 var records_text: Label
 var evidence: VBoxContainer
 var evidence_text: Label
+var challenge_section: VBoxContainer
+var challenge_buttons: Array[Button] = []
+var challenge_panel: VBoxContainer
+var challenge_title: Label
+var challenge_info: Label
+var challenge_start_button: Button
+var challenge_back_button: Button
+var selected_challenge := -1
 var continue_button: Button
 var story_mode_button: Button
 var continue_story_button: Button
@@ -94,7 +104,9 @@ func _ready() -> void:
 		brief.custom_minimum_size = Vector2(340, 0)
 		brief.add_theme_font_size_override("font_size", 12)
 		missions.add_child(brief)
+	build_challenge_section()
 	button(missions, "Back", func(): show_screen(Screen.HOME))
+	build_challenge_panel(column)
 	settings_screen = SettingsScreen.new()
 	settings_screen.closed.connect(func(): show_screen(Screen.HOME))
 	column.add_child(settings_screen)
@@ -140,6 +152,7 @@ func show_screen(value: int) -> void:
 	workbench.visible = screen == Screen.WORKBENCH
 	records.visible = screen == Screen.RECORDS
 	evidence.visible = screen == Screen.EVIDENCE
+	challenge_panel.visible = screen == Screen.CHALLENGE
 	if screen == Screen.RECORDS:
 		records_text.text = "\n".join(Progression.summary_lines())
 	if screen == Screen.EVIDENCE:
@@ -159,6 +172,94 @@ func start_mission(index: int) -> String:
 	SaveSystem.pending = {}
 	scene_changer.call(mission.scene)
 	return mission.scene
+
+# Long-shot challenges sit under the missions as a compact grid; each button
+# opens that challenge's briefing.
+func build_challenge_section() -> void:
+	challenge_section = VBoxContainer.new()
+	challenge_section.name = "Challenges"
+	challenge_section.add_theme_constant_override("separation", 6)
+	missions.add_child(challenge_section)
+	var header := Label.new()
+	header.text = tr("LONG-SHOT CHALLENGES")
+	header.add_theme_font_size_override("font_size", 12)
+	header.add_theme_color_override("font_color", Color(0.72, 0.58, 0.37))
+	challenge_section.add_child(header)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 6)
+	challenge_section.add_child(grid)
+	for i in range(ChallengeCatalog.count()):
+		var challenge: Dictionary = ChallengeCatalog.get_challenge(i)
+		var b := button(grid, tr(String(challenge.title)), func(): show_challenge(i))
+		b.custom_minimum_size = Vector2(166, 38)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		challenge_buttons.append(b)
+
+func build_challenge_panel(column: Node) -> void:
+	challenge_panel = VBoxContainer.new()
+	challenge_panel.add_theme_constant_override("separation", 10)
+	column.add_child(challenge_panel)
+	challenge_title = Label.new()
+	challenge_title.add_theme_font_size_override("font_size", 26)
+	challenge_title.add_theme_color_override("font_color", Color(0.93, 0.90, 0.82))
+	challenge_panel.add_child(challenge_title)
+	challenge_info = Label.new()
+	challenge_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	challenge_info.custom_minimum_size = Vector2(400, 0)
+	challenge_info.add_theme_font_size_override("font_size", 14)
+	challenge_panel.add_child(challenge_info)
+	challenge_start_button = button(challenge_panel, "Start challenge", func(): start_challenge(selected_challenge))
+	challenge_back_button = button(challenge_panel, "Back", func(): show_screen(Screen.MISSIONS))
+
+func show_challenge(index: int) -> void:
+	var challenge: Dictionary = ChallengeCatalog.get_challenge(index)
+	if challenge.is_empty():
+		return
+	selected_challenge = index
+	challenge_title.text = tr(String(challenge.title))
+	challenge_info.text = "\n".join(challenge_brief_lines(challenge))
+	show_screen(Screen.CHALLENGE)
+	challenge_start_button.grab_focus.call_deferred()
+
+# The rules of a challenge and the player's record, for its briefing.
+func challenge_brief_lines(challenge: Dictionary) -> Array[String]:
+	var lines: Array[String] = [tr(String(challenge.brief)), ""]
+	var plates: Array = challenge.plates.map(func(metres): return "%d m" % int(metres))
+	lines.append((tr("Plates in order: %s") if challenge.ordered else tr("Plates: %s")) % ", ".join(plates))
+	lines.append(tr("Conditions: %s, %s") % [tr(["Dawn", "Noon", "Dusk", "Night"][int(challenge.time_of_day)]), tr(["clear", "windy", "rain", "dust"][int(challenge.weather)])])
+	var weather: Dictionary = Atmosphere.WEATHER[int(challenge.weather)]
+	var wind: Vector3 = challenge.wind
+	var speed := wind.length() * float(weather.wind_scale)
+	var gusts := int(round(float(weather.gust) * 100.0))
+	if speed < 0.05:
+		lines.append(tr("Still air"))
+	elif wind.x >= 0.0:
+		lines.append(tr("Wind %.1f m/s from the left, gusts up to %d%%") % [speed, gusts])
+	else:
+		lines.append(tr("Wind %.1f m/s from the right, gusts up to %d%%") % [speed, gusts])
+	lines.append(tr("Rounds: %d") % int(challenge.rounds))
+	var limit := int(challenge.time_limit)
+	if limit > 0:
+		lines.append(tr("Time limit: %d:%02d") % [limit / 60, limit % 60])
+		lines.append(tr("Pass: ring every plate before you run out of rounds or time."))
+		lines.append(tr("Score: plate metres + %d per unused round + %d per second left") % [ChallengeCatalog.ROUND_BONUS, ChallengeCatalog.SECOND_BONUS])
+	else:
+		lines.append(tr("No time limit"))
+		lines.append(tr("Pass: ring every plate before you run out of rounds."))
+		lines.append(tr("Score: plate metres + %d per unused round") % ChallengeCatalog.ROUND_BONUS)
+	lines.append("")
+	lines.append(tr("Your record:") + " " + Progression.challenge_record_text(String(challenge.id)))
+	return lines
+
+func start_challenge(index: int) -> String:
+	var challenge: Dictionary = ChallengeCatalog.get_challenge(index)
+	if challenge.is_empty():
+		return ""
+	SaveSystem.pending = {}
+	scene_changer.call(challenge.scene)
+	return challenge.scene
 
 func continue_checkpoint() -> String:
 	if not SaveSystem.request_load(SaveSystem.CHECKPOINT_SLOT):

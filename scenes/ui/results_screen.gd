@@ -63,6 +63,9 @@ func stealth_rating(stats: Dictionary, objectives: Node) -> String:
 	return tr("Compromised") if int(stats.detections) < 3 else tr("Loud")
 
 func show_results(progress: Dictionary = {}) -> void:
+	if progress.has("challenge"):
+		show_challenge_results(progress)
+		return
 	var stats: Dictionary = mission.stats
 	var objectives = mission.level.mission_log
 	var lines: Array[String] = []
@@ -88,6 +91,46 @@ func show_results(progress: Dictionary = {}) -> void:
 	for line in objectives.lines():
 		lines.append(line)
 	text.text = "\n".join(lines)
+	visible = true
+
+static func clock_text(seconds: float) -> String:
+	var whole := int(seconds)
+	return "%d:%02d" % [whole / 60, whole % 60]
+
+# A long-shot challenge: pass or fail and why, the score and its parts, plates,
+# rounds and time against the limits, new bests, and the standing record.
+func show_challenge_results(progress: Dictionary) -> void:
+	var attempt: Dictionary = progress.challenge
+	var parts: Dictionary = attempt.parts
+	var stats: Dictionary = mission.stats
+	var lines: Array[String] = []
+	lines.append(tr("CHALLENGE PASSED") if attempt.passed else tr("CHALLENGE FAILED"))
+	lines.append(tr(String(attempt.title)))
+	match String(attempt.get("reason", "")):
+		"out_of_rounds":
+			lines.append(tr("Out of rounds"))
+		"out_of_time":
+			lines.append(tr("Out of time"))
+	lines.append(tr("Score: %d") % int(attempt.score))
+	if attempt.passed:
+		lines.append(tr("Plates %d + rounds %d + time %d") % [int(parts.distance), int(parts.rounds), int(parts.time)])
+	lines.append(tr("Plates rung: %d / %d  |  Rounds used: %d / %d") % [int(attempt.plates_rung), int(attempt.plate_count), int(attempt.rounds_used), int(attempt.rounds)])
+	if float(attempt.time_limit) > 0.0:
+		lines.append(tr("Time: %s of %s") % [clock_text(float(attempt.time)), clock_text(float(attempt.time_limit))])
+	else:
+		lines.append(tr("Time: %d:%02d") % [int(attempt.time) / 60, int(attempt.time) % 60])
+	lines.append(tr("Shots: %d | Hits: %d | Accuracy: %d%%") % [stats.shots, stats.hits, int(round(mission.accuracy() * 100.0))])
+	if progress.get("new_best", false):
+		lines.append(tr("New best score"))
+	if progress.get("new_fewest_rounds", false):
+		lines.append(tr("New fewest rounds"))
+	if progress.get("new_fastest", false):
+		lines.append(tr("New fastest time"))
+	for id in progress.get("unlocked", []):
+		lines.append(tr("Achievement unlocked:") + " " + tr(String(Progression.ACHIEVEMENTS[id].title)))
+	lines.append(tr("Your record:") + " " + Progression.challenge_record_text(String(attempt.id)))
+	text.text = "\n".join(lines)
+	continue_story_button.visible = false
 	visible = true
 
 func _continue_story() -> void:
