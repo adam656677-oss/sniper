@@ -105,7 +105,7 @@ flowchart TB
 | `Settings` | Saved user preferences, controls, sensitivity, video/audio and accessibility options |
 | `SaveSystem` | Versioned save data, checkpoints, quick save/load and validation of corrupt or incompatible files |
 | `Loadout` | Installed weapon parts and per-weapon configurations |
-| `Progression` | Mission records, best score/time/shot distance, unlocks and achievements |
+| `Progression` | Mission records, best score/time/shot distance, the long-shot challenge leaderboard (best score, fewest rounds, fastest time), unlocks and achievements |
 | `AudioDirector` | Positional gameplay sound events and SFX preference handling |
 | `StoryCampaign` | Saved story chapter, unlocks, evidence, seen dialogue, flags and ending decision |
 | `StoryDialogue` | Shared subtitle/radio overlay that presents lines requested by the story campaign |

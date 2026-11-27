@@ -20,13 +20,14 @@ Planning and status live in `docs/`:
 | `autoload/game_state.gd` | `GameState` autoload: paused, finished, failed, intel, difficulty |
 | `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, difficulty, kill cam |
 | `autoload/loadout.gd` | `Loadout` autoload: installed gunsmith parts per weapon family |
-| `autoload/progression.gd` | `Progression` autoload: per-mission records and eight achievements |
+| `autoload/progression.gd` | `Progression` autoload: per-mission records, the per-challenge leaderboard and ten achievements |
 | `autoload/save_system.gd` | `SaveSystem` autoload: versioned JSON saves, checkpoints, quick save and load |
 | `scenes/player/` | First-person body and camera |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
 | `scenes/levels/level_base.gd` | Level contract: spawn, wind, targets, interact, objective, completion |
 | `scenes/levels/test_range.tscn` | The intel mission level; targets are children of `Targets` |
 | `scenes/levels/shooting_range.tscn` | The 1000 m plate range |
+| `scenes/levels/challenge_range.gd`, `scenes/challenges/` | Long-shot challenges on the range: the catalog with rules and score formula, and one scene per challenge |
 | `scenes/targets/` | `TargetDummy` with hit zones, `SteelPlate` range target, shared hit-zone helpers |
 | `scenes/enemies/` | `Enemy` state machine, `Perception`, `AlertCoordinator` |
 | `scenes/missions/` | `MissionLog` objectives and `TriggerZone` |
@@ -51,6 +52,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | `main.tscn` | Echo Ridge recon mission: collect intel at the terminal, extract. |
 | `compound_mission.tscn` | Walled compound with four patrolling hostiles. Perception, alert states, squad coordination, return fire, lockdown reinforcements. Eliminate every hostile to complete. Open it and press F6. |
 | `range_mission.tscn` | 1000 m shooting range with a steel plate every 100 m on its own bearing. Open it and press F6. Rings every plate to complete. |
+| `scenes/challenges/*.tscn` | Long-shot challenges on the same range, also under Missions: a calm warm-up (200, 300 and 400 m, six rounds), a gusting crosswind (700 and 800 m at dawn, six rounds), a kilometre shot (1000 m at dusk, three rounds) and a timed sequence (300 to 900 m in order, ten rounds, three minutes). Score: plate metres + 100 per unused round + 10 per second left on the clock; a failure scores 0. Best score, fewest rounds and fastest time are kept per challenge on the Records screen. No saves during a challenge. |
 
 ## Controls
 
