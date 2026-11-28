@@ -227,6 +227,10 @@ func is_failed() -> bool:
 func allows_saves() -> bool:
 	return true
 
+# HUD banner once the mission is over; {tokens} are filled with the current bindings.
+func end_banner(failed: bool) -> String:
+	return tr("MISSION FAILED - {restart} to restart") if failed else tr("MISSION COMPLETE - {restart} to restart")
+
 # Records the finished mission locally and returns what changed for the results
 # screen. Challenges keep their own leaderboard instead.
 func record_progress(mission_id: String, stats: Dictionary) -> Dictionary:

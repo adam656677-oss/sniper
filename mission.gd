@@ -278,6 +278,9 @@ func controls_help() -> String:
 		[tr("{weapon_1} rifle"), tr("{weapon_2}–{weapon_4} handguns"), tr("{next_weapon} next weapon"), tr("{takedown} silent takedown (behind, close)"),
 			tr("{quick_save} quick save"), tr("{quick_load} quick load"), tr("{pause} pause"), tr("{restart} restart")],
 	]
+	# Levels that refuse saves (the long-shot challenges) do not advertise them.
+	if level and not level.allows_saves():
+		rows[2] = rows[2].filter(func(entry): return not entry.begins_with("{quick_save}") and not entry.begins_with("{quick_load}"))
 	var lines: Array[String] = []
 	for row in rows:
 		var entries: Array[String] = []
@@ -302,10 +305,8 @@ static func signed_text(value: float) -> String:
 
 func update_hud() -> void:
 	var lines: Array[String] = []
-	if GameState.failed:
-		lines.append(InputGlyphs.fill(tr("MISSION FAILED - {restart} to restart")))
-	elif GameState.finished:
-		lines.append(InputGlyphs.fill(tr("MISSION COMPLETE - {restart} to restart")))
+	if GameState.failed or GameState.finished:
+		lines.append(InputGlyphs.fill(level.end_banner(GameState.failed)))
 	elif GameState.paused:
 		lines.append(tr("PAUSED"))
 	lines.append_array(level.mission_log.lines())

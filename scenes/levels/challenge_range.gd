@@ -139,6 +139,9 @@ func fail(reason: int) -> void:
 	finish_time = minf(elapsed, time_limit()) if reason == Outcome.OUT_OF_TIME else elapsed
 	mission_log.fail("plates")
 
+func end_banner(failed: bool) -> String:
+	return tr("CHALLENGE FAILED - {restart} to retry") if failed else tr("CHALLENGE PASSED - {restart} to retry")
+
 func allows_saves() -> bool:
 	return false
 
