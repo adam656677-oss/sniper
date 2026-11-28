@@ -187,6 +187,10 @@ func run_tests() -> void:
 	check(result.passed and result.score == 1100 and result.plates_rung == 3 and result.rounds_used == 4 and result.time > 0.0 and result.longest == 400.0, "The warm-up result carries the score, plates, rounds, time and longest plate")
 	await finish(game)
 	check(state.finished and not state.failed and game.results.visible, "A passed challenge finishes and shows the results")
+	game.update_hud()
+	check(game.hud.text.contains("CHALLENGE PASSED") and not game.hud.text.contains("MISSION COMPLETE"), "The HUD banner names a passed challenge, not a mission")
+	check(level.end_banner(true).contains("CHALLENGE FAILED"), "A failed challenge has its own HUD banner")
+	check(not game.controls_help().contains("quick save") and not game.controls_help().contains("quick load"), "Pause help leaves out quick save and quick load during a challenge")
 	var text: String = game.results.text.text
 	check(text.contains("CHALLENGE PASSED") and text.contains("Calm warm-up") and text.contains("Score: 1100") and text.contains("Plates 900 + rounds 200 + time 0"), "Results show the challenge, its score and the score breakdown")
 	check(text.contains("Plates rung: 3 / 3") and text.contains("Rounds used: 4 / 6") and text.contains("New best score") and not text.contains("MISSION COMPLETE"), "Results show plates rung, rounds used and the new best")
@@ -358,6 +362,7 @@ func run_tests() -> void:
 	level = game.level
 	check(level.plates.size() == 10 and level.get("challenge_id") == null and level.TUTORIAL.size() == 7 and level.mission_log.status("t_aim") == level.mission_log.Status.ACTIVE, "The plain range keeps every plate and its tutorial")
 	check(level.allows_saves() and level.conditions_text() == "Noon, clear" and game.weapon.ammo == game.weapon.profile().capacity and game.weapon.reserve_ammo == game.weapon.profile().reserve, "The plain range keeps its conditions, saves and full ammunition")
+	check(game.controls_help().contains("quick save") and level.end_banner(false).contains("MISSION COMPLETE"), "The plain range keeps quick save in the pause help and the mission banner")
 	level.mission_log.complete("plates")
 	var range_progress: Dictionary = level.record_progress("range", game.stats)
 	check(progression.records.has("range") and progression.challenge_records.is_empty() and range_progress.has("new_best"), "The plain range records to the mission records")
