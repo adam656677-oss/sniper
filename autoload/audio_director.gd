@@ -1,6 +1,9 @@
 extends Node
 ## Lightweight procedural audio foundation. Replace these generated cues with licensed recordings as the art pass matures.
-## Events are positional and respect the player's SFX slider.
+## Events are positional and respect the player's SFX slider. Cues marked "sweep"
+## glide in pitch from "crack" down to "low" Hz instead of the report-style mix.
+
+signal event_played(event_name: String, world_position: Vector3)
 
 const SAMPLE_RATE := 22050
 const MAX_ACTIVE_VOICES := 24
@@ -11,6 +14,7 @@ const EVENT_CONFIG := {
 	"sidearm_report": {"duration": 0.38, "pitch": 1.0, "gain": 0.72, "low": 92.0, "crack": 1450.0},
 	"reload_click": {"duration": 0.10, "pitch": 1.0, "gain": 0.22, "low": 520.0, "crack": 2600.0},
 	"impact": {"duration": 0.20, "pitch": 1.0, "gain": 0.32, "low": 150.0, "crack": 800.0},
+	"ricochet": {"duration": 0.55, "pitch": 1.0, "gain": 0.3, "low": 900.0, "crack": 3400.0, "sweep": true},
 	"footstep": {"duration": 0.12, "pitch": 1.0, "gain": 0.18, "low": 95.0, "crack": 420.0},
 	"radio_static": {"duration": 0.45, "pitch": 1.0, "gain": 0.12, "low": 260.0, "crack": 2100.0}
 }
@@ -20,7 +24,8 @@ var _voices: Array[AudioStreamPlayer3D] = []
 
 func _ready() -> void:
 	for event_name in EVENT_CONFIG:
-		_streams[event_name] = _build_stream(EVENT_CONFIG[event_name])
+		var config: Dictionary = EVENT_CONFIG[event_name]
+		_streams[event_name] = _build_whine(config) if config.get("sweep", false) else _build_stream(config)
 
 func play_weapon_report(profile: WeaponProfile, world_position: Vector3) -> void:
 	if profile == null:
@@ -53,6 +58,7 @@ func play_event(event_name: String, world_position: Vector3, volume_db: float = 
 	_voices.append(player)
 	player.finished.connect(_on_voice_finished.bind(player), CONNECT_ONE_SHOT)
 	player.play()
+	event_played.emit(event_name, world_position)
 	return true
 
 func _prune_voices() -> void:
@@ -90,5 +96,31 @@ func _build_stream(config: Dictionary) -> AudioStreamWAV:
 		var sample := clampf((low_tone + crack_tone + transient) * envelope * float(config.gain), -1.0, 1.0)
 		var pcm := int(sample * 32767.0)
 		bytes.encode_s16(i * 2, pcm)
+	stream.data = bytes
+	return stream
+
+# Ricochet whine: a sharp metallic tick, then a tone gliding down from "crack" to
+# "low" Hz with a slight warble as the deflected round tumbles away.
+func _build_whine(config: Dictionary) -> AudioStreamWAV:
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = SAMPLE_RATE
+	stream.stereo = false
+	var count := int(float(config.duration) * SAMPLE_RATE)
+	var bytes := PackedByteArray()
+	bytes.resize(count * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(float(config.low) * 1000.0 + float(config.crack))
+	var phase := 0.0
+	for i in range(count):
+		var t := float(i) / SAMPLE_RATE
+		var progress := float(i) / maxf(float(count - 1), 1.0)
+		var frequency := lerpf(float(config.crack), float(config.low), pow(progress, 0.7)) * (1.0 + 0.015 * sin(TAU * 23.0 * t))
+		phase += TAU * frequency / SAMPLE_RATE
+		var envelope := clampf(t / 0.006, 0.0, 1.0) * pow(1.0 - progress, 1.6)
+		var tone := (sin(phase) * 0.62 + sin(phase * 2.0) * 0.12) * envelope
+		var tick := rng.randf_range(-1.0, 1.0) * exp(-t * 90.0) * 0.8
+		var sample := clampf((tone + tick) * float(config.gain), -1.0, 1.0)
+		bytes.encode_s16(i * 2, int(sample * 32767.0))
 	stream.data = bytes
 	return stream

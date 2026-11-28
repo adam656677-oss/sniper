@@ -1,6 +1,7 @@
 extends Node3D
 
 const TakedownControllerScript = preload("res://scenes/takedown_controller.gd")
+const ImpactSurfaces = preload("res://scenes/fx/impact_surfaces.gd")
 
 # Mission root: wires the level, player, weapon rig and HUD together and
 # routes input to the right system. Simulation state lives in GameState.
@@ -22,6 +23,9 @@ var last_long_shot := 0.0
 var stats := {"shots": 0, "hits": 0, "kills": 0, "longest_kill": 0.0, "elapsed": 0.0, "detections": 0}
 var camera: Camera3D
 var takedown: Variant
+var applied_fov_kick := 0.0
+var breath_latched := false # Shift held from a sprint when the scope came up
+var was_aiming := false
 
 func _ready() -> void:
 	GameState.reset()
@@ -38,6 +42,7 @@ func _ready() -> void:
 	takedown.bind(self)
 	weapon.excluded = [player.get_rid()]
 	scope_view.source = camera
+	scope_view.bind_weapon(weapon)
 	weapon.body_hit.connect(level.on_body_hit)
 	weapon.wind = level.wind
 	level.player = player
@@ -45,11 +50,15 @@ func _ready() -> void:
 	stealth.camera = camera
 	stealth.player = player
 	stealth.level = level
+	player.sprint_gate = sprint_allowed
+	player.look_friction = aim_friction
+	player.landed.connect(on_player_landed)
 	level.target_killed.connect(on_target_killed)
 	killcam.camera = $KillCamCamera
 	killcam.return_camera = camera
 	weapon.fired.connect(on_weapon_fired)
 	weapon.impact.connect(on_impact)
+	weapon.ricochet.connect(on_ricochet)
 	weapon.body_hit.connect(on_body_hit)
 	level.coordinator.level_changed.connect(on_alert_changed)
 	level.mission_log.objective_changed.connect(on_objective_changed)
@@ -64,10 +73,11 @@ func on_mission_over() -> void:
 		for objective in level.mission_log.objectives:
 			if objective.status == MissionLog.Status.ACTIVE and objective.kind != MissionLog.Kind.PRIMARY:
 				level.mission_log.complete(objective.id)
-	SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
+	if level.allows_saves():
+		SaveSystem.delete_save(SaveSystem.CHECKPOINT_SLOT)
 	if not GameState.failed:
 		StoryCampaign.record_mission_completed(scene_file_path)
-	var progress := Progression.record(Progression.mission_id_for(scene_file_path), stats, level.mission_log, GameState.failed)
+	var progress := level.record_progress(Progression.mission_id_for(scene_file_path), stats)
 	results.show_results(progress)
 
 func quit_to_menu() -> void:
@@ -77,16 +87,16 @@ func quit_to_menu() -> void:
 func on_objective_changed(_id: String, status: int) -> void:
 	if status == MissionLog.Status.COMPLETE:
 		StoryCampaign.on_objective_completed(scene_file_path, _id)
-	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete():
+	if status == MissionLog.Status.COMPLETE and not GameState.finished and not level.is_complete() and level.allows_saves():
 		SaveSystem.save_game(SaveSystem.CHECKPOINT_SLOT, self)
 
 func quick_save() -> bool:
-	if not GameState.simulation_active():
+	if not GameState.simulation_active() or not level.allows_saves():
 		return false
 	return SaveSystem.save_game(SaveSystem.QUICK_SLOT, self)
 
 func load_slot(slot: String) -> bool:
-	if not SaveSystem.request_load(slot):
+	if not level.allows_saves() or not SaveSystem.request_load(slot):
 		return false
 	get_tree().reload_current_scene()
 	return true
@@ -95,26 +105,14 @@ func on_impact(position: Vector3, normal: Vector3, body: Node3D) -> void:
 	var living := body != null and body.has_method("take_hit")
 	feedback.impact(position, normal, not living, impact_surface_for(body))
 
-
 func impact_surface_for(body: Node3D) -> String:
-	if body == null:
-		return "earth"
-	if body.has_meta("impact_surface"):
-		return String(body.get_meta("impact_surface"))
-	if body.is_in_group("surface_metal"):
-		return "metal"
-	if body.is_in_group("surface_wood"):
-		return "wood"
-	if body.is_in_group("surface_earth"):
-		return "earth"
-	var label := String(body.name).to_lower()
-	if label.contains("fuel") or label.contains("truck") or label.contains("metal"):
-		return "metal"
-	if label.contains("wood") or label.contains("crate") or label.contains("door"):
-		return "wood"
-	if label.contains("ground") or label.contains("terrain") or label.contains("road"):
-		return "earth"
-	return "stone"
+	return ImpactSurfaces.surface_for(body)
+
+# A round skipping off a hard surface: sparks along its new path, and the whine is
+# a noise for guards near the strike (loud enough to alarm the closest ones).
+func on_ricochet(position: Vector3, _normal: Vector3, _incoming: Vector3, outgoing: Vector3, _body: Node3D) -> void:
+	feedback.ricochet(position, outgoing)
+	level.report_noise(position, WeaponRig.RICOCHET_NOISE_RADIUS, 1.0)
 
 func on_weapon_fired(profile: WeaponProfile) -> void:
 	if profile.simulated_projectile and not weapon.projectiles.is_empty():
@@ -244,11 +242,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		if is_aiming():
 			scope_view.zoom_out()
 	elif event.is_action_pressed("binoculars"):
+		if weapon.aiming and not stealth.binoculars:
+			weapon.toggle_aim() # the binoculars replace the scope rather than hiding it
 		stealth.toggle_binoculars()
 	elif event.is_action_pressed("tag"):
 		stealth.tag()
 	elif event.is_action_pressed("throw"):
 		stealth.throw_stone()
+	elif event.is_action_pressed("sprint") and event is InputEventJoypadButton:
+		player.toggle_sprint()
 	elif event.is_action_released("aim") and weapon.aiming and (bool(Settings.get_value("controls", "hold_to_aim")) or event is InputEventJoypadMotion):
 		weapon.toggle_aim()
 	elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or event is InputEventJoypadButton or event is InputEventJoypadMotion:
@@ -263,22 +265,53 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				weapon.toggle_aim()
 
-const CONTROLS_HELP := "Left click fire | Right click aim | Wheel zoom | Shift hold breath | [ ] zero\nB binoculars (click tags) | G throw stone | C crouch | Z prone | R reload | E interact\n1 rifle | 2–4 handguns | F silent takedown (behind, close) | F5 quick save | F9 quick load | Escape pause | N restart"
+# Pause menu help for the device in use (InputGlyphs). Each entry names its
+# actions as tokens; an entry with an action the device cannot reach is left out
+# (the controller has no takedown, quick save or weapon slots, the keyboard no weapon cycle).
+func controls_help() -> String:
+	var breath: Array[String] = [tr("{sprint} sprint, or hold breath while aiming")]
+	if InputGlyphs.glyph("sprint") != InputGlyphs.glyph("hold_breath"):
+		breath = [tr("{sprint} sprint"), tr("{hold_breath} hold breath while aiming")]
+	var rows: Array = [
+		[tr("{fire} fire"), tr("{aim} aim"), tr("{zoom_in} zoom in"), tr("{zoom_out} zoom out")] + breath + [tr("{zero_up} zero up"), tr("{zero_down} zero down")],
+		[tr("{binoculars} binoculars ({fire} or {tag} tags)"), tr("{throw} throw stone"), tr("{crouch} crouch"), tr("{prone} prone"), tr("{reload} reload"), tr("{interact} interact")],
+		[tr("{weapon_1} rifle"), tr("{weapon_2}–{weapon_4} handguns"), tr("{next_weapon} next weapon"), tr("{takedown} silent takedown (behind, close)"),
+			tr("{quick_save} quick save"), tr("{quick_load} quick load"), tr("{pause} pause"), tr("{restart} restart")],
+	]
+	# Levels that refuse saves (the long-shot challenges) do not advertise them.
+	if level and not level.allows_saves():
+		rows[2] = rows[2].filter(func(entry): return not entry.begins_with("{quick_save}") and not entry.begins_with("{quick_load}"))
+	var lines: Array[String] = []
+	for row in rows:
+		var entries: Array[String] = []
+		for entry in row:
+			var text := InputGlyphs.fill_bound(entry)
+			if not text.is_empty():
+				entries.append(text)
+		lines.append(" | ".join(entries))
+	return "\n".join(lines)
+
+# Right-stick aim friction over a live hostile in sight (see AimAssist), scaled
+# by difficulty. Only the stick look asks for it, so the mouse never feels it.
+func aim_friction() -> float:
+	if not Settings.aim_assist() or level == null or camera == null:
+		return 1.0
+	var exclude: Array[RID] = [player.get_rid()]
+	var strength := AimAssist.strength_for(GameState.perception_multiplier())
+	return AimAssist.look_scale(camera.global_position, -camera.global_basis.z, level.enemies, strength, get_world_3d().direct_space_state, exclude)
 
 static func signed_text(value: float) -> String:
 	return "%.1f" % (0.0 if absf(value) < 0.05 else value)
 
 func update_hud() -> void:
 	var lines: Array[String] = []
-	if GameState.failed:
-		lines.append(tr("MISSION FAILED - N to restart"))
-	elif GameState.finished:
-		lines.append(tr("MISSION COMPLETE - N to restart"))
+	if GameState.failed or GameState.finished:
+		lines.append(InputGlyphs.fill(level.end_banner(GameState.failed)))
 	elif GameState.paused:
 		lines.append(tr("PAUSED"))
 	lines.append_array(level.mission_log.lines())
 	lines.append(level.conditions_text())
-	var weapon_line := "%s  %d / %d  %s" % [weapon.profile().display_name, weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
+	var weapon_line := "%s  %d / %d  %s" % [tr(weapon.profile().display_name), weapon.ammo, weapon.reserve_ammo, weapon.status_text()]
 	if not weapon.projectiles.is_empty():
 		weapon_line += "  (%d in flight)" % weapon.projectiles.size()
 	lines.append(weapon_line)
@@ -304,12 +337,12 @@ func update_hud() -> void:
 	if stealth.binoculars:
 		extras += "  |  " + tr("BINOCULARS")
 	if stealth.is_carrying():
-		extras += "  |  " + tr("CARRYING BODY (E to drop)")
+		extras += "  |  " + InputGlyphs.fill(tr("CARRYING BODY ({interact} to drop)"))
 	if player.suppression > 0.3:
 		extras += "  |  " + tr("SUPPRESSED")
 	lines.append(tr("Stones %d%s") % [stealth.stones, extras])
 	if killcam.active() or killcam.following:
-		lines.append(tr("LONG SHOT %.0f m  (Space to skip)") % last_long_shot)
+		lines.append(InputGlyphs.fill(tr("LONG SHOT %.0f m  ({skip_killcam} to skip)")) % last_long_shot)
 	hud.text = "\n".join(lines)
 
 func hip_fov() -> float:
@@ -318,14 +351,43 @@ func hip_fov() -> float:
 func is_aiming() -> bool:
 	return camera.fov < 70.0 and not stealth.binoculars
 
+# The player may sprint only at the hip: not scoped, not on the binoculars, not mid-takedown.
+func sprint_allowed() -> bool:
+	return not weapon.aiming and not stealth.binoculars and not (takedown and takedown.active)
+
+func on_player_landed(fall_speed: float) -> void:
+	feedback.land(fall_speed, weapon.aiming, Settings.reduced_motion())
+
+# Shift is both sprint and hold breath. Breath is held only through a raised
+# sight (a narrow hip field of view alone does not count), and a press held from
+# a sprint when the scope comes up is ignored until the player presses it again.
 func advance_sway(delta: float) -> void:
 	sway.stance_multiplier = player.sway_multiplier()
 	if GameState.simulation_active():
-		sway.set_holding(is_aiming() and Input.is_action_pressed("hold_breath"))
+		var aiming := is_aiming() and weapon.aiming
+		var breath_held := Input.is_action_pressed("hold_breath")
+		if not breath_held:
+			breath_latched = false
+		elif aiming and not was_aiming and Input.is_action_pressed("sprint"):
+			breath_latched = true
+		was_aiming = aiming
+		sway.set_holding(aiming and breath_held and not breath_latched)
 		sway.advance(delta)
 	var offset := sway.offset_degrees() if is_aiming() and GameState.simulation_active() else Vector2.ZERO
 	camera.rotation_degrees = Vector3(offset.y + feedback.recoil_degrees, offset.x, 0.0)
-	camera.position.y = feedback.bob_offset()
+	camera.position.y = feedback.bob_offset() + feedback.dip_offset()
+
+# The sprint kick widens the hip view only. The scope and binoculars own the
+# field of view while they are up, and the kick has eased away by the time
+# sprinting can resume.
+func advance_camera_fov() -> void:
+	if weapon.aiming or stealth.binoculars:
+		applied_fov_kick = 0.0
+		return
+	var kick: float = feedback.sprint_fov_offset()
+	if kick > 0.0 or applied_fov_kick > 0.0:
+		camera.fov = hip_fov() + kick
+	applied_fov_kick = kick
 
 const CROSSHAIR := "+"
 const HIT_MARKER := "X"
@@ -344,6 +406,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if GameState.simulation_active():
 		feedback.advance(delta, Vector2(player.velocity.x, player.velocity.z).length(), is_aiming(), Settings.reduced_motion())
+		feedback.advance_motion(delta, player.sprinting, Settings.reduced_motion())
 	feedback.draw_tracers(weapon.projectiles)
 	update_crosshair()
 	$HUDLayer.visible = not killcam.following
@@ -352,6 +415,7 @@ func _physics_process(delta: float) -> void:
 	viewmodel.advance(delta, weapon.aiming, weapon.reload_remaining, Vector2(player.velocity.x, player.velocity.z).length())
 	weapon.advance_projectiles(delta)
 	advance_sway(delta)
+	advance_camera_fov()
 	killcam.advance(delta)
 	killcam.advance_follow(delta, killcam.following and weapon.projectiles.has(killcam.followed))
 	stealth.advance(delta)

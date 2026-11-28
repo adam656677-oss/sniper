@@ -7,11 +7,11 @@ const PATH := "user://settings.cfg"
 const DEFAULTS := {
 	"video": {"fullscreen": false, "vsync": true, "fov": 75.0, "resolution_scale": 1.0},
 	"audio": {"master": 1.0, "music": 0.8, "sfx": 1.0},
-	"controls": {"sensitivity": 1.0, "invert_y": false, "hold_to_aim": false},
-	"gameplay": {"difficulty": 1, "killcam": true, "realism_ranging": false, "hud_assists": true},
+	"controls": {"sensitivity": 1.0, "invert_y": false, "hold_to_aim": false, "aim_assist": true},
+	"gameplay": {"difficulty": 1, "killcam": true, "realism_ranging": false, "hud_assists": true, "blood_effects": true},
 	"accessibility": {"reduced_motion": false, "colorblind_reticle": false, "subtitles": true},
 }
-const REMAPPABLE := ["move_forward", "move_back", "move_left", "move_right", "fire", "aim", "reload", "interact",
+const REMAPPABLE := ["move_forward", "move_back", "move_left", "move_right", "sprint", "fire", "aim", "reload", "interact",
 	"crouch", "prone", "hold_breath", "binoculars", "tag", "throw", "zero_up", "zero_down", "quick_save", "quick_load"]
 
 signal changed(section: String, key: String, value: Variant)
@@ -112,12 +112,19 @@ func remap(action: String, event: InputEvent) -> bool:
 	changed.emit("bindings", action, text)
 	return true
 
+# A binding replaces the action's events on its own device only: a new key or
+# mouse button keeps the controller binding, and a new controller button keeps the key.
 func apply_binding(action: String, text: String) -> void:
 	var event := deserialize_event(text)
 	if event == null or not InputMap.has_action(action):
 		return
-	InputMap.action_erase_events(action)
+	for existing in InputMap.action_get_events(action):
+		if is_pad_event(existing) == is_pad_event(event):
+			InputMap.action_erase_event(action, existing)
 	InputMap.action_add_event(action, event)
+
+static func is_pad_event(event: InputEvent) -> bool:
+	return event is InputEventJoypadButton or event is InputEventJoypadMotion
 
 func clear_bindings() -> void:
 	bindings = {}
@@ -135,8 +142,16 @@ func high_contrast_reticle() -> bool:
 func realism_ranging() -> bool:
 	return bool(get_value("gameplay", "realism_ranging"))
 
+# A small dark-red mist on body hits; off shows the neutral dust puff. The hit marker is the same either way.
+func blood_effects() -> bool:
+	return bool(get_value("gameplay", "blood_effects"))
+
 func invert_y() -> bool:
 	return bool(get_value("controls", "invert_y"))
+
+# Right-stick friction over hostiles; never affects the mouse.
+func aim_assist() -> bool:
+	return bool(get_value("controls", "aim_assist"))
 
 func apply() -> void:
 	GameState.difficulty = clampi(int(get_value("gameplay", "difficulty")), 0, 2)

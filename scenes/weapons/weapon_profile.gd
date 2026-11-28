@@ -21,9 +21,19 @@ extends Resource
 @export var damage := 50.0
 @export var suppressed := false
 @export var recoil_degrees := 3.0
+# Rifle optic: magnification range of the rendered scope view and the holdover
+# reticle (a mark every reticle_step metres beyond the zero, out to reticle_max).
+# The defaults are the standard 4x to 12x scope; gunsmith optics override them.
+@export var zoom_min := 4.0
+@export var zoom_max := 12.0
+@export var zoom_step := 2.0
+@export var reticle_step := 100.0
+@export var reticle_max := 1000.0
 
 func to_stats() -> Dictionary:
 	return {
 		"capacity": capacity, "reserve": reserve, "reload": reload_seconds, "interval": shot_interval,
-		"pellets": pellets, "spread": spread, "range": max_range, "fov": aim_fov
+		"pellets": pellets, "spread": spread, "range": max_range, "fov": aim_fov,
+		"zoom_min": zoom_min, "zoom_max": zoom_max, "zoom_step": zoom_step,
+		"reticle_step": reticle_step, "reticle_max": reticle_max
 	}

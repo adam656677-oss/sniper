@@ -6,7 +6,7 @@ extends VBoxContainer
 signal closed
 
 const REMAP_LABELS := {
-	"move_forward": "Move forward", "move_back": "Move back", "move_left": "Move left", "move_right": "Move right",
+	"move_forward": "Move forward", "move_back": "Move back", "move_left": "Move left", "move_right": "Move right", "sprint": "Sprint",
 	"fire": "Fire", "aim": "Aim", "reload": "Reload", "interact": "Interact", "crouch": "Crouch", "prone": "Prone",
 	"hold_breath": "Hold breath", "binoculars": "Binoculars", "tag": "Tag target", "throw": "Throw stone",
 	"zero_up": "Zero up", "zero_down": "Zero down", "quick_save": "Quick save", "quick_load": "Quick load",
@@ -37,6 +37,7 @@ func _ready() -> void:
 	add_slider_to(controls, "Mouse sensitivity", "controls", "sensitivity", 0.1, 5.0, 0.1)
 	add_check_to(controls, "Invert vertical look", "controls", "invert_y")
 	add_check_to(controls, "Hold to aim", "controls", "hold_to_aim")
+	add_check_to(controls, tr("Controller aim assist"), "controls", "aim_assist")
 	var gameplay := page("Gameplay")
 	difficulty = OptionButton.new()
 	for name in ["Easy", "Normal", "Hard"]:
@@ -46,6 +47,7 @@ func _ready() -> void:
 	add_check_to(gameplay, "Long-shot slow motion", "gameplay", "killcam")
 	add_check_to(gameplay, "HUD assists", "gameplay", "hud_assists")
 	add_check_to(gameplay, "Realistic ranging (binoculars only)", "gameplay", "realism_ranging")
+	add_check_to(gameplay, tr("Blood effects"), "gameplay", "blood_effects")
 	var access := page("Accessibility")
 	add_check_to(access, "Reduced motion", "accessibility", "reduced_motion")
 	add_check_to(access, "High-contrast reticle", "accessibility", "colorblind_reticle")
@@ -106,11 +108,10 @@ func add_check_to(parent: Node, text: String, section: String, key: String) -> C
 	checks[section + "/" + key] = box
 	return box
 
+# Key and mouse button names match the in-game prompts (InputGlyphs).
 func binding_text(action: String) -> String:
-	for event in InputMap.action_get_events(action):
-		if event is InputEventKey or event is InputEventMouseButton:
-			return event.as_text().replace(" (Physical)", "")
-	return "Unbound"
+	var event: InputEvent = InputGlyphs.binding(action, false)
+	return InputGlyphs.event_text(event) if event else tr("Unbound")
 
 func load_into_controls() -> void:
 	for path in sliders:

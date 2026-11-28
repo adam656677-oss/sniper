@@ -3,9 +3,13 @@ extends Node
 
 # Owns the loadout, per-weapon ammunition, reload and cycling timers, and
 # fires either hitscan pellets or a simulated projectile (see ballistics.gd).
-# Needs `camera` and `excluded` set by the mission before firing.
+# Needs `camera` and `excluded` set by the mission before firing. A projectile
+# that grazes metal or stone ricochets once (Ballistics.ricochet) and flies on
+# for RICOCHET_RANGE metres; hitscan rounds never ricochet.
 
 const Ballistics = preload("res://ballistics.gd")
+const ImpactSurfaces = preload("res://scenes/fx/impact_surfaces.gd")
+# The first entry is the default rifle; the workbench's chosen rifle replaces it.
 const DEFAULT_PROFILES := [
 	"res://scenes/weapons/profiles/ridgeline_recon.tres",
 	"res://scenes/weapons/profiles/whisper_sidearm.tres",
@@ -17,10 +21,15 @@ const ZERO_MIN := 100.0
 const ZERO_MAX := 1000.0
 const PROJECTILE_LIFETIME := 3.0
 const SUBSTEP := 1.0 / 120.0
+const RICOCHET_RANGE := 100.0 # metres a deflected round can still travel
+const RICOCHET_MAX_BOUNCES := 1 # a deflected round that grazes again stops
+const RICOCHET_STANDOFF := 0.01 # metres off the surface the deflected round restarts
+const RICOCHET_NOISE_RADIUS := 40.0 # guards this close hear the whine; within a quarter of it, it alarms them
 
 signal body_hit(body: Node3D, shape_index: int, damage: float, distance: float)
 signal fired(profile: WeaponProfile)
 signal impact(position: Vector3, normal: Vector3, body: Node3D)
+signal ricochet(position: Vector3, normal: Vector3, incoming: Vector3, outgoing: Vector3, body: Node3D)
 
 var profiles: Array[WeaponProfile] = []
 var active := 0
@@ -33,20 +42,29 @@ var zero_ranges: Array[float] = []
 var projectiles: Array[Dictionary] = []
 var wind := Vector3.ZERO # Air-mass velocity in m/s.
 var spread_rng := RandomNumberGenerator.new()
+var ricochet_rng := RandomNumberGenerator.new() # seed it for repeatable deflections
+var ricochet_scatter := Ballistics.RICOCHET_SCATTER_DEGREES # degrees; zero for the exact reflection
 var camera: Camera3D
 var aiming := false
 var excluded: Array[RID] = []
 
 func _ready() -> void:
 	spread_rng.randomize()
+	ricochet_rng.randomize()
 	if profiles.is_empty():
-		for path in DEFAULT_PROFILES:
+		for path in profile_paths():
 			profiles.append(Loadout.apply_to(load(path) as WeaponProfile))
 	for profile in profiles:
 		stored.append({"ammo": profile.capacity, "reserve": profile.reserve, "cooldown": 0.0})
 		zero_ranges.append(profile.zero_range)
 	ammo = profiles[active].capacity
 	reserve_ammo = profiles[active].reserve
+
+# The default loadout with the rifle chosen at the workbench in the primary slot.
+static func profile_paths() -> Array:
+	var paths: Array = DEFAULT_PROFILES.duplicate()
+	paths[0] = Loadout.rifle_path()
+	return paths
 
 func hip_fov() -> float:
 	return clampf(float(Settings.get_value("video", "fov")), 60.0, 110.0)
@@ -172,15 +190,21 @@ func advance_projectiles(delta: float) -> void:
 			var state := Ballistics.step_drag(start, projectile.velocity, dt, params)
 			var finish: Vector3 = state.position
 			var segment_length := start.distance_to(finish)
-			var range_left := maxf(0.0, max_range - float(projectile.distance))
+			var range_left := maxf(0.0, float(projectile.get("range_limit", max_range)) - float(projectile.distance))
 			if segment_length > range_left:
 				finish = start.move_toward(finish, range_left)
 			var hit := Ballistics.trace_segment(space, start, finish, excluded)
 			if not hit.is_empty():
-				AudioDirector.play_event("impact", hit.position)
 				var travelled: float = float(projectile.distance) + start.distance_to(hit.position)
+				var share := start.distance_to(hit.position) / maxf(segment_length, 0.000001)
+				var arrival: Vector3 = Vector3(projectile.velocity).lerp(state.velocity, share)
+				if try_ricochet(projectile, hit, arrival, travelled, max_range):
+					projectile.age = float(projectile.age) + dt
+					remaining = maxf(0.0, remaining - dt)
+					continue
+				AudioDirector.play_event("impact", hit.position)
 				impact.emit(hit.position, hit.normal, hit.collider)
-				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage, travelled)
+				body_hit.emit(hit.collider, int(hit.get("shape", -1)), shot_profile.damage * float(projectile.get("damage_scale", 1.0)), travelled)
 				removed = true
 				break
 			projectile.position = finish
@@ -194,9 +218,42 @@ func advance_projectiles(delta: float) -> void:
 		if removed or float(projectile.age) >= PROJECTILE_LIFETIME:
 			projectiles.remove_at(index)
 
+# Hard environment surfaces (metal, stone) can deflect a grazing round. Hostiles,
+# dummies and plates never do: a hit on anything that takes hits always counts.
+static func deflects_off(body: Object) -> bool:
+	if body == null or body.has_method("take_hit"):
+		return false
+	return ImpactSurfaces.is_hard(ImpactSurfaces.surface_for(body))
+
+# Skip a round off the surface it just met, if it grazed a hard one. The round
+# restarts just off the surface on its new heading with the speed it kept, a short
+# range left and its damage scaled by the energy it kept. False when it stops there.
+func try_ricochet(projectile: Dictionary, hit: Dictionary, arrival: Vector3, travelled: float, max_range: float) -> bool:
+	var bounces := int(projectile.get("bounces", 0))
+	if bounces >= RICOCHET_MAX_BOUNCES or not deflects_off(hit.collider):
+		return false
+	var normal: Vector3 = hit.normal
+	var result := Ballistics.ricochet(arrival, normal, true, ricochet_rng, ricochet_scatter)
+	if result.is_empty():
+		return false
+	var point: Vector3 = hit.position
+	var outgoing: Vector3 = result.velocity
+	projectile.position = point + normal.normalized() * RICOCHET_STANDOFF
+	projectile.velocity = outgoing
+	projectile.distance = travelled
+	projectile.bounces = bounces + 1
+	projectile.bounce_point = point
+	projectile.range_limit = minf(max_range, travelled + RICOCHET_RANGE)
+	projectile.damage_scale = float(projectile.get("damage_scale", 1.0)) * outgoing.length_squared() / maxf(arrival.length_squared(), 0.000001)
+	AudioDirector.play_event("ricochet", point, 0.0, ricochet_rng.randf_range(0.92, 1.08))
+	impact.emit(point, normal, hit.collider)
+	ricochet.emit(point, normal, arrival, outgoing, hit.collider)
+	return true
+
 # Dry run of a projectile with the same integration as advance_projectiles,
 # without moving it or emitting anything. Returns {} for a miss, otherwise
-# {"collider", "shape", "position", "distance", "time"}.
+# {"collider", "shape", "position", "distance", "time"}. It stops at the first
+# surface, so a round that would ricochet is never predicted to kill.
 func predict_hit(projectile: Dictionary) -> Dictionary:
 	if camera == null:
 		return {}

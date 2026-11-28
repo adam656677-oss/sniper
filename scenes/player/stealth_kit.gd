@@ -16,6 +16,10 @@ const FOOTSTEP_INTERVAL := 0.5
 const FOOTSTEP_RADIUS := 14.0
 const FOOTSTEP_LOUDNESS := 0.3
 const STANCE_NOISE := {0: 1.0, 1: 0.5, 2: 0.25} # Player.Stance order: stand, crouch, prone.
+# Sprinting carries footsteps further, more often, and loud enough to send a guard to investigate.
+const SPRINT_NOISE := 1.75
+const SPRINT_FOOTSTEP_INTERVAL := 0.35
+const SPRINT_FOOTSTEP_LOUDNESS := 0.5
 
 var binoculars := false
 var stones := STONE_COUNT
@@ -25,6 +29,7 @@ var camera: Camera3D
 var player: Node3D
 var level: Node
 
+# Footstep noise relative to walking upright (1.0); sprinting goes above it.
 func noise_level() -> float:
 	if player == null:
 		return 0.0
@@ -32,7 +37,12 @@ func noise_level() -> float:
 	var moving: bool = Vector2(player.velocity.x, player.velocity.z).length() > 0.1
 	if not moving:
 		return 0.0
+	if is_sprinting():
+		return SPRINT_NOISE
 	return minf(1.0, float(STANCE_NOISE.get(player.stance, 1.0)) + carry_noise)
+
+func is_sprinting() -> bool:
+	return player != null and player.get("sprinting") == true
 
 func set_binoculars(value: bool) -> bool:
 	if not GameState.simulation_active() or camera == null:
@@ -138,6 +148,7 @@ func advance(delta: float) -> void:
 		footstep_timer = 0.0
 		return
 	footstep_timer += delta
-	if footstep_timer >= FOOTSTEP_INTERVAL:
+	var sprinting := is_sprinting()
+	if footstep_timer >= (SPRINT_FOOTSTEP_INTERVAL if sprinting else FOOTSTEP_INTERVAL):
 		footstep_timer = 0.0
-		level.report_noise(player.global_position, FOOTSTEP_RADIUS * noise, FOOTSTEP_LOUDNESS)
+		level.report_noise(player.global_position, FOOTSTEP_RADIUS * noise, SPRINT_FOOTSTEP_LOUDNESS if sprinting else FOOTSTEP_LOUDNESS)

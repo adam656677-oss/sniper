@@ -41,12 +41,12 @@ The original revenge/corporate-noir story is documented in:
 
 The story follows Elias Vance after Asterion Continuity's Varn Accord strike team attacks his home, kills his wife Lena Vale and frames him. Lena's Black Ledger evidence points to the NIGHTGLASS program and ultimately to Asterion director Silas Vey. The final confrontation is intended to be earned through the campaign, with the player deciding what happens to the evidence afterward.
 
-The current prologue is a text-and-dialogue cinematic presentation. It does not yet contain the playable domestic exploration, tutorial, 3D home attack or escape sequence. Later missions, the complete Rusk/Vey boss encounters and ending presentation are not implemented yet.
+The prologue opens with a short text presentation that sets up the evening, then hands off to a playable blockout: the home with three story discoveries, the front-door breach, and a stealth escape across the yard past two flashlight-sweeping Accord operatives (cover, crouch, an exposure meter, spotted-and-reset). Lena's loss and the framing are narrated over black after the escape, and the Kestrel Pass briefing acknowledges whether Elias was seen. It uses primitive geometry; the on-screen raid, authored characters, animation, voice and a human difficulty playtest remain. Later missions, the complete Rusk/Vey boss encounters and ending presentation are not implemented yet.
 
 ## Major remaining production gates
 
 1. **Human Windows playtest:** download and launch the CI build; record controls, stability and playability in `docs/VALIDATION.md`.
-2. **Playable story vertical slice:** build the 3D prologue home, character interaction, attack/escape sequence and story handoff into Kestrel Pass.
+2. **Playable story vertical slice:** replace the prologue blockout (home, breach and yard escape) with production art, the on-screen raid and animation; playtest the escape difficulty; finish the story handoff into Kestrel Pass.
 3. **Core sniper feel:** visual/audio review of scope, impacts, weapon handling, camera and enemy reactions.
 4. **World and art:** production terrain, environment kit, player/weapon models, character variants, authored animations, VFX and recorded audio.
 5. **Campaign content:** build and playtest the remaining missions, including the final High Cairn boss encounter.

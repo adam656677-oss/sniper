@@ -1,6 +1,6 @@
 # Campaign outline
 
-Status: narrative direction is defined and the first story-mode foundation is integrated on `main`. The prologue currently plays as a text-and-dialogue sequence; the playable 3D home exploration, attack and escape remain production work. Fictional factions, locations and names throughout.
+Status: narrative direction is defined and the first story-mode foundation is integrated on `main`. The prologue plays as a text-and-dialogue opening followed by a playable blockout of the home, the breach and a stealth escape across the yard; production art, animation, voice and the on-screen raid remain. Fictional factions, locations and names throughout.
 
 ## Premise
 
@@ -14,7 +14,7 @@ A cinematic playable prologue/tutorial followed by eight main missions. The play
 
 | # | Name | Conditions | Story purpose / mechanic | Status |
 |---|---|---|---|---|
-| 0 | The Last Quiet Night | Quiet evening into night | Establish Elias and Lena, tutorial, home attack, escape and framing | Narrative sequence integrated; playable 3D set piece not started |
+| 0 | The Last Quiet Night | Quiet evening into night | Establish Elias and Lena, tutorial, home attack, escape and framing | Narrative opening, playable home and stealth yard escape integrated as blockout; production art, on-screen raid and playtest pending |
 | 1 | Kestrel Pass | Clear dawn into windy day | Track the raid team; overwatch, gusting crosswind and outpost infiltration | Existing mission scene wired to campaign progression and story radio; full playthrough pending |
 | 2 | Echo Ridge | Clear dawn | Recover a Black Ledger shard and extract under surveillance pressure | Existing recon scene wired to campaign progression and story radio; full playthrough pending |
 | 3 | The Compound | Windy dusk | Identify Commander Rusk; close stealth, body hiding and silent objectives | Existing scene wired to campaign progression and story radio; full playthrough pending |

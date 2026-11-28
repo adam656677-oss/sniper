@@ -222,6 +222,20 @@ func is_complete() -> bool:
 func is_failed() -> bool:
 	return mission_log.any_primary_failed()
 
+# Quick saves and checkpoints. Challenges refuse them so a round budget or a
+# clock cannot be reloaded.
+func allows_saves() -> bool:
+	return true
+
+# HUD banner once the mission is over; {tokens} are filled with the current bindings.
+func end_banner(failed: bool) -> String:
+	return tr("MISSION FAILED - {restart} to restart") if failed else tr("MISSION COMPLETE - {restart} to restart")
+
+# Records the finished mission locally and returns what changed for the results
+# screen. Challenges keep their own leaderboard instead.
+func record_progress(mission_id: String, stats: Dictionary) -> Dictionary:
+	return Progression.record(mission_id, stats, mission_log, GameState.failed)
+
 # Code-built box for tests and quick prototyping. Level geometry itself lives in the scene file.
 func spawn_box(pos: Vector3, size: Vector3, color: Color) -> StaticBody3D:
 	var body := StaticBody3D.new()

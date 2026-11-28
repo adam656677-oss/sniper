@@ -18,15 +18,17 @@ Planning and status live in `docs/`:
 |---|---|
 | `main.tscn`, `mission.gd` | Mission root: wires level, player, weapon rig and HUD; routes input actions |
 | `autoload/game_state.gd` | `GameState` autoload: paused, finished, failed, intel, difficulty |
-| `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, difficulty, kill cam |
+| `autoload/settings.gd` | `Settings` autoload: config file, input remapping, sensitivity, aim assist, difficulty, kill cam |
+| `autoload/input_glyphs.gd` | `InputGlyphs` autoload: last input device and device-aware prompt text for each action's binding |
 | `autoload/loadout.gd` | `Loadout` autoload: installed gunsmith parts per weapon family |
-| `autoload/progression.gd` | `Progression` autoload: per-mission records and eight achievements |
+| `autoload/progression.gd` | `Progression` autoload: per-mission records, the per-challenge leaderboard and ten achievements |
 | `autoload/save_system.gd` | `SaveSystem` autoload: versioned JSON saves, checkpoints, quick save and load |
-| `scenes/player/` | First-person body and camera |
+| `scenes/player/` | First-person body and camera; `aim_assist.gd` is the controller aim friction |
 | `scenes/weapons/` | `WeaponRig` (ammunition, reload, firing, projectiles) and `WeaponProfile` resources under `profiles/` |
 | `scenes/levels/level_base.gd` | Level contract: spawn, wind, targets, interact, objective, completion |
 | `scenes/levels/test_range.tscn` | The intel mission level; targets are children of `Targets` |
 | `scenes/levels/shooting_range.tscn` | The 1000 m plate range |
+| `scenes/levels/challenge_range.gd`, `scenes/challenges/` | Long-shot challenges on the range: the catalog with rules and score formula, and one scene per challenge |
 | `scenes/targets/` | `TargetDummy` with hit zones, `SteelPlate` range target, shared hit-zone helpers |
 | `scenes/enemies/` | `Enemy` state machine, `Perception`, `AlertCoordinator` |
 | `scenes/missions/` | `MissionLog` objectives and `TriggerZone` |
@@ -41,7 +43,7 @@ Planning and status live in `docs/`:
 
 ## Implemented
 
-Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Binoculars with target tagging, a stance-based noise meter and throwable stones. Three difficulty levels. Dawn, noon, dusk and night lighting with clear, windy, rain and dust weather that changes the wind, haze, and how far guards see and hear. Primary, secondary and optional objectives per mission with trigger zones and kill, accuracy and detection statistics. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
+Test range scene (ground, cover blocks, three targets, intel terminal, extraction pad). First-person movement with gravity and fall reset. Three selectable weapon profiles: a bolt-action rifle that fires a simulated projectile with gravity, wind and swept collision, plus two hitscan shotgun profiles with pellet spread. Realistic rifle ballistics: drag, wind, adjustable zero turret, holdover reticle marks, laser rangefinder and wind readout. Suppressed sidearm. Long-shot slow motion. Magazine and reserve ammunition, timed reload, shot interval, per-weapon zoom. Stand, crouch and prone stances with breath-hold sway while aiming. Sprint while standing and moving forward at the hip, with an eased field-of-view kick, louder footsteps and a brief sway penalty afterwards; a short camera dip on hard landings. Both camera effects are off with reduced motion. Targets and hostiles with head, torso and limb hit zones. Hostiles with vision cones, hearing, a patrol-suspicious-investigate-alert-search-flee state machine, squad contact sharing, return fire, body discovery, lockdown and reinforcements. Player health, regeneration and mission failure. Binoculars with target tagging, a stance-based noise meter and throwable stones. Three difficulty levels. Dawn, noon, dusk and night lighting with clear, windy, rain and dust weather that changes the wind, haze, and how far guards see and hear. Primary, secondary and optional objectives per mission with trigger zones and kill, accuracy and detection statistics. Scope overlay with reticle and surface range readout. Intel-then-extract mission, pause on Escape and on window focus loss, restart.
 
 ## Scenes
 
@@ -51,6 +53,7 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | `main.tscn` | Echo Ridge recon mission: collect intel at the terminal, extract. |
 | `compound_mission.tscn` | Walled compound with four patrolling hostiles. Perception, alert states, squad coordination, return fire, lockdown reinforcements. Eliminate every hostile to complete. Open it and press F6. |
 | `range_mission.tscn` | 1000 m shooting range with a steel plate every 100 m on its own bearing. Open it and press F6. Rings every plate to complete. |
+| `scenes/challenges/*.tscn` | Long-shot challenges on the same range, also under Missions: a calm warm-up (200, 300 and 400 m, six rounds), a gusting crosswind (700 and 800 m at dawn, six rounds), a kilometre shot (1000 m at dusk, three rounds) and a timed sequence (300 to 900 m in order, ten rounds, three minutes). Score: plate metres + 100 per unused round + 10 per second left on the clock; a failure scores 0. Best score, fewest rounds and fastest time are kept per challenge on the Records screen. No saves during a challenge. |
 
 ## Controls
 
@@ -61,10 +64,11 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 | Left click | Fire (also resumes from pause) |
 | Right click | Aim through the scope |
 | Mouse wheel | Scope magnification 4x to 12x while aiming |
-| 1, 2 | Rifle, sidearm |
+| 1 to 4 | Rifle, then the three handguns |
 | B | Toggle binoculars (left click or T tags the hostile under the crosshair) |
 | G | Throw a stone to draw a guard |
-| Shift (hold) | Hold breath while aiming |
+| Shift (hold) | Sprint while standing and moving forward; footsteps carry further |
+| Shift (hold, while aiming) | Hold breath. A Shift still held from sprinting must be pressed again |
 | [ and ] | Zero turret down and up (100 m steps) |
 | Space | Skip long-shot slow motion |
 | C | Toggle crouch |
@@ -77,7 +81,11 @@ Test range scene (ground, cover blocks, three targets, intel terminal, extractio
 
 ### Controller
 
-Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click holds breath, right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses.
+Left stick moves, right stick looks. Right trigger fires, left trigger aims while held. A interacts, B crouches, X reloads, Y raises binoculars, right bumper tags, left bumper switches weapon. Left stick click sprints while moving forward at the hip (until you stop, aim, crouch or click again) and holds breath while aiming; right stick click goes prone. D-pad up and down set the zero, left throws a stone, right zooms. Start pauses. Takedowns, skipping slow motion, zooming out, quick save and load and restart have no controller binding yet.
+
+On-screen prompts (tutorial steps, objectives, HUD lines and the pause menu controls help) name the controls of the device you used last, with Xbox-style button names, and switch as soon as you press a key, click or move the mouse, or press a button or push a stick or trigger. They read the current bindings, so a remapped key shows its new key, and remapping a key keeps its controller button.
+
+Aim assist (Settings, Controls, "Controller aim assist", on by default) slows the right stick while the crosshair or scope centre is on or just beside a live hostile in clear sight: 40% slower at Normal, 67% on Easy and 27% on Hard, fading out between 0.3 m and 0.9 m from the body's centre line. It never moves or snaps the aim and does nothing with the mouse or when switched off.
 
 ## Validation
 

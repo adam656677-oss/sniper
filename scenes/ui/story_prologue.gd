@@ -1,7 +1,8 @@
 extends Control
 
-# Story-first prologue presentation. This is a skippable narrative sequence;
-# the playable home/ambush set piece is a later cinematic production task.
+# Story-first prologue opening. A skippable narrative sequence that sets up the
+# evening and hands off to the playable home, attack and escape (prologue_home).
+# The aftermath is narrated by prologue_home after the escape.
 
 var beat_index := 0
 var speaker_label: Label

@@ -14,12 +14,16 @@ const PROLOGUE_BEATS := [
 	{"speaker": "NARRATOR", "text": "MERIDIAN CORRIDOR — 2041.\nA quiet home, far from the city lights. For the first time in years, Elias Vance believes the war is behind him."},
 	{"speaker": "LENA VALE", "text": "You said we'd get one normal evening. No radios. No work. Just us."},
 	{"speaker": "ELIAS VANCE", "text": "I kept my promise. The phone is off. The world can wait until morning."},
-	{"speaker": "LENA VALE", "text": "I wish it could. I found something inside Asterion's system. Names, payments, people who were supposed to have disappeared. They're calling it NIGHTGLASS."},
-	{"speaker": "NARRATOR", "text": "Outside, headlights cut through the trees. The power dies. A team moves toward the house with practiced silence."},
-	{"speaker": "MARA QUILL — RADIO", "text": "Elias, this is Mara. Get down! That's not a police response. Move, now!"},
-	{"speaker": "NARRATOR", "text": "The strike team leaves the house burning. Lena is gone. Elias survives beneath the wreckage, wounded and alone. By sunrise, Asterion has already rewritten the story: Elias Vance is the terrorist responsible."},
+	{"speaker": "LENA VALE", "text": "I wish it could. I found something inside Asterion's system. Names, payments, people who were supposed to have disappeared. They're calling it NIGHTGLASS."}
+]
+
+# Played over black after the playable escape, before Kestrel Pass. The intro
+# above stops before the attack because the player lives through it in the home.
+const AFTERMATH_BEATS := [
+	{"speaker": "NARRATOR", "text": "From the tree line, Elias watches the strike team leave the house burning. Lena never made it out."},
+	{"speaker": "NARRATOR", "text": "By sunrise, Asterion has already rewritten the story: Elias Vance is the terrorist responsible."},
 	{"speaker": "ELIAS VANCE", "text": "Lena... I'm sorry. I should have seen them coming."},
-	{"speaker": "NARRATOR", "text": "A damaged data key is still in his hand. One fragment of Lena's Black Ledger. One name in the operation log: VARN ACCORD."}
+	{"speaker": "NARRATOR", "text": "Her data key is still in his hand. One fragment of Lena's Black Ledger. One name in the operation log: VARN ACCORD."}
 ]
 
 const CHAPTERS := {
@@ -178,7 +182,11 @@ func on_mission_started(scene_path: String) -> void:
 		return
 	match active_chapter:
 		"kestrel_pass":
-			radio_once("kestrel_briefing", "MARA QUILL — RADIO", "Echo, confirm your position. The depot supplied the team that hit your home. Find the records office. We need proof, not another blind shot.")
+			# The briefing acknowledges how Elias got out of the prologue.
+			if bool(get_flag("prologue_escape_unseen", false)):
+				radio_once("kestrel_briefing", "MARA QUILL — RADIO", "Echo, they never saw you leave. The Accord thinks you died in that fire, so let's keep it that way. The depot supplied the team that hit your home. Find the records office.")
+			else:
+				radio_once("kestrel_briefing", "MARA QUILL — RADIO", "Echo, they know you got out. Expect them to be watching the roads. The depot supplied the team that hit your home. Find the records office. We need proof, not another blind shot.")
 		"echo_ridge":
 			radio_once("echo_ridge_briefing", "IMANI ROOK — RADIO", "I have the first fragment. The names are scrubbed, but the routing mark is intact. Bring me the rest and I can tell you who paid for the raid.")
 		"compound":

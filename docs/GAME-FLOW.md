@@ -103,9 +103,10 @@ flowchart TB
 |---|---|
 | `GameState` | Shared mission state: pause, completion/failure, difficulty and mission-level flags |
 | `Settings` | Saved user preferences, controls, sensitivity, video/audio and accessibility options |
+| `InputGlyphs` | Last input device (keyboard and mouse or controller) and device-aware prompt text for each action's current binding |
 | `SaveSystem` | Versioned save data, checkpoints, quick save/load and validation of corrupt or incompatible files |
 | `Loadout` | Installed weapon parts and per-weapon configurations |
-| `Progression` | Mission records, best score/time/shot distance, unlocks and achievements |
+| `Progression` | Mission records, best score/time/shot distance, the long-shot challenge leaderboard (best score, fewest rounds, fastest time), unlocks and achievements |
 | `AudioDirector` | Positional gameplay sound events and SFX preference handling |
 | `StoryCampaign` | Saved story chapter, unlocks, evidence, seen dialogue, flags and ending decision |
 | `StoryDialogue` | Shared subtitle/radio overlay that presents lines requested by the story campaign |
@@ -283,8 +284,14 @@ flowchart TD
     ROUTE --> KESTREL[Kestrel Pass]
     ROUTE --> ECHO[Echo Ridge recon]
     ROUTE --> COMPOUND[The Compound]
-    PROLOGUE --> BEATS[Skippable narrative beats and saved position]
-    BEATS --> COMPLETE_PROLOGUE[Complete prologue]
+    PROLOGUE --> BEATS[Skippable intro: the evening and Lena's discovery, saved position]
+    BEATS --> HOME[Playable home: three discoveries and Lena's data key]
+    HOME --> BREACH[Attack: front door breached, Lena sends Elias out with the key, Accord team sweeps the yard]
+    BREACH --> SWEEP{Exposure meter full?}
+    SWEEP -->|yes: spotted| DOORWAY[Reset to the doorway, Mara radio hint]
+    DOORWAY --> BREACH
+    SWEEP -->|no: reach the tree line| AFTERMATH[Fade to black: aftermath narration, Lena's loss and the framing]
+    AFTERMATH --> COMPLETE_PROLOGUE[Complete prologue and record unseen or seen escape]
     COMPLETE_PROLOGUE --> KESTREL
     KESTREL --> RADIO[StoryDialogue radio/subtitle beats]
     RADIO --> OBJECTIVES[Mission objectives and player choices]
@@ -306,4 +313,4 @@ flowchart TD
 - Mission objective events can request one-time dialogue and add evidence. Replayed scenes do not repeat already-seen one-time story lines.
 - The prologue stores its current beat so Continue Story resumes the sequence.
 - The current story path connects the prologue to Kestrel Pass, Echo Ridge recon and The Compound. Later campaign chapters are intentionally not selectable until their playable scenes exist.
-- The current prologue is a text-and-dialogue cinematic presentation. A fully playable 3D home/ambush sequence, authored cinematics, voice acting and the final boss/ending presentation remain production work.
+- The prologue is a skippable text-and-dialogue opening followed by a playable blockout: the home (three discoveries), the breach, and a stealth escape across the yard past two flashlight-sweeping Accord operatives. Operatives use the shared `Perception` component narrowed to the beam; the van and low cover block sight, crouching lowers exposure, the house is a safe zone, and being spotted resets Elias to the doorway. The `prologue_escape_unseen` story flag records how he got out, and Mara's Kestrel Pass briefing changes to match. The text intro stops before the attack; Lena's loss, the framing and the VARN ACCORD lead are narrated over black after the escape (`StoryCampaign.AFTERMATH_BEATS`). Authored cinematics, an on-screen raid, character art and animation, voice acting and the final boss/ending presentation remain production work.

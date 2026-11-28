@@ -33,6 +33,28 @@ func run() -> void:
 	var prologue = load("res://scenes/ui/prologue_home.tscn").instantiate()
 	root.add_child(prologue)
 	await shot("12_playable_prologue_home")
+	# Trigger the attack and freeze the sweep in a readable pose.
+	prologue.interact_with("photo")
+	prologue.interact_with("lena")
+	prologue.interact_with("ledger")
+	root.get_node("StoryDialogue").clear_queue()
+	prologue.patrol_enabled = false
+	prologue.auto_transition = false
+	var left: Node3D = prologue.operatives[0]
+	var right: Node3D = prologue.operatives[1]
+	left.global_position = Vector3(-4.0, prologue.OPERATIVE_HEIGHT, 16.0)
+	left.look_at(Vector3(-1.0, prologue.OPERATIVE_HEIGHT, 10.0), Vector3.UP)
+	right.global_position = Vector3(4.5, prologue.OPERATIVE_HEIGHT, 22.0)
+	right.look_at(Vector3(0.5, prologue.OPERATIVE_HEIGHT, 12.0), Vector3.UP)
+	prologue.player.global_position = Vector3(0, 0.9, 8.3)
+	prologue.player.rotation.y = PI
+	await shot("13_prologue_escape_yard")
+	prologue.set_crouched(true)
+	prologue.player.global_position = Vector3(-6.5, 0.76, 13.8)
+	prologue.player.rotation.y = PI + 0.25
+	left.global_position = Vector3(-5.0, prologue.OPERATIVE_HEIGHT, 24.0)
+	left.look_at(Vector3(-6.5, prologue.OPERATIVE_HEIGHT, 15.0), Vector3.UP)
+	await shot("14_prologue_woodpile_cover")
 	prologue.queue_free()
 	await process_frame
 	var game = load("res://compound_mission.tscn").instantiate()
